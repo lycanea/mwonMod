@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
@@ -56,13 +57,15 @@ public class MwonmodClient implements ClientModInitializer {
         });
 
         // setup clientside commands
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager
-                .literal("debug")
-                .executes(context -> {
-                    LOGGER.info("{}", shouldShowPlotOverlay());
-                    DEBUG = !DEBUG;
-                    return 1;
-                })));
+        if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
+            ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager
+                    .literal("debug")
+                    .executes(context -> {
+                        LOGGER.info("{}", shouldShowPlotOverlay());
+                        DEBUG = !DEBUG;
+                        return 1;
+                    })));
+        }
 
         // set up the overlay rendering thingy
         HudRenderCallback.EVENT.register((context, tickDelta) -> renderHUDOverlay(context));
@@ -86,9 +89,6 @@ public class MwonmodClient implements ClientModInitializer {
             List<Item> itemsToCount = Arrays.asList(Items.GOLD_NUGGET, Items.MELON_SLICE);
             InventoryScanResult result = scanInventory(client.player, itemsToCount);
 
-            int x = client.getWindow().getScaledWidth() / 2;
-            int y = client.getWindow().getScaledHeight() / 2 + 10;
-
             double emptyPercent = (double) result.emptySlots() / 36;
             double goldPercent = (double) result.itemSlots().get(Items.GOLD_NUGGET) / 36;
             double melonPercent = (double) result.itemSlots().get(Items.MELON_SLICE) / 36;
@@ -96,9 +96,6 @@ public class MwonmodClient implements ClientModInitializer {
             int goldWidth = (int) (barWidth * goldPercent);
             int melonWidth = (int) (barWidth * melonPercent);
 
-            String displayText = emptyWidth + " " + goldWidth + " " + melonWidth;
-
-            context.drawCenteredTextWithShadow(client.textRenderer, displayText, x, y, 0xFFFFFF);
             context.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF555555);
             context.fill(barX, barY, barX + emptyWidth, barY + barHeight, 0xFF888888);
             context.fill(barX + emptyWidth, barY, barX + emptyWidth + goldWidth, barY + barHeight, 0xFFFFFF00);
