@@ -2,7 +2,7 @@ name: Build Fabric Mod
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   workflow_dispatch:
 
 permissions:
