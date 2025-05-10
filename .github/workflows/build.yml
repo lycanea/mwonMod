@@ -19,6 +19,14 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
+      - name: Cache Gradle Packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '**/gradle-wrapper.properties') }}
+
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
@@ -35,3 +43,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: ${{ env.JAR_FILE }}
+
+      - name: Create a new release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.run_number }}
+
+      - name: Upload the jar to the release
+        run: |
+          gh release upload
+          "v${{ github.run_number }}"
+          ${{ env.JAR_FILE }}
+          --clobber
