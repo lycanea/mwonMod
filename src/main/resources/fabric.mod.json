@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "mwonmod",
+  "version": "${version}",
+  "name": "mwonmod",
+  "description": "a clientside mod for the melon king game on diamondfire",
+  "authors": ["lycanea"],
+  "contact": {"email": "mwon@lycanea.dev"},
+  "license": "GPL-3.0",
+  "icon": "assets/mwonmod/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.lycanea.mwonmod.client.MwonmodClient"
+    ],
+    "main": [
+      "dev.lycanea.mwonmod.Mwonmod"
+    ]
+  },
+  "mixins": [
+    "mwonmod.mixins.json",
+    {
+      "config": "mwonmod.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "fabric-screen-api-v1": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.lycanea.mwonmod.client.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "InventoryScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
