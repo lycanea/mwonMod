@@ -75,7 +75,7 @@ public class MwonmodClient implements ClientModInitializer {
             context.drawText(client.textRenderer, "ON MWON: " + shouldShowPlotOverlay(), 0, 10, 0xFFFFFF, true);
         }
 
-        if (!(client.player == null) && !(client.world == null) && shouldShowPlotOverlay() && !MwonmodClient.inventory_rundown) {
+        if (!(client.player == null) && !(client.world == null) && shouldShowPlotOverlay() && MwonmodClient.inventory_rundown) {
 
             // okay uhh quick note to self, you first need to completely remove the inventory scan thing and just do that in here so you have more control over it, enchanted melons should be counted seperate from regular melons for example
             int barX = client.getWindow().getScaledWidth() / 2 - 50;
