@@ -55,7 +55,7 @@ dependencies {
     modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}")
     implementation 'org.slf4j:slf4j-api:1.7.36'
 
-    modApi("maven.modrinth:flint:${project.flint_version}")
+    modImplementation("maven.modrinth:flint:${project.flint_version}")
     modImplementation include("net.kyori:adventure-platform-fabric:${project.adventure_fabric_version}") {
         exclude group: "net.fabricmc.fabric-api"
     }
@@ -70,7 +70,8 @@ processResources {
     filesMatching("fabric.mod.json") {
         expand "version": project.version,
                 "minecraft_version": project.minecraft_version,
-                "loader_version": project.loader_version
+                "loader_version": project.loader_version,
+                "flint_version": project.flint_version
     }
 }
 
