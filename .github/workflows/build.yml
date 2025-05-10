@@ -29,4 +29,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: fabric-mod-jar
-          path: build/libs/*.jar
+          path: |
+            build/libs/*.jar
+            !build/libs/*-sources.jar
