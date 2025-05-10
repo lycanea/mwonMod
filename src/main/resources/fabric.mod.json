@@ -7,7 +7,7 @@
   "authors": ["lycanea"],
   "contact": {"email": "mwon@lycanea.dev"},
   "license": "GPL-3.0",
-  "icon": "assets/mwonmod/icon.png",
+  "icon": "assets/mwonmod/melon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
