@@ -55,7 +55,4 @@ jobs:
       - name: Upload the jar to the release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload \
-          "v${{ github.run_number }}" \
-          build/libs/*.jar \
-          --clobber
+        run: gh release upload "v${{ github.run_number }}" build/libs/*.jar --clobber
