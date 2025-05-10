@@ -25,10 +25,14 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
+      - name: Find Main JAR File
+        id: find_jar
+        run: |
+          JAR_FILE=$(ls build/libs/*.jar | grep -v -- "-sources.jar")
+          echo "JAR_FILE=$JAR_FILE" >> $GITHUB_ENV
+
       - name: Upload built mod JAR
         uses: actions/upload-artifact@v4
         with:
           name: fabric-mod-jar
-          path: |
-            build/libs/*.jar
-            !build/libs/*-sources.jar
+          path: ${{ env.JAR_FILE }}
