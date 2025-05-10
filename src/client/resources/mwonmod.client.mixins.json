@@ -4,7 +4,8 @@
   "package": "dev.lycanea.mwonmod.client.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "InventoryScreenMixin"
+    "InventoryScreenMixin",
+    "OnChatMixin"
   ],
   "injectors": {
     "defaultRequire": 1

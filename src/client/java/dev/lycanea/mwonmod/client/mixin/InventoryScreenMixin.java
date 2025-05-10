@@ -53,7 +53,7 @@ public abstract class InventoryScreenMixin extends HandledScreen<PlayerScreenHan
     @Inject(method = "render", at = @At("TAIL"))
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (inventoryRundownButton != null) {
-            if (!MwonmodClient.shouldShowPlotOverlay()) {
+            if (!MwonmodClient.onMelonKing()) {
                 inventoryRundownButton.visible = false;
                 return;
             }

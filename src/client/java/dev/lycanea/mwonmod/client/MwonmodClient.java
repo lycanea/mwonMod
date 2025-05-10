@@ -49,7 +49,7 @@ public class MwonmodClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (keyBinding.wasPressed()) {
                 assert client.player != null;
-                if (!(client.world == null) && shouldShowPlotOverlay()) {
+                if (!(client.world == null) && onMelonKing()) {
                     client.player.sendMessage(Text.literal("Bank Opened"), false);
                     client.execute(() -> client.player.networkHandler.sendChatMessage("@bank"));
                 }
@@ -61,7 +61,7 @@ public class MwonmodClient implements ClientModInitializer {
             ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager
                     .literal("debug")
                     .executes(context -> {
-                        LOGGER.info("{}", shouldShowPlotOverlay());
+                        LOGGER.info("{}", onMelonKing());
                         DEBUG = !DEBUG;
                         return 1;
                     })));
@@ -75,10 +75,15 @@ public class MwonmodClient implements ClientModInitializer {
         MinecraftClient client = MinecraftClient.getInstance();
         if (DEBUG) {
             context.drawText(client.textRenderer, "DEBUG MODE", 0, 0, 0xFFFFFF, true);
-            context.drawText(client.textRenderer, "ON MWON: " + shouldShowPlotOverlay(), 0, 10, 0xFFFFFF, true);
+            context.drawText(client.textRenderer, "ON MWON: " + onMelonKing(), 0, 10, 0xFFFFFF, true);
         }
 
-        if (!(client.player == null) && !(client.world == null) && shouldShowPlotOverlay() && MwonmodClient.inventory_rundown) {
+        if (!(client.player == null) && !(client.world == null) && onMelonKing()) {
+            long waitMillis = TimeUtils.millisUntilNextHalfOrHourUTC();
+            context.drawTextWithShadow(client.textRenderer, "Next Auction: " + waitMillis / 60000  + "m", 3, 3, 0xFFFFFF);
+        }
+
+        if (!(client.player == null) && !(client.world == null) && onMelonKing() && MwonmodClient.inventory_rundown) {
 
             // okay uhh quick note to self, you first need to completely remove the inventory scan thing and just do that in here so you have more control over it, enchanted melons should be counted seperate from regular melons for example
             int barX = client.getWindow().getScaledWidth() / 2 - 50;
@@ -130,7 +135,7 @@ public class MwonmodClient implements ClientModInitializer {
         return new InventoryScanResult(counts, slotCounts, emptySlots);
     }
 
-    public static boolean shouldShowPlotOverlay() {
+    public static boolean onMelonKing() {
 //        return true;
         if (Flint.getUser().getMode() != Mode.PLAY) return false;
         assert Flint.getUser().getPlot() != null;
