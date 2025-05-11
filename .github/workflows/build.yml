@@ -34,7 +34,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Set mod_version in gradle.properties
-        run: echo "\nmod_version=${{ github.run_number }}" >> gradle.properties
+        run: echo "mod_version=${{ github.run_number }}" >> gradle.properties
 
       - name: Build with Gradle
         run: ./gradlew build
