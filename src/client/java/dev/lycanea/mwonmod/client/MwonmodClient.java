@@ -1,5 +1,9 @@
 package dev.lycanea.mwonmod.client;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import dev.dfonline.flint.Flint;
 import dev.dfonline.flint.FlintAPI;
 import dev.dfonline.flint.hypercube.Mode;
@@ -14,6 +18,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
@@ -21,6 +26,9 @@ import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -31,11 +39,32 @@ public class MwonmodClient implements ClientModInitializer {
     public static final String MOD_ID = "mwonmod";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static KeyBinding keyBinding;
-    public Boolean DEBUG = false;
+    public static Boolean DEBUG = false;
     public static Boolean inventory_rundown = false;
+    private static final String DATA_PATH = "assets/mwonmod/data/items.json";
+    public static JsonObject itemData = null;
 
     @Override
     public void onInitializeClient() {
+        try (InputStream stream = MwonmodClient.class.getClassLoader().getResourceAsStream(DATA_PATH)) {
+            if (stream == null) {
+                LOGGER.error("Could not find data file: " + DATA_PATH);
+                return;
+            }
+            InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+            JsonElement jsonElement = JsonParser.parseReader(reader);
+
+            if (jsonElement.isJsonObject()) {
+                itemData = jsonElement.getAsJsonObject();
+                LOGGER.info("Successfully loaded data from: " + DATA_PATH);
+            } else {
+                LOGGER.error("Data file is not a JSON object: " + DATA_PATH);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOGGER.error("Error loading data from: " + DATA_PATH);
+        }
+
         // make flint check the players plot
         FlintAPI.confirmLocationWithLocate();
 
@@ -65,6 +94,16 @@ public class MwonmodClient implements ClientModInitializer {
                         DEBUG = !DEBUG;
                         return 1;
                     })));
+            ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager
+                    .literal("itemlookup")
+                    .then(ClientCommandManager.argument("value", StringArgumentType.string())
+                            .executes(context -> {
+                                final String value = StringArgumentType.getString(context, "value");
+                                JsonElement lookupItemData = itemData.get(value.toLowerCase().replaceAll(" ", "_"));
+                                assert MinecraftClient.getInstance().player != null;
+                                MinecraftClient.getInstance().player.sendMessage(Text.literal(String.valueOf(lookupItemData)), false);
+                                return 1;
+                            }))));
         }
 
         // set up the overlay rendering thingy
@@ -74,13 +113,21 @@ public class MwonmodClient implements ClientModInitializer {
     private void renderHUDOverlay(DrawContext context) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (DEBUG) {
-            context.drawText(client.textRenderer, "DEBUG MODE", 0, 0, 0xFFFFFF, true);
-            context.drawText(client.textRenderer, "ON MWON: " + onMelonKing(), 0, 10, 0xFFFFFF, true);
+            context.drawText(client.textRenderer, "DEBUG MODE", 0, context.getScaledWindowHeight()-20, 0xFFFFFF, true);
+            context.drawText(client.textRenderer, "ON MWON: " + onMelonKing(), 0, context.getScaledWindowHeight()-10, 0xFFFFFF, true);
         }
 
         if (!(client.player == null) && !(client.world == null) && onMelonKing()) {
-            long waitMillis = TimeUtils.millisUntilNextHalfOrHourUTC();
-            context.drawTextWithShadow(client.textRenderer, "Next Auction: " + waitMillis / 60000  + "m", 3, 3, 0xFFFFFF);
+            long auctionwaitMillis = TimeUtils.auctionTime();
+            long auctionminutes = auctionwaitMillis / 60000;
+            long auctionseconds = (auctionwaitMillis % 60000) / 1000;
+            context.drawTextWithShadow(client.textRenderer, String.format("Next Auction: %02d:%02d", auctionminutes, auctionseconds), 3, 3, 0xFFFFFF);
+            long flawlessWait = TimeUtils.flawlessTime();
+            if (flawlessWait < 4478) {
+                context.drawTextWithShadow(client.textRenderer, String.format("Next Flawless: %02d:%02d", flawlessWait / 60 / 60, flawlessWait / 60 % 60), 3, 12, 0xFFFFFF);
+            } else {
+                context.drawTextWithShadow(client.textRenderer, "Next Flawless: Now", 3, 12, 0xFFFFFF);
+            }
         }
 
         if (!(client.player == null) && !(client.world == null) && onMelonKing() && MwonmodClient.inventory_rundown) {
@@ -108,7 +155,7 @@ public class MwonmodClient implements ClientModInitializer {
         }
     }
 
-    private InventoryScanResult scanInventory(net.minecraft.entity.player.PlayerEntity player, List<Item> itemsToCount) {
+    private InventoryScanResult scanInventory(PlayerEntity player, List<Item> itemsToCount) {
         Map<Item, Integer> counts = new HashMap<>();
         Map<Item, Integer> slotCounts = new HashMap<>();
         for (Item item : itemsToCount) {

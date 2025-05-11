@@ -5,7 +5,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 public class TimeUtils {
-    public static long millisUntilNextHalfOrHourUTC() {
+    public static long auctionTime() {
         ZonedDateTime nowUtc = ZonedDateTime.now(ZoneOffset.UTC);
 
         int minute = nowUtc.getMinute();
@@ -28,5 +28,18 @@ public class TimeUtils {
 
         Duration duration = Duration.between(nowUtc, nextBoundary);
         return duration.toMillis();
+    }
+
+    public static long flawlessTime() {
+        ZonedDateTime nowUtc = ZonedDateTime.now(ZoneOffset.UTC);
+
+        long currentMinutes = nowUtc.toEpochSecond();
+        long nextFlawless = 4620 - currentMinutes % 4620;
+
+        // despawns at 1:14:38 spawn timer time
+        // despawns at nextFlawless = 4478
+        // if nextFlawless > 4478 then npc is spawned
+        
+        return nextFlawless;
     }
 }
