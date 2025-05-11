@@ -21,6 +21,7 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -99,9 +100,9 @@ public class MwonmodClient implements ClientModInitializer {
                     .then(ClientCommandManager.argument("value", StringArgumentType.string())
                             .executes(context -> {
                                 final String value = StringArgumentType.getString(context, "value");
-                                JsonElement lookupItemData = itemData.get(value.toLowerCase().replaceAll(" ", "_"));
+                                JsonObject lookupItemData = itemData.get(value.toLowerCase().replaceAll(" ", "_")).getAsJsonObject();
                                 assert MinecraftClient.getInstance().player != null;
-                                MinecraftClient.getInstance().player.sendMessage(Text.literal(String.valueOf(lookupItemData)), false);
+                                MinecraftClient.getInstance().player.sendMessage(Text.literal(String.valueOf(lookupItemData.get("name").getAsString())).styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(lookupItemData.get("description").getAsString() )))), false);
                                 return 1;
                             }))));
         }
@@ -123,8 +124,8 @@ public class MwonmodClient implements ClientModInitializer {
             long auctionseconds = (auctionwaitMillis % 60000) / 1000;
             context.drawTextWithShadow(client.textRenderer, String.format("Next Auction: %02d:%02d", auctionminutes, auctionseconds), 3, 3, 0xFFFFFF);
             long flawlessWait = TimeUtils.flawlessTime();
-            if (flawlessWait < 4478) {
-                context.drawTextWithShadow(client.textRenderer, String.format("Next Flawless: %02d:%02d", flawlessWait / 60 / 60, flawlessWait / 60 % 60), 3, 12, 0xFFFFFF);
+            if (flawlessWait < 4428) {
+                context.drawTextWithShadow(client.textRenderer, String.format("Next Flawless: %02d:%02d", flawlessWait / 60 / 60, (flawlessWait + 1) / 60 % 60), 3, 12, 0xFFFFFF);
             } else {
                 context.drawTextWithShadow(client.textRenderer, "Next Flawless: Now", 3, 12, 0xFFFFFF);
             }
