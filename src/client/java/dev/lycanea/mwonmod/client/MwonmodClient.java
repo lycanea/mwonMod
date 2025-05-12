@@ -135,9 +135,9 @@ public class MwonmodClient implements ClientModInitializer {
 
             // okay uhh quick note to self, you first need to completely remove the inventory scan thing and just do that in here so you have more control over it, enchanted melons should be counted seperate from regular melons for example
             int barX = client.getWindow().getScaledWidth() / 2 - 50;
-            int barY = client.getWindow().getScaledHeight() / 2 - 20;
+            int barY = client.getWindow().getScaledHeight() - 90;
             int barWidth = 100;
-            int barHeight = 10;
+            int barHeight = 6;
 
             List<Item> itemsToCount = Arrays.asList(Items.GOLD_NUGGET, Items.MELON_SLICE);
             InventoryScanResult result = scanInventory(client.player, itemsToCount);
@@ -145,14 +145,15 @@ public class MwonmodClient implements ClientModInitializer {
             double emptyPercent = (double) result.emptySlots() / 36;
             double goldPercent = (double) result.itemSlots().get(Items.GOLD_NUGGET) / 36;
             double melonPercent = (double) result.itemSlots().get(Items.MELON_SLICE) / 36;
-            int emptyWidth = (int) (barWidth * emptyPercent);
-            int goldWidth = (int) (barWidth * goldPercent);
-            int melonWidth = (int) (barWidth * melonPercent);
+            double emptyWidth = (barWidth * emptyPercent);
+            double goldWidth = (barWidth * goldPercent);
+            double melonWidth = (barWidth * melonPercent);
 
+            context.fill(barX-1, barY-1, barX+1 + barWidth, barY+1 + barHeight, 0xFFFFFFFF);
             context.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF555555);
-            context.fill(barX, barY, barX + emptyWidth, barY + barHeight, 0xFF888888);
-            context.fill(barX + emptyWidth, barY, barX + emptyWidth + goldWidth, barY + barHeight, 0xFFFFFF00);
-            context.fill(barX + emptyWidth + goldWidth, barY, barX + emptyWidth + goldWidth + melonWidth, barY + barHeight, 0xFF00FFFF);
+            context.fill(barX, barY, (int) (barX + emptyWidth), barY + barHeight, 0xFF888888);
+            context.fill((int) (barX + emptyWidth), barY, (int) (barX + emptyWidth + goldWidth), barY + barHeight, 0xFFFFFF00);
+            context.fill((int) (barX + emptyWidth + goldWidth), barY, (int) (barX + emptyWidth + goldWidth + melonWidth), barY + barHeight, 0xFF00FFFF);
         }
     }
 
