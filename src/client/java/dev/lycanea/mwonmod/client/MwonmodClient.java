@@ -14,6 +14,8 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
@@ -21,8 +23,13 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
+import net.minecraft.util.Colors;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
+import org.apache.commons.logging.Log;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,41 +37,34 @@ import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public class MwonmodClient implements ClientModInitializer {
-
     public static final String MOD_ID = "mwonmod";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+    public static MinecraftClient MC = MinecraftClient.getInstance();
     private static KeyBinding keyBinding;
     public static Boolean DEBUG = false;
     public static Boolean inventory_rundown = false;
     private static final String DATA_PATH = "assets/mwonmod/data/items.json";
-    public static JsonObject itemData = null;
+    private static final String UPGRADES_PATH = "assets/mwonmod/data/melonmod_upgrades.json";
+    public static JsonObject itemData;
+    public static Map<String, String> upgradeData;
 
     @Override
     public void onInitializeClient() {
-        try (InputStream stream = MwonmodClient.class.getClassLoader().getResourceAsStream(DATA_PATH)) {
-            if (stream == null) {
-                LOGGER.error("Could not find data file: " + DATA_PATH);
-                return;
+        // upgrade data
+        JsonObject upgrade_dataJson = loadJsonFile(UPGRADES_PATH);
+        upgradeData = new HashMap<>();
+        if (upgrade_dataJson != null) {
+            for (String key : upgrade_dataJson.keySet()) {
+                upgradeData.put(key, upgrade_dataJson.get(key).getAsString());
             }
-            InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
-            JsonElement jsonElement = JsonParser.parseReader(reader);
-
-            if (jsonElement.isJsonObject()) {
-                itemData = jsonElement.getAsJsonObject();
-                LOGGER.info("Successfully loaded data from: " + DATA_PATH);
-            } else {
-                LOGGER.error("Data file is not a JSON object: " + DATA_PATH);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.error("Error loading data from: " + DATA_PATH);
         }
+        LOGGER.info(upgradeData.toString());
+
+        itemData = loadJsonFile(DATA_PATH);
 
         // make flint check the players plot
         FlintAPI.confirmLocationWithLocate();
@@ -111,6 +111,29 @@ public class MwonmodClient implements ClientModInitializer {
         HudRenderCallback.EVENT.register((context, tickDelta) -> renderHUDOverlay(context));
     }
 
+    public static JsonObject loadJsonFile(String PATH) {
+        JsonObject ret = null;
+        try (InputStream stream = MwonmodClient.class.getClassLoader().getResourceAsStream(PATH)) {
+            if (stream == null) {
+                LOGGER.error("Could not find data file: " + UPGRADES_PATH);
+                return null;
+            }
+            InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+            JsonElement jsonElement = JsonParser.parseReader(reader);
+
+            if (jsonElement.isJsonObject()) {
+                LOGGER.info("Successfully loaded data from: " + UPGRADES_PATH);
+                ret = jsonElement.getAsJsonObject();
+            } else {
+                LOGGER.error("Data file is not a JSON object: " + UPGRADES_PATH);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOGGER.error("Error loading data from: " + UPGRADES_PATH);
+        }
+        return ret;
+    }
+
     private void renderHUDOverlay(DrawContext context) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (DEBUG) {
@@ -154,6 +177,84 @@ public class MwonmodClient implements ClientModInitializer {
             context.fill(barX + emptyWidth, barY, barX + emptyWidth + goldWidth, barY + barHeight, 0xFFFFFF00);
             context.fill(barX + emptyWidth + goldWidth, barY, barX + emptyWidth + goldWidth + melonWidth, barY + barHeight, 0xFF00FFFF);
         }
+
+        if (client.getWindow() == null) return;
+        if (client.player == null) return;
+        if (client.world == null) return;
+
+        Vec3d hit = client.player.raycast(4.5, 0, false).getPos();
+        String vecKey = serializeVec(hit);
+        BlockEntity state = client.world.getBlockEntity(new BlockPos((int) hit.x, (int) hit.y, (int) hit.z).subtract(new Vec3i(1, 0, 1)));
+
+        ArrayList<Text> signTooltip = new ArrayList<>();
+        if (state instanceof SignBlockEntity signBlock) {
+            for (Text[] textList : new Text[][]{signBlock.getFrontText().getMessages(true), signBlock.getBackText().getMessages(true)}) {
+                if (textList.length == 4 && !textList[0].getString().trim().isEmpty()) {
+                    String top = textList[0].getString().trim();
+                    String m = textList[1].getString().trim();
+                    String m2 = textList[2].getString().trim();
+                    if (!m2.isEmpty()) m += " " + m2;
+                    if (m.contains("City Improvement:")) m = m2;
+
+                    int color = 0xFFFFFF;
+
+                    if (top.equals("[Right Click]")) color = 0xfcdb6d;
+                    if (top.equals("Bought!")) color = Colors.GREEN;
+                    if (top.equals("Can't Buy") || Pattern.compile(".\\d/.\\d").matcher(top).find()) color = Colors.LIGHT_RED;
+                    if (top.equals("Locked") || top.equals("Locked!") || top.equals("Path Locked!")) color = Colors.RED;
+
+
+                    String mkey = m;
+                    if (m.equals("Upgrade Town")) {
+                        mkey = m + vecKey;
+                    }
+                    if (!upgradeData.containsKey(mkey)) return;
+                    String upgradeDesc = upgradeData.get(mkey);
+                    //Mod.log("n:" + mkey + " d: " + upgradeDesc);
+
+                    upgradeDesc = upgradeDesc.replace( " queen ", " monarch ").replace(" king ", " monarch ");
+                    List<OrderedText> otList = MC.textRenderer.wrapLines(StringVisitable.plain(upgradeDesc), client.getWindow().getScaledWidth() / 3);
+
+                    signTooltip = new ArrayList<>(List.of(Text.literal(m).withColor(color)));
+                    for (OrderedText t : otList) {
+                        Text nt = convertOrderedTextToTextWithStyle(t);
+                        signTooltip.add(Text.literal(nt.getString()).withColor(Colors.LIGHT_GRAY));
+                    }
+                }
+            }
+        }
+
+        if (!signTooltip.isEmpty()) {
+            context.drawTooltip(client.textRenderer, signTooltip, client.getWindow().getScaledWidth()/2, client.getWindow().getScaledHeight()/2);
+        }
+    }
+
+    private static String serializeVec(Vec3d vec) {
+        return "<" + (int) vec.x + ", " + (int) vec.y + ", " + (int) vec.z + ">";
+    }
+
+    public static Text convertOrderedTextToTextWithStyle(OrderedText orderedText) {
+        List<Text> components = new ArrayList<>();
+        StringBuilder currentText = new StringBuilder();
+        final Style[] currentStyle = {Style.EMPTY};
+
+        orderedText.accept((index, style, codePoint) -> {
+            if (!style.equals(currentStyle[0])) {
+                if (!currentText.isEmpty()) {
+                    components.add(Text.literal(currentText.toString()).setStyle(currentStyle[0]));
+                    currentText.setLength(0);
+                }
+                currentStyle[0] = style;
+            }
+            currentText.appendCodePoint(codePoint);
+            return true;
+        });
+
+        if (!currentText.isEmpty()) {
+            components.add(Text.literal(currentText.toString()).setStyle(currentStyle[0]));
+        }
+
+        return Texts.join(components, Text.empty());
     }
 
     private InventoryScanResult scanInventory(PlayerEntity player, List<Item> itemsToCount) {
