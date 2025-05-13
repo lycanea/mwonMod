@@ -1,6 +1,7 @@
 package dev.lycanea.mwonmod.client.mixin;
 
 import com.google.gson.JsonObject;
+import dev.lycanea.mwonmod.client.Config;
 import dev.lycanea.mwonmod.client.MwonmodClient;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -25,18 +26,18 @@ public class OnChatMixin {
         Matcher matcher = pattern.matcher(message);
         if (matcher.find()) {
             assert MinecraftClient.getInstance().player != null;
-            if (MwonmodClient.DEBUG) MinecraftClient.getInstance().player.sendMessage(Text.literal("Auction Item: " + matcher.group(1)), false);
+            if (Config.HANDLER.instance().debugMode) MinecraftClient.getInstance().player.sendMessage(Text.literal("Auction Item: " + matcher.group(1)), false);
             try {
                 var itemKey = matcher.group(1).toLowerCase().replaceAll(" ", "_");
                 var itemElement = MwonmodClient.itemData.get(itemKey);
                 if (itemElement == null) {
-                    if (MwonmodClient.DEBUG) MinecraftClient.getInstance().player.sendMessage(Text.literal("Item data not found for: " + itemKey), false);
+                    if (Config.HANDLER.instance().debugMode) MinecraftClient.getInstance().player.sendMessage(Text.literal("Item data not found for: " + itemKey), false);
                     return;
                 }
                 JsonObject itemData = itemElement.getAsJsonObject();
                 MinecraftClient.getInstance().player.sendMessage(Text.literal("Auction Item: " + String.valueOf(itemData.get("name").getAsString())).styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(itemData.get("description").getAsString())))), false);
             } catch (Exception e) {
-                if (MwonmodClient.DEBUG) MinecraftClient.getInstance().player.sendMessage(Text.literal("Error accessing item data: " + e.getMessage()), false);
+                if (Config.HANDLER.instance().debugMode) MinecraftClient.getInstance().player.sendMessage(Text.literal("Error accessing item data: " + e.getMessage()), false);
             }
         }
     }

@@ -25,11 +25,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.text.*;
 import net.minecraft.util.Colors;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import org.apache.commons.logging.Log;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,8 +42,8 @@ public class MwonmodClient implements ClientModInitializer {
     public static final String MOD_ID = "mwonmod";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static MinecraftClient MC = MinecraftClient.getInstance();
-    private static KeyBinding keyBinding;
-    public static Boolean DEBUG = false;
+    private static KeyBinding bankKeyBinding;
+    private static KeyBinding forgeKeyBinding;
     public static Boolean inventory_rundown = false;
     private static final String DATA_PATH = "assets/mwonmod/data/items.json";
     private static final String UPGRADES_PATH = "assets/mwonmod/data/melonmod_upgrades.json";
@@ -54,6 +52,7 @@ public class MwonmodClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        Config.HANDLER.load();
         // upgrade data
         JsonObject upgrade_dataJson = loadJsonFile(UPGRADES_PATH);
         upgradeData = new HashMap<>();
@@ -70,18 +69,31 @@ public class MwonmodClient implements ClientModInitializer {
         FlintAPI.confirmLocationWithLocate();
 
         // setup keybinds
-        keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.mwonmod.bank", // The translation key of the keybinding's name
+        bankKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            "key.mwonmod.bank", // The translation key of the keybinding's name
+            InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
+            GLFW.GLFW_KEY_UNKNOWN, // The keycode of the key
+            "lycanea.mwonmod.keybinds" // The translation key of the keybinding's category.
+        ));
+        forgeKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.mwonmod.forge", // The translation key of the keybinding's name
                 InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
                 GLFW.GLFW_KEY_UNKNOWN, // The keycode of the key
                 "lycanea.mwonmod.keybinds" // The translation key of the keybinding's category.
         ));
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (keyBinding.wasPressed()) {
+            while (bankKeyBinding.wasPressed()) {
                 assert client.player != null;
                 if (!(client.world == null) && onMelonKing()) {
-                    client.player.sendMessage(Text.literal("Bank Opened"), false);
+//                    client.player.sendMessage(Text.literal("Bank Opened"), false);
                     client.execute(() -> client.player.networkHandler.sendChatMessage("@bank"));
+                }
+            }
+            while (forgeKeyBinding.wasPressed()) {
+                assert client.player != null;
+                if (!(client.world == null) && onMelonKing()) {
+//                    client.player.sendMessage(Text.literal("Forge Opened"), false);
+                    client.execute(() -> client.player.networkHandler.sendChatMessage("@forge"));
                 }
             }
         });
@@ -89,22 +101,15 @@ public class MwonmodClient implements ClientModInitializer {
         // setup clientside commands
         if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
             ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager
-                    .literal("debug")
+                .literal("itemlookup")
+                .then(ClientCommandManager.argument("value", StringArgumentType.string())
                     .executes(context -> {
-                        LOGGER.info("{}", onMelonKing());
-                        DEBUG = !DEBUG;
+                        final String value = StringArgumentType.getString(context, "value");
+                        JsonObject lookupItemData = itemData.get(value.toLowerCase().replaceAll(" ", "_")).getAsJsonObject();
+                        assert MinecraftClient.getInstance().player != null;
+                        MinecraftClient.getInstance().player.sendMessage(Text.literal(String.valueOf(lookupItemData.get("name").getAsString())).styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(lookupItemData.get("description").getAsString() )))), false);
                         return 1;
-                    })));
-            ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager
-                    .literal("itemlookup")
-                    .then(ClientCommandManager.argument("value", StringArgumentType.string())
-                            .executes(context -> {
-                                final String value = StringArgumentType.getString(context, "value");
-                                JsonObject lookupItemData = itemData.get(value.toLowerCase().replaceAll(" ", "_")).getAsJsonObject();
-                                assert MinecraftClient.getInstance().player != null;
-                                MinecraftClient.getInstance().player.sendMessage(Text.literal(String.valueOf(lookupItemData.get("name").getAsString())).styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(lookupItemData.get("description").getAsString() )))), false);
-                                return 1;
-                            }))));
+                    }))));
         }
 
         // set up the overlay rendering thingy
@@ -136,21 +141,25 @@ public class MwonmodClient implements ClientModInitializer {
 
     private void renderHUDOverlay(DrawContext context) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (DEBUG) {
+        if (Config.HANDLER.instance().debugMode) {
             context.drawText(client.textRenderer, "DEBUG MODE", 0, context.getScaledWindowHeight()-20, 0xFFFFFF, true);
             context.drawText(client.textRenderer, "ON MWON: " + onMelonKing(), 0, context.getScaledWindowHeight()-10, 0xFFFFFF, true);
         }
 
         if (!(client.player == null) && !(client.world == null) && onMelonKing()) {
-            long auctionwaitMillis = TimeUtils.auctionTime();
-            long auctionminutes = auctionwaitMillis / 60000;
-            long auctionseconds = (auctionwaitMillis % 60000) / 1000;
-            context.drawTextWithShadow(client.textRenderer, String.format("Next Auction: %02d:%02d", auctionminutes, auctionseconds), 3, 3, 0xFFFFFF);
-            long flawlessWait = TimeUtils.flawlessTime();
-            if (flawlessWait < 4428) {
-                context.drawTextWithShadow(client.textRenderer, String.format("Next Flawless: %02d:%02d", flawlessWait / 60 / 60, (flawlessWait + 1) / 60 % 60), 3, 12, 0xFFFFFF);
-            } else {
-                context.drawTextWithShadow(client.textRenderer, "Next Flawless: Now", 3, 12, 0xFFFFFF);
+            if (Config.HANDLER.instance().auctionTimer) {
+                long auctionwaitMillis = TimeUtils.auctionTime();
+                long auctionminutes = auctionwaitMillis / 60000;
+                long auctionseconds = (auctionwaitMillis % 60000) / 1000;
+                context.drawTextWithShadow(client.textRenderer, String.format("Next Auction: %02d:%02d", auctionminutes, auctionseconds), 3, 3, 0xFFFFFF);
+            }
+            if (Config.HANDLER.instance().flawlessTimer) {
+                long flawlessWait = TimeUtils.flawlessTime();
+                if (flawlessWait < 4428) {
+                    context.drawTextWithShadow(client.textRenderer, String.format("Next Flawless: %02d:%02d", flawlessWait / 60 / 60, (flawlessWait + 1) / 60 % 60), 3, 12, 0xFFFFFF);
+                } else {
+                    context.drawTextWithShadow(client.textRenderer, "Next Flawless: Now", 3, 12, 0xFFFFFF);
+                }
             }
         }
 
@@ -183,50 +192,54 @@ public class MwonmodClient implements ClientModInitializer {
         if (client.player == null) return;
         if (client.world == null) return;
 
-        Vec3d hit = client.player.raycast(4.5, 0, false).getPos();
-        String vecKey = serializeVec(hit);
-        BlockEntity state = client.world.getBlockEntity(new BlockPos((int) hit.x, (int) hit.y, (int) hit.z).subtract(new Vec3i(1, 0, 1)));
+        if (Config.HANDLER.instance().signUpgradeTooltip) {
+            Vec3d hit = client.player.raycast(4.5, 0, false).getPos();
+            String vecKey = serializeVec(hit);
+            BlockEntity state = client.world.getBlockEntity(new BlockPos((int) hit.x, (int) hit.y, (int) hit.z).subtract(new Vec3i(1, 0, 1)));
 
-        ArrayList<Text> signTooltip = new ArrayList<>();
-        if (state instanceof SignBlockEntity signBlock) {
-            for (Text[] textList : new Text[][]{signBlock.getFrontText().getMessages(true), signBlock.getBackText().getMessages(true)}) {
-                if (textList.length == 4 && !textList[0].getString().trim().isEmpty()) {
-                    String top = textList[0].getString().trim();
-                    String m = textList[1].getString().trim();
-                    String m2 = textList[2].getString().trim();
-                    if (!m2.isEmpty()) m += " " + m2;
-                    if (m.contains("City Improvement:")) m = m2;
+            ArrayList<Text> signTooltip = new ArrayList<>();
+            if (state instanceof SignBlockEntity signBlock) {
+                for (Text[] textList : new Text[][]{signBlock.getFrontText().getMessages(true), signBlock.getBackText().getMessages(true)}) {
+                    if (textList.length == 4 && !textList[0].getString().trim().isEmpty()) {
+                        String top = textList[0].getString().trim();
+                        String m = textList[1].getString().trim();
+                        String m2 = textList[2].getString().trim();
+                        if (!m2.isEmpty()) m += " " + m2;
+                        if (m.contains("City Improvement:")) m = m2;
 
-                    int color = 0xFFFFFF;
+                        int color = 0xFFFFFF;
 
-                    if (top.equals("[Right Click]")) color = 0xfcdb6d;
-                    if (top.equals("Bought!")) color = Colors.GREEN;
-                    if (top.equals("Can't Buy") || Pattern.compile(".\\d/.\\d").matcher(top).find()) color = Colors.LIGHT_RED;
-                    if (top.equals("Locked") || top.equals("Locked!") || top.equals("Path Locked!")) color = Colors.RED;
+                        if (top.equals("[Right Click]")) color = 0xfcdb6d;
+                        if (top.equals("Bought!")) color = Colors.GREEN;
+                        if (top.equals("Can't Buy") || Pattern.compile(".\\d/.\\d").matcher(top).find())
+                            color = Colors.LIGHT_RED;
+                        if (top.equals("Locked") || top.equals("Locked!") || top.equals("Path Locked!"))
+                            color = Colors.RED;
 
 
-                    String mkey = m;
-                    if (m.equals("Upgrade Town")) {
-                        mkey = m + vecKey;
-                    }
-                    if (!upgradeData.containsKey(mkey)) return;
-                    String upgradeDesc = upgradeData.get(mkey);
-                    //Mod.log("n:" + mkey + " d: " + upgradeDesc);
+                        String mkey = m;
+                        if (m.equals("Upgrade Town")) {
+                            mkey = m + vecKey;
+                        }
+                        if (!upgradeData.containsKey(mkey)) return;
+                        String upgradeDesc = upgradeData.get(mkey);
+                        //Mod.log("n:" + mkey + " d: " + upgradeDesc);
 
-                    upgradeDesc = upgradeDesc.replace( " queen ", " monarch ").replace(" king ", " monarch ");
-                    List<OrderedText> otList = MC.textRenderer.wrapLines(StringVisitable.plain(upgradeDesc), client.getWindow().getScaledWidth() / 3);
+                        upgradeDesc = upgradeDesc.replace(" queen ", " monarch ").replace(" king ", " monarch ");
+                        List<OrderedText> otList = MC.textRenderer.wrapLines(StringVisitable.plain(upgradeDesc), client.getWindow().getScaledWidth() / 3);
 
-                    signTooltip = new ArrayList<>(List.of(Text.literal(m).withColor(color)));
-                    for (OrderedText t : otList) {
-                        Text nt = convertOrderedTextToTextWithStyle(t);
-                        signTooltip.add(Text.literal(nt.getString()).withColor(Colors.LIGHT_GRAY));
+                        signTooltip = new ArrayList<>(List.of(Text.literal(m).withColor(color)));
+                        for (OrderedText t : otList) {
+                            Text nt = convertOrderedTextToTextWithStyle(t);
+                            signTooltip.add(Text.literal(nt.getString()).withColor(Colors.LIGHT_GRAY));
+                        }
                     }
                 }
             }
-        }
 
-        if (!signTooltip.isEmpty()) {
-            context.drawTooltip(client.textRenderer, signTooltip, client.getWindow().getScaledWidth()/2, client.getWindow().getScaledHeight()/2);
+            if (!signTooltip.isEmpty()) {
+                context.drawTooltip(client.textRenderer, signTooltip, client.getWindow().getScaledWidth() / 2, client.getWindow().getScaledHeight() / 2);
+            }
         }
     }
 
@@ -287,6 +300,7 @@ public class MwonmodClient implements ClientModInitializer {
 
     public static boolean onMelonKing() {
 //        return true;
+        if (Config.HANDLER.instance().ignoreMelonKingCheck) return true;
         if (Flint.getUser().getMode() != Mode.PLAY) return false;
         assert Flint.getUser().getPlot() != null;
         return Flint.getUser().getPlot().getId() == 22467;

@@ -21,6 +21,9 @@
     ],
     "main": [
       "dev.lycanea.mwonmod.Mwonmod"
+    ],
+    "modmenu": [
+      "dev.lycanea.mwonmod.client.ModMenu"
     ]
   },
   "mixins": [

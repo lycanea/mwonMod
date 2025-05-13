@@ -1,4 +1,12 @@
 {
   "lycanea.mwonmod.keybinds": "MwonMod",
-  "key.mwonmod.bank": "Open @Bank"
+  "key.mwonmod.bank": "Open @bank",
+  "key.mwonmod.forge": "Open @forge",
+  "yacl3.config.mwonmod:config.category.General": "General",
+  "yacl3.config.mwonmod:config.category.Developer": "Developer",
+  "yacl3.config.mwonmod:config.auctionTimer": "Enable Auction Timer",
+  "yacl3.config.mwonmod:config.flawlessTimer": "Enable Flawless NPC Spawn Timer",
+  "yacl3.config.mwonmod:config.signUpgradeTooltip": "Enable Sign Upgrade Tooltip",
+  "yacl3.config.mwonmod:config.debugMode": "Enable Debug Mode",
+  "yacl3.config.mwonmod:config.ignoreMelonKingCheck": "Override Melon King Check"
 }
