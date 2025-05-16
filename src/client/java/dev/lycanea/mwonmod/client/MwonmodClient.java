@@ -156,7 +156,7 @@ public class MwonmodClient implements ClientModInitializer {
             if (Config.HANDLER.instance().flawlessTimer) {
                 long flawlessWait = TimeUtils.flawlessTime();
                 if (flawlessWait < 4428) {
-                    context.drawTextWithShadow(client.textRenderer, String.format("Next Flawless: %02d:%02d", flawlessWait / 60 / 60, (flawlessWait + 1) / 60 % 60), 3, 12, 0xFFFFFF);
+                    context.drawTextWithShadow(client.textRenderer, String.format("Next Flawless: %02d:%02d:%02d", flawlessWait / 60 / 60, (flawlessWait + 1) / 60 % 60, (flawlessWait + 1)%60), 3, 12, 0xFFFFFF);
                 } else {
                     context.drawTextWithShadow(client.textRenderer, "Next Flawless: Now", 3, 12, 0xFFFFFF);
                 }
