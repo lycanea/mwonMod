@@ -22,22 +22,34 @@ public class OnChatMixin {
     private void onGameMessage(GameMessageS2CPacket packet, CallbackInfo ci) {
         if (!MwonmodClient.onMelonKing()) return;
         String message = packet.content().getString();
-        Pattern pattern = Pattern.compile("^>\\s*(?:First up,|And next,|Next,|And now,|And lastly,|Now,|Up next,)?\\s*(?:a|an|some)\\s+(.+?)!$");
-        Matcher matcher = pattern.matcher(message);
-        if (matcher.find()) {
+        Pattern auctionPattern = Pattern.compile("^>\\s*(?:First up,|And next,|Next,|And now,|And lastly,|Now,|Up next,)?\\s*(?:a|an|some)\\s+(.+?)!$");
+        Pattern newKingPattern = Pattern.compile("^>\\s*([\\w]+)\\s+is\\s+the\\s+new\\s+(?:king|queen|monarch)!$");
+
+        Matcher auctionMatcher = auctionPattern.matcher(message);
+        Matcher kingMatcher = newKingPattern.matcher(message);
+
+        if (auctionMatcher.find()) {
             assert MinecraftClient.getInstance().player != null;
-            if (Config.HANDLER.instance().debugMode) MinecraftClient.getInstance().player.sendMessage(Text.literal("Auction Item: " + matcher.group(1)), false);
+            if (Config.HANDLER.instance().debugMode)
+                MinecraftClient.getInstance().player.sendMessage(Text.literal("Auction Item: " + auctionMatcher.group(1)), false);
             try {
-                var itemKey = matcher.group(1).toLowerCase().replaceAll(" ", "_");
+                var itemKey = auctionMatcher.group(1).toLowerCase().replaceAll(" ", "_");
                 var itemElement = MwonmodClient.itemData.get(itemKey);
                 if (itemElement == null) {
-                    if (Config.HANDLER.instance().debugMode) MinecraftClient.getInstance().player.sendMessage(Text.literal("Item data not found for: " + itemKey), false);
+                    if (Config.HANDLER.instance().debugMode)
+                        MinecraftClient.getInstance().player.sendMessage(Text.literal("Item data not found for: " + itemKey), false);
                     return;
                 }
                 JsonObject itemData = itemElement.getAsJsonObject();
                 MinecraftClient.getInstance().player.sendMessage(Text.literal("Auction Item: " + String.valueOf(itemData.get("name").getAsString())).styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(itemData.get("description").getAsString())))), false);
             } catch (Exception e) {
-                if (Config.HANDLER.instance().debugMode) MinecraftClient.getInstance().player.sendMessage(Text.literal("Error accessing item data: " + e.getMessage()), false);
+                if (Config.HANDLER.instance().debugMode)
+                    MinecraftClient.getInstance().player.sendMessage(Text.literal("Error accessing item data: " + e.getMessage()), false);
+            }
+        } else if (kingMatcher.find()) {
+            assert MinecraftClient.getInstance().player != null;
+            if (Config.HANDLER.instance().kingChangeNotification) {
+                MwonmodClient.notification("New Monarch", kingMatcher.group(1));
             }
         }
     }

@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
+import net.kyori.adventure.title.Title;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -32,10 +33,16 @@ import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class MwonmodClient implements ClientModInitializer {
@@ -49,6 +56,7 @@ public class MwonmodClient implements ClientModInitializer {
     private static final String UPGRADES_PATH = "assets/mwonmod/data/melonmod_upgrades.json";
     public static JsonObject itemData;
     public static Map<String, String> upgradeData;
+    private static boolean auctionNotificationSent = false;
 
     @Override
     public void onInitializeClient() {
@@ -147,11 +155,23 @@ public class MwonmodClient implements ClientModInitializer {
         }
 
         if (!(client.player == null) && !(client.world == null) && onMelonKing()) {
+            long auctionwaitMillis = TimeUtils.auctionTime();
+            if (!auctionNotificationSent && auctionwaitMillis <= 30000) {
+                if (Config.HANDLER.instance().auctionDesktopNotification) {
+                    notification("Auction Alert", "There is an auction in 30 seconds.");
+                }
+                if (Config.HANDLER.instance().auctionTitleNotification) {
+                    client.player.showTitle(Title.title(net.kyori.adventure.text.Component.text("There is an auction in 30 seconds."), net.kyori.adventure.text.Component.text("")));
+                }
+                auctionNotificationSent = true;
+            }
+            if (auctionNotificationSent && auctionwaitMillis > 30000) {
+                auctionNotificationSent = false;
+            }
             if (Config.HANDLER.instance().auctionTimer) {
-                long auctionwaitMillis = TimeUtils.auctionTime();
                 long auctionminutes = auctionwaitMillis / 60000;
                 long auctionseconds = (auctionwaitMillis % 60000) / 1000;
-                context.drawTextWithShadow(client.textRenderer, String.format("Next Auction: %02d:%02d", auctionminutes, auctionseconds), 3, 3, 0xFFFFFF);
+                context.drawTextWithShadow(client.textRenderer, String.format("Next Auction:  00:%02d:%02d", auctionminutes, auctionseconds), 3, 3, 0xFFFFFF);
             }
             if (Config.HANDLER.instance().flawlessTimer) {
                 long flawlessWait = TimeUtils.flawlessTime();
@@ -304,5 +324,41 @@ public class MwonmodClient implements ClientModInitializer {
         if (Flint.getUser().getMode() != Mode.PLAY) return false;
         assert Flint.getUser().getPlot() != null;
         return Flint.getUser().getPlot().getId() == 22467;
+    }
+
+    public static void notification(String title, String message) {
+        String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+        try {
+            if (os.contains("nux") || os.contains("nix")) {
+                InputStream iconStream = MwonmodClient.class.getResourceAsStream("/assets/mwonmod/melon.png");
+                if (iconStream == null) {
+                    LOGGER.error("Icon resource not found.");
+                    return;
+                }
+
+                Path tempIcon = Files.createTempFile("mwonmod-icon-", ".png");
+                Files.copy(iconStream, tempIcon, StandardCopyOption.REPLACE_EXISTING);
+                iconStream.close();
+                tempIcon.toFile().deleteOnExit();
+                new ProcessBuilder("notify-send", "-i", tempIcon.toString(), title, message)
+                        .inheritIO()
+                        .start();
+            } else {
+                if (SystemTray.isSupported()) {
+                    SystemTray tray = SystemTray.getSystemTray();
+                    Image icon = Toolkit.getDefaultToolkit().getImage(
+                            MwonmodClient.class.getResource("/icon.png")
+                    );
+                    TrayIcon trayIcon = new TrayIcon(icon, "MyMod Notification");
+                    trayIcon.setImageAutoSize(true);
+                    tray.add(trayIcon);
+                    trayIcon.displayMessage(title, message, TrayIcon.MessageType.INFO);
+                } else {
+                    LOGGER.error("SystemTray not supported; fallback here.");
+                }
+            }
+        } catch (IOException | AWTException e) {
+            e.printStackTrace();
+        }
     }
 }

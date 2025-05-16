@@ -22,7 +22,7 @@ public class Config {
 
     // Only fields with @SerialEntry are serialized
     @Boolean
-    @AutoGen(category = "General")
+    @AutoGen(category = "General", group = "auction")
     @SerialEntry
     public boolean auctionTimer = true;
 
@@ -35,6 +35,21 @@ public class Config {
     @AutoGen(category = "General")
     @SerialEntry
     public boolean signUpgradeTooltip = true;
+
+    @Boolean
+    @AutoGen(category = "General", group = "misc")
+    @SerialEntry
+    public boolean kingChangeNotification = false;
+
+    @Boolean
+    @AutoGen(category = "General", group = "auction")
+    @SerialEntry
+    public boolean auctionDesktopNotification = false;
+
+    @Boolean
+    @AutoGen(category = "General", group = "auction")
+    @SerialEntry
+    public boolean auctionTitleNotification = false;
 
     @Boolean
     @AutoGen(category = "Developer")

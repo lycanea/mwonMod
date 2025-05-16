@@ -8,5 +8,10 @@
   "yacl3.config.mwonmod:config.flawlessTimer": "Enable Flawless NPC Spawn Timer",
   "yacl3.config.mwonmod:config.signUpgradeTooltip": "Enable Sign Upgrade Tooltip",
   "yacl3.config.mwonmod:config.debugMode": "Enable Debug Mode",
-  "yacl3.config.mwonmod:config.ignoreMelonKingCheck": "Override Melon King Check"
+  "yacl3.config.mwonmod:config.ignoreMelonKingCheck": "Override Melon King Check",
+  "yacl3.config.mwonmod:config.kingChangeNotification": "Desktop Notification on King Change",
+  "yacl3.config.mwonmod:config.auctionDesktopNotification": "Desktop Notification on Auction Starting",
+  "yacl3.config.mwonmod:config.auctionTitleNotification": "Ingame Notification on Auction Starting",
+  "yacl3.config.mwonmod:config.category.General.group.auction": "Auction",
+  "yacl3.config.mwonmod:config.category.General.group.misc": "Miscellaneous"
 }
