@@ -13,5 +13,8 @@
   "yacl3.config.mwonmod:config.auctionDesktopNotification": "Desktop Notification on Auction Starting",
   "yacl3.config.mwonmod:config.auctionTitleNotification": "Ingame Notification on Auction Starting",
   "yacl3.config.mwonmod:config.category.General.group.auction": "Auction",
-  "yacl3.config.mwonmod:config.category.General.group.misc": "Miscellaneous"
+  "yacl3.config.mwonmod:config.category.General.group.misc": "Miscellaneous",
+  "yacl3.config.mwonmod:config.fullInvEmptySlots": "Full Inventory Threshold",
+  "yacl3.config.mwonmod:config.preventFullInventorySelling": "Prevent Full Inventory Selling",
+  "yacl3.config.mwonmod:config.what": "> What?"
 }

@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +23,9 @@ public class OnChatMixin {
     private void onGameMessage(GameMessageS2CPacket packet, CallbackInfo ci) {
         if (!MwonmodClient.onMelonKing()) return;
         String message = packet.content().getString();
+        if (Config.HANDLER.instance().what && Objects.equals(message, "> What?")) {
+            MwonmodClient.notification("> What?", "> What?");
+        }
         Pattern auctionPattern = Pattern.compile("^>\\s*(?:First up,|And next,|Next,|And now,|And lastly,|Now,|Up next,)?\\s*(?:a|an|some)\\s+(.+?)!$");
         Pattern newKingPattern = Pattern.compile("^>\\s*([\\w]+)\\s+is\\s+the\\s+new\\s+(?:king|queen|monarch)!$");
 
@@ -41,7 +45,7 @@ public class OnChatMixin {
                     return;
                 }
                 JsonObject itemData = itemElement.getAsJsonObject();
-                MinecraftClient.getInstance().player.sendMessage(Text.literal("Auction Item: " + String.valueOf(itemData.get("name").getAsString())).styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(itemData.get("description").getAsString())))), false);
+                MinecraftClient.getInstance().player.sendMessage(Text.literal("Auction Item: " + itemData.get("name").getAsString()).styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(itemData.get("description").getAsString())))), false);
             } catch (Exception e) {
                 if (Config.HANDLER.instance().debugMode)
                     MinecraftClient.getInstance().player.sendMessage(Text.literal("Error accessing item data: " + e.getMessage()), false);

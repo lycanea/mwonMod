@@ -3,6 +3,7 @@ package dev.lycanea.mwonmod.client;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.autogen.AutoGen;
+import dev.isxander.yacl3.config.v2.api.autogen.IntSlider;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 import dev.isxander.yacl3.platform.YACLPlatform;
 import net.minecraft.util.Identifier;
@@ -41,6 +42,16 @@ public class Config {
     @SerialEntry
     public boolean kingChangeNotification = false;
 
+    @IntSlider(min = 0, max = 10, step = 1)
+    @AutoGen(category = "General", group = "misc")
+    @SerialEntry
+    public int fullInvEmptySlots = 0;
+
+    @Boolean
+    @AutoGen(category = "General", group = "misc")
+    @SerialEntry
+    public boolean preventFullInventorySelling = false;
+
     @Boolean
     @AutoGen(category = "General", group = "auction")
     @SerialEntry
@@ -50,6 +61,11 @@ public class Config {
     @AutoGen(category = "General", group = "auction")
     @SerialEntry
     public boolean auctionTitleNotification = false;
+
+    @Boolean
+    @AutoGen(category = "Silly")
+    @SerialEntry
+    public boolean what = false;
 
     @Boolean
     @AutoGen(category = "Developer")

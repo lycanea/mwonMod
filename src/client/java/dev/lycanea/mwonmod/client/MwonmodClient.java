@@ -13,6 +13,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.kyori.adventure.title.Title;
 import net.minecraft.block.entity.BlockEntity;
@@ -105,6 +106,8 @@ public class MwonmodClient implements ClientModInitializer {
                 }
             }
         });
+
+        UseEntityCallback.EVENT.register((SellEvent::entityInteract));
 
         // setup clientside commands
         if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
@@ -291,7 +294,7 @@ public class MwonmodClient implements ClientModInitializer {
         return Texts.join(components, Text.empty());
     }
 
-    private InventoryScanResult scanInventory(PlayerEntity player, List<Item> itemsToCount) {
+    public static InventoryScanResult scanInventory(PlayerEntity player, List<Item> itemsToCount) {
         Map<Item, Integer> counts = new HashMap<>();
         Map<Item, Integer> slotCounts = new HashMap<>();
         for (Item item : itemsToCount) {
