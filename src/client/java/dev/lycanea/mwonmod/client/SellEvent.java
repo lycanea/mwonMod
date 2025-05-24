@@ -20,6 +20,7 @@ import java.util.Objects;
 
 public class SellEvent {
     public static ActionResult entityInteract(PlayerEntity playerEntity, World world, Hand hand, Entity entity, @Nullable EntityHitResult entityHitResult) {
+        if (!MwonmodClient.onMelonKing()) return ActionResult.PASS;
         if (!Config.HANDLER.instance().preventFullInventorySelling) {
             return ActionResult.PASS;
         }

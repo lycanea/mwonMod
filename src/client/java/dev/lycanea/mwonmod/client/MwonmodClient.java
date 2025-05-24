@@ -13,6 +13,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.kyori.adventure.title.Title;
@@ -108,6 +109,7 @@ public class MwonmodClient implements ClientModInitializer {
         });
 
         UseEntityCallback.EVENT.register((SellEvent::entityInteract));
+        AttackEntityCallback.EVENT.register((AttackEvent::entityAttack));
 
         // setup clientside commands
         if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
@@ -227,6 +229,7 @@ public class MwonmodClient implements ClientModInitializer {
                         String top = textList[0].getString().trim();
                         String m = textList[1].getString().trim();
                         String m2 = textList[2].getString().trim();
+                        if (textList[3].getString().contains("Reserve")) return; // fixes Better Bankers in beneath showing the upgrade desc for Better Bankers the upgrade
                         if (!m2.isEmpty()) m += " " + m2;
                         if (m.contains("City Improvement:")) m = m2;
 

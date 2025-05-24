@@ -5,7 +5,9 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "InventoryScreenMixin",
-    "OnChatMixin"
+    "OnChatMixin",
+    "ScoreboardRendering",
+    "SignRendering"
   ],
   "injectors": {
     "defaultRequire": 1

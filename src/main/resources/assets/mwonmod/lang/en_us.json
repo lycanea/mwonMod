@@ -3,6 +3,7 @@
   "key.mwonmod.bank": "Open @bank",
   "key.mwonmod.forge": "Open @forge",
   "yacl3.config.mwonmod:config.category.General": "General",
+  "yacl3.config.mwonmod:config.category.Silly": "Silly",
   "yacl3.config.mwonmod:config.category.Developer": "Developer",
   "yacl3.config.mwonmod:config.auctionTimer": "Enable Auction Timer",
   "yacl3.config.mwonmod:config.flawlessTimer": "Enable Flawless NPC Spawn Timer",
@@ -16,5 +17,8 @@
   "yacl3.config.mwonmod:config.category.General.group.misc": "Miscellaneous",
   "yacl3.config.mwonmod:config.fullInvEmptySlots": "Full Inventory Threshold",
   "yacl3.config.mwonmod:config.preventFullInventorySelling": "Prevent Full Inventory Selling",
-  "yacl3.config.mwonmod:config.what": "> What?"
+  "yacl3.config.mwonmod:config.what": "> What?",
+  "yacl3.config.mwonmod:config.preventAttackingWithHoe": "Prevent Attacking With Hoe",
+  "yacl3.config.mwonmod:config.bankSignImprovements": "Bank Sign Improvements",
+  "yacl3.config.mwonmod:config.scoreboardImprovements": "Scoreboard Improvements"
 }

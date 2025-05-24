@@ -53,6 +53,21 @@ public class Config {
     public boolean preventFullInventorySelling = false;
 
     @Boolean
+    @AutoGen(category = "General", group = "misc")
+    @SerialEntry
+    public boolean preventAttackingWithHoe = false;
+
+    @Boolean
+    @AutoGen(category = "General", group = "misc")
+    @SerialEntry
+    public boolean bankSignImprovements = true;
+
+    @Boolean
+    @AutoGen(category = "General", group = "misc")
+    @SerialEntry
+    public boolean scoreboardImprovements = true;
+
+    @Boolean
     @AutoGen(category = "General", group = "auction")
     @SerialEntry
     public boolean auctionDesktopNotification = false;
