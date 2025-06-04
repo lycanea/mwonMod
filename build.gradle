@@ -49,9 +49,16 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
+    implementation include('com.github.jagrosh:DiscordIPC:a8d6631')
+    implementation include('org.json:json:20230227')
+    implementation include('com.kohlschutter.junixsocket:junixsocket-common:2.6.2')
+    implementation include('com.kohlschutter.junixsocket:junixsocket-native-common:2.6.2')
+    modImplementation "com.google.code.gson:gson:2.10.1"
+
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"

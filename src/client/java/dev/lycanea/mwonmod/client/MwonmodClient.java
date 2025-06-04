@@ -16,12 +16,14 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.loader.api.FabricLoader;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -43,8 +45,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
 public class MwonmodClient implements ClientModInitializer {
@@ -53,10 +58,12 @@ public class MwonmodClient implements ClientModInitializer {
     public static MinecraftClient MC = MinecraftClient.getInstance();
     private static KeyBinding bankKeyBinding;
     private static KeyBinding forgeKeyBinding;
+    private static KeyBinding profileKeyBinding;
     public static Boolean inventory_rundown = false;
-    private static final String DATA_PATH = "assets/mwonmod/data/items.json";
+    private static final String ITEM_DATA_PATH = "assets/mwonmod/data/items.json";
     private static final String UPGRADES_PATH = "assets/mwonmod/data/melonmod_upgrades.json";
     public static JsonObject itemData;
+    public static List<Region> locationData;
     public static Map<String, String> upgradeData;
     private static boolean auctionNotificationSent = false;
 
@@ -71,9 +78,12 @@ public class MwonmodClient implements ClientModInitializer {
                 upgradeData.put(key, upgrade_dataJson.get(key).getAsString());
             }
         }
-        LOGGER.info(upgradeData.toString());
 
-        itemData = loadJsonFile(DATA_PATH);
+        itemData = loadJsonFile(ITEM_DATA_PATH);
+
+        InputStream inputStream = MwonmodClient.class.getClassLoader().getResourceAsStream("assets/mwonmod/data/locations.json");
+        locationData = RegionLoader.loadRegionsFromJson(inputStream);
+        RegionRenderer.init();
 
         // make flint check the players plot
         FlintAPI.confirmLocationWithLocate();
@@ -91,7 +101,29 @@ public class MwonmodClient implements ClientModInitializer {
                 GLFW.GLFW_KEY_UNKNOWN, // The keycode of the key
                 "lycanea.mwonmod.keybinds" // The translation key of the keybinding's category.
         ));
+        profileKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.mwonmod.profile", // The translation key of the keybinding's name
+                InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
+                GLFW.GLFW_KEY_UNKNOWN, // The keycode of the key
+                "lycanea.mwonmod.keybinds" // The translation key of the keybinding's category.
+        ));
+        AtomicReference<String> previousRegion = new AtomicReference<>();
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (onMelonKing()) {
+                if (getCurrentRegion() != null) {
+                    if (!Objects.equals(getCurrentRegion().name, previousRegion.get())) {
+                        previousRegion.set(getCurrentRegion().name);
+                        if (Objects.equals(previousRegion.get(), "housing")) {
+                            assert MinecraftClient.getInstance().player != null;
+                            GameState.housing_pos = MinecraftClient.getInstance().player.getPos();
+                        }
+                    }
+                    GameState.playerLocation = getCurrentRegion().name;
+                } else {
+                    GameState.playerLocation = null;
+                }
+            }
+            DiscordManager.updateStatus();
             while (bankKeyBinding.wasPressed()) {
                 assert client.player != null;
                 if (!(client.world == null) && onMelonKing()) {
@@ -102,14 +134,26 @@ public class MwonmodClient implements ClientModInitializer {
             while (forgeKeyBinding.wasPressed()) {
                 assert client.player != null;
                 if (!(client.world == null) && onMelonKing()) {
-//                    client.player.sendMessage(Text.literal("Forge Opened"), false);
+                    client.player.sendMessage(Text.literal("Forge Opened"), false);
                     client.execute(() -> client.player.networkHandler.sendChatMessage("@forge"));
+                }
+            }
+            while (profileKeyBinding.wasPressed()) {
+                assert client.player != null;
+                if (!(client.world == null)) {
+                    var targetedEntity = client.crosshairTarget != null && client.crosshairTarget.getType() == net.minecraft.util.hit.HitResult.Type.ENTITY ?
+                            ((net.minecraft.util.hit.EntityHitResult) client.crosshairTarget).getEntity() : null;
+                    if (targetedEntity instanceof PlayerEntity) {
+                        client.execute(() -> client.player.networkHandler.sendCommand("profile " + targetedEntity.getName().getString()));
+                    }
                 }
             }
         });
 
         UseEntityCallback.EVENT.register((SellEvent::entityInteract));
         AttackEntityCallback.EVENT.register((AttackEvent::entityAttack));
+
+        DiscordManager.initialise();
 
         // setup clientside commands
         if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
@@ -155,10 +199,25 @@ public class MwonmodClient implements ClientModInitializer {
     private void renderHUDOverlay(DrawContext context) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (Config.HANDLER.instance().debugMode) {
-            context.drawText(client.textRenderer, "DEBUG MODE", 0, context.getScaledWindowHeight()-20, 0xFFFFFF, true);
-            context.drawText(client.textRenderer, "ON MWON: " + onMelonKing(), 0, context.getScaledWindowHeight()-10, 0xFFFFFF, true);
-        }
+            List<String> debugLines = new ArrayList<>(List.of(
+                    "DEBUG MODE",
+                    "ON MWON: " + onMelonKing()
+            ));
+            if (GameState.housing_pos != null) debugLines.add("HOUSING LOCATION: " + GameState.housing_pos);
+            if (GameState.currentPath != null) debugLines.add("CURRENT PATH: " + GameState.currentPath);
+            if (GameState.currentMonarch != null) debugLines.add("CURRENT MONARCH: " + GameState.currentMonarch);
+            if (GameState.coins != null) debugLines.add("CURRENT COINS: " + GameState.coins);
+            if (GameState.bank_gold != null) debugLines.add("CURRENT BANK GOLD: " + GameState.bank_gold);
+            if (GameState.playerLocation != null) debugLines.add("CURRENT LOCATION: " + GameState.playerLocation);
+            if (GameState.personal_bank != null) debugLines.add("CURRENT PERSONAL BANK: " + GameState.personal_bank);
+            if (GameState.medals != null) debugLines.add("CURRENT MEDALS: " + GameState.medals);
+            if (GameState.trophies != null) debugLines.add("CURRENT TROPHIES: " + GameState.trophies);
+            if (GameState.karma != null) debugLines.add("CURRENT KARMA: " + GameState.karma);
+            if (GameState.melonJoin != null) debugLines.add("MWON TIMER: " + Duration.between(GameState.melonJoin, LocalDateTime.now()).getSeconds());
 
+            int startY = context.getScaledWindowHeight() - 390;
+            drawDebugLines(context, client, debugLines, startY, 10, 0x82B7ED);
+        }
         if (!(client.player == null) && !(client.world == null) && onMelonKing()) {
             long auctionwaitMillis = TimeUtils.auctionTime();
             if (!auctionNotificationSent && auctionwaitMillis <= 30000) {
@@ -166,7 +225,7 @@ public class MwonmodClient implements ClientModInitializer {
                     notification("Auction Alert", "There is an auction in 30 seconds.");
                 }
                 if (Config.HANDLER.instance().auctionTitleNotification) {
-                    client.player.showTitle(Title.title(net.kyori.adventure.text.Component.text("There is an auction in 30 seconds."), net.kyori.adventure.text.Component.text("")));
+                    client.player.showTitle(Title.title(Component.text("There is an auction in 30 seconds."), Component.text("")));
                 }
                 auctionNotificationSent = true;
             }
@@ -272,6 +331,24 @@ public class MwonmodClient implements ClientModInitializer {
     private static String serializeVec(Vec3d vec) {
         return "<" + (int) vec.x + ", " + (int) vec.y + ", " + (int) vec.z + ">";
     }
+    public static Region getCurrentRegion() {
+        if (MinecraftClient.getInstance().player == null || MinecraftClient.getInstance().world == null || locationData == null) return null;
+
+        BlockPos pos = MinecraftClient.getInstance().player.getBlockPos();
+
+        for (Region region : locationData) {
+            if (pos.getX() >= Math.min(region.min.getX(), region.max.getX()) &&
+                    pos.getX() <= Math.max(region.min.getX(), region.max.getX()) &&
+                    pos.getY() >= Math.min(region.min.getY(), region.max.getY()) &&
+                    pos.getY() <= Math.max(region.min.getY(), region.max.getY()) &&
+                    pos.getZ() >= Math.min(region.min.getZ(), region.max.getZ()) &&
+                    pos.getZ() <= Math.max(region.min.getZ(), region.max.getZ())) {
+                return region;
+            }
+        }
+
+        return null;
+    }
 
     public static Text convertOrderedTextToTextWithStyle(OrderedText orderedText) {
         List<Text> components = new ArrayList<>();
@@ -328,8 +405,23 @@ public class MwonmodClient implements ClientModInitializer {
 //        return true;
         if (Config.HANDLER.instance().ignoreMelonKingCheck) return true;
         if (Flint.getUser().getMode() != Mode.PLAY) return false;
-        assert Flint.getUser().getPlot() != null;
+        if (Flint.getUser().getPlot() == null) return false;
         return Flint.getUser().getPlot().getId() == 22467;
+    }
+
+    public void drawDebugLines(DrawContext context, MinecraftClient client, List<String> lines, int startY, int lineSpacing, int color) {
+        int maxWidth = 0;
+        for (String line : lines) {
+            maxWidth = Math.max(maxWidth, client.textRenderer.getWidth(line));
+        }
+
+        context.fill(RenderLayer.getEndPortal(), 0, startY - 2, maxWidth + 4, startY + (lines.size() * lineSpacing), 0x80000000);
+
+        int y = startY;
+        for (String line : lines) {
+            context.drawText(client.textRenderer, line, 0, y, color, true);
+            y += lineSpacing;
+        }
     }
 
     public static void notification(String title, String message) {

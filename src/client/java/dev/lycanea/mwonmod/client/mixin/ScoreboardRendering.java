@@ -1,6 +1,7 @@
 package dev.lycanea.mwonmod.client.mixin;
 
 import dev.lycanea.mwonmod.client.Config;
+import dev.lycanea.mwonmod.client.GameState;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.scoreboard.*;
@@ -22,12 +23,26 @@ public class ScoreboardRendering {
             if (team.getPrefix().getString().startsWith("Coins: ")) {
                 objective.getScoreboard().removeScore(ScoreHolder.fromName(display), objective);
                 float value = Float.parseFloat(team.getPrefix().getString().substring(7));
+                GameState.coins = value;
                 objective.getScoreboard().getOrCreateScore(ScoreHolder.fromName("§7Coins: §e" + formatter.format(value)), objective,true).setScore(entry.value());
             }
             if (team.getPrefix().getString().startsWith("Bank Gold: ")) {
                 objective.getScoreboard().removeScore(ScoreHolder.fromName(display), objective);
                 float value = Float.parseFloat(team.getPrefix().getString().substring(11));
-                objective.getScoreboard().getOrCreateScore(ScoreHolder.fromName("§7Bank Gold: §e" + formatter.format(value)), objective,true).setScore(entry.value());
+                GameState.bank_gold = value;
+                objective.getScoreboard().getOrCreateScore(ScoreHolder.fromName("§7Bank Gold: §6" + formatter.format(value)), objective,true).setScore(entry.value());
+            }
+            if (team.getPrefix().getString().startsWith("Path: ")) {
+                GameState.currentPath = team.getPrefix().getString().substring(6);
+            }
+            if (team.getPrefix().getString().startsWith("King: ")) {
+                GameState.currentMonarch = team.getPrefix().getString().substring(6);
+            }
+            if (team.getPrefix().getString().startsWith("Monarch: ")) {
+                GameState.currentMonarch = team.getPrefix().getString().substring(9);
+            }
+            if (team.getPrefix().getString().startsWith("Queen: ")) {
+                GameState.currentMonarch = team.getPrefix().getString().substring(7);
             }
         }
 //        objective.getScoreboard().getOrCreateScore(ScoreHolder.fromName("§fa§1a§6a§0a§2a§5a§3a§9a§9a§9a§9a"), objective,true).setScore(5);

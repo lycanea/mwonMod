@@ -2,6 +2,7 @@ package dev.lycanea.mwonmod.client.mixin;
 
 import com.google.gson.JsonObject;
 import dev.lycanea.mwonmod.client.Config;
+import dev.lycanea.mwonmod.client.GameState;
 import dev.lycanea.mwonmod.client.MwonmodClient;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -13,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,8 +23,16 @@ import java.util.regex.Pattern;
 public class OnChatMixin {
     @Inject(method = "onGameMessage", at = @At("HEAD"))
     private void onGameMessage(GameMessageS2CPacket packet, CallbackInfo ci) {
-        if (!MwonmodClient.onMelonKing()) return;
         String message = packet.content().getString();
+
+        Pattern melonJoinPattern = Pattern.compile("^» Joined game: < Melon King > \\(\\d(\\.\\d*)*\\) by DeepSeaBlue\\.$");
+        Matcher melonJoinMatcher = melonJoinPattern.matcher(message);
+
+        if (melonJoinMatcher.find()) {
+            GameState.melonJoin = LocalDateTime.now();
+        }
+
+        if (!MwonmodClient.onMelonKing()) return;
         if (Config.HANDLER.instance().what && Objects.equals(message, "> What?")) {
             MwonmodClient.notification("> What?", "> What?");
         }
@@ -53,6 +63,7 @@ public class OnChatMixin {
         } else if (kingMatcher.find()) {
             assert MinecraftClient.getInstance().player != null;
             if (Config.HANDLER.instance().kingChangeNotification) {
+                GameState.currentMonarch = kingMatcher.group(1);
                 MwonmodClient.notification("New Monarch", kingMatcher.group(1));
             }
         }

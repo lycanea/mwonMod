@@ -2,12 +2,12 @@ package dev.lycanea.mwonmod.client;
 
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
-import dev.isxander.yacl3.config.v2.api.autogen.AutoGen;
-import dev.isxander.yacl3.config.v2.api.autogen.IntSlider;
+import dev.isxander.yacl3.config.v2.api.autogen.*;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 import dev.isxander.yacl3.platform.YACLPlatform;
 import net.minecraft.util.Identifier;
-import dev.isxander.yacl3.config.v2.api.autogen.Boolean;
+
+import java.lang.Boolean;
 
 
 public class Config {
@@ -22,72 +22,94 @@ public class Config {
             .build();
 
     // Only fields with @SerialEntry are serialized
-    @Boolean
+    @TickBox
     @AutoGen(category = "General", group = "auction")
     @SerialEntry
     public boolean auctionTimer = true;
 
-    @Boolean
+    @TickBox
     @AutoGen(category = "General")
     @SerialEntry
     public boolean flawlessTimer = true;
 
-    @Boolean
+    @TickBox
     @AutoGen(category = "General")
     @SerialEntry
     public boolean signUpgradeTooltip = true;
 
-    @Boolean
+    @TickBox
     @AutoGen(category = "General", group = "misc")
     @SerialEntry
     public boolean kingChangeNotification = false;
+
+    @MasterTickBox(value = {"fullInvEmptySlots"})
+    @AutoGen(category = "General", group = "misc")
+    @SerialEntry
+    public boolean preventFullInventorySelling = false;
 
     @IntSlider(min = 0, max = 10, step = 1)
     @AutoGen(category = "General", group = "misc")
     @SerialEntry
     public int fullInvEmptySlots = 0;
 
-    @Boolean
-    @AutoGen(category = "General", group = "misc")
-    @SerialEntry
-    public boolean preventFullInventorySelling = false;
-
-    @Boolean
+    @TickBox
     @AutoGen(category = "General", group = "misc")
     @SerialEntry
     public boolean preventAttackingWithHoe = false;
 
-    @Boolean
+    @TickBox
     @AutoGen(category = "General", group = "misc")
     @SerialEntry
     public boolean bankSignImprovements = true;
 
-    @Boolean
+    @TickBox
     @AutoGen(category = "General", group = "misc")
     @SerialEntry
     public boolean scoreboardImprovements = true;
 
-    @Boolean
+    @TickBox
     @AutoGen(category = "General", group = "auction")
     @SerialEntry
     public boolean auctionDesktopNotification = false;
 
-    @Boolean
+    @TickBox
     @AutoGen(category = "General", group = "auction")
     @SerialEntry
     public boolean auctionTitleNotification = false;
 
-    @Boolean
+    @MasterTickBox(value = {"richPresenceLine1","richPresenceLine2","richPresencePathIcon"})
+    @AutoGen(category = "General", group = "discord")
+    @SerialEntry
+    public boolean discordRichPresence = false;
+
+    @Dropdown(values = {"Empty","Medals","Trophies","Karma","Location","Personal Gold","Coins/City Gold","Path","Monarch"})
+    @AutoGen(category = "General", group = "discord")
+    @SerialEntry
+    @CustomDescription(value = "Personal Gold requires entering housing once to update\nIf data is missing, mwonmod will just exclude that line from your status")
+    public String richPresenceLine1 = "Monarch";
+
+    @Dropdown(values = {"Empty","Medals","Trophies","Karma","Location","Personal Gold","Coins/City Gold","Path","Monarch"})
+    @AutoGen(category = "General", group = "discord")
+    @SerialEntry
+    @CustomDescription(value = "Personal Gold requires entering housing once to update\nIf data is missing, mwonmod will just exclude that line from your status")
+    public String richPresenceLine2 = "Coins/City Gold";
+
+    @TickBox
+    @AutoGen(category = "General", group = "discord")
+    @SerialEntry
+    public Boolean richPresencePathIcon = true;
+
+    @TickBox
     @AutoGen(category = "Silly")
     @SerialEntry
     public boolean what = false;
 
-    @Boolean
+    @TickBox
     @AutoGen(category = "Developer")
     @SerialEntry
     public boolean debugMode = false;
 
-    @Boolean
+    @TickBox
     @AutoGen(category = "Developer")
     @SerialEntry
     public boolean ignoreMelonKingCheck = false;

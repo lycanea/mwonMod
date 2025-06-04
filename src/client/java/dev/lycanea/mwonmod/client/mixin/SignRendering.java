@@ -1,6 +1,7 @@
 package dev.lycanea.mwonmod.client.mixin;
 
 import dev.lycanea.mwonmod.client.Config;
+import dev.lycanea.mwonmod.client.GameState;
 import dev.lycanea.mwonmod.client.MwonmodClient;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -17,7 +18,7 @@ import java.text.NumberFormat;
 @Mixin(SignBlockEntityRenderer.class)
 public class SignRendering {
 
-    @Inject(method = "render", at = @At("HEAD"))
+    @Inject(method = "render*", at = @At("HEAD"))
     private void onRender(SignBlockEntity sign, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, CallbackInfo ci) {
         NumberFormat formatter = NumberFormat.getIntegerInstance();
 
@@ -31,6 +32,9 @@ public class SignRendering {
                 if (numberPart.matches("\\d+")) {
                     try {
                         long value = Long.parseLong(numberPart);
+                        if (GameState.housing_pos != null && sign.getPos().isWithinDistance(GameState.housing_pos, 5) && signText.getMessage(0, true).getString().startsWith("Gold")) {
+                            GameState.personal_bank = Math.toIntExact(value);
+                        }
                         return signText.withMessage(3, Text.of(formatter.format(value)));
                     } catch (NumberFormatException e) {
                         return signText;

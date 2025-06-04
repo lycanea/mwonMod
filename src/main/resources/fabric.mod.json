@@ -19,15 +19,11 @@
     "client": [
       "dev.lycanea.mwonmod.client.MwonmodClient"
     ],
-    "main": [
-      "dev.lycanea.mwonmod.Mwonmod"
-    ],
     "modmenu": [
       "dev.lycanea.mwonmod.client.ModMenu"
     ]
   },
   "mixins": [
-    "mwonmod.mixins.json",
     {
       "config": "mwonmod.client.mixins.json",
       "environment": "client"

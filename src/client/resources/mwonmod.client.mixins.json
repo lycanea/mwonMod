@@ -4,6 +4,7 @@
   "package": "dev.lycanea.mwonmod.client.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "ActionBarMixin",
     "InventoryScreenMixin",
     "OnChatMixin",
     "ScoreboardRendering",

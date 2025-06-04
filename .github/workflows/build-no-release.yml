@@ -1,6 +1,8 @@
-name: Build Fabric Mod
+name: Build Fabric Mod (No Release)
 
 on:
+  push:
+    branches: [ master ]
   workflow_dispatch:
 
 permissions:
@@ -32,7 +34,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Set mod_version in gradle.properties
-        run: echo "mod_version=${{ github.run_number }}" >> gradle.properties
+        run: echo "mod_version=DEV-${{ github.run_number }}" >> gradle.properties
 
       - name: Build with Gradle
         run: ./gradlew build
@@ -47,13 +49,3 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: ${{ env.JAR_FILE }}
-
-      - name: Create a new release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ github.run_number }}
-
-      - name: Upload the jar to the release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload "v${{ github.run_number }}" build/libs/*.jar --clobber
