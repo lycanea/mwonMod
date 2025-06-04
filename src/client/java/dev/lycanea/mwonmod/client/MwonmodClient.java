@@ -1,5 +1,7 @@
 package dev.lycanea.mwonmod.client;
 
+import dev.lycanea.mwonmod.client.KeyBindings;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -11,7 +13,6 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
@@ -22,9 +23,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -33,7 +32,6 @@ import net.minecraft.util.Colors;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,9 +54,6 @@ public class MwonmodClient implements ClientModInitializer {
     public static final String MOD_ID = "mwonmod";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static MinecraftClient MC = MinecraftClient.getInstance();
-    private static KeyBinding bankKeyBinding;
-    private static KeyBinding forgeKeyBinding;
-    private static KeyBinding profileKeyBinding;
     public static Boolean inventory_rundown = false;
     private static final String ITEM_DATA_PATH = "assets/mwonmod/data/items.json";
     private static final String UPGRADES_PATH = "assets/mwonmod/data/melonmod_upgrades.json";
@@ -88,27 +83,12 @@ public class MwonmodClient implements ClientModInitializer {
         // make flint check the players plot
         FlintAPI.confirmLocationWithLocate();
 
-        // setup keybinds
-        bankKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-            "key.mwonmod.bank", // The translation key of the keybinding's name
-            InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
-            GLFW.GLFW_KEY_UNKNOWN, // The keycode of the key
-            "lycanea.mwonmod.keybinds" // The translation key of the keybinding's category.
-        ));
-        forgeKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.mwonmod.forge", // The translation key of the keybinding's name
-                InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
-                GLFW.GLFW_KEY_UNKNOWN, // The keycode of the key
-                "lycanea.mwonmod.keybinds" // The translation key of the keybinding's category.
-        ));
-        profileKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.mwonmod.profile", // The translation key of the keybinding's name
-                InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
-                GLFW.GLFW_KEY_UNKNOWN, // The keycode of the key
-                "lycanea.mwonmod.keybinds" // The translation key of the keybinding's category.
-        ));
         AtomicReference<String> previousRegion = new AtomicReference<>();
+
+        KeyBindings.setup();
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+
             if (onMelonKing()) {
                 if (getCurrentRegion() != null) {
                     if (!Objects.equals(getCurrentRegion().name, previousRegion.get())) {
@@ -123,31 +103,9 @@ public class MwonmodClient implements ClientModInitializer {
                     GameState.playerLocation = null;
                 }
             }
+
             DiscordManager.updateStatus();
-            while (bankKeyBinding.wasPressed()) {
-                assert client.player != null;
-                if (!(client.world == null) && onMelonKing()) {
-//                    client.player.sendMessage(Text.literal("Bank Opened"), false);
-                    client.execute(() -> client.player.networkHandler.sendChatMessage("@bank"));
-                }
-            }
-            while (forgeKeyBinding.wasPressed()) {
-                assert client.player != null;
-                if (!(client.world == null) && onMelonKing()) {
-                    client.player.sendMessage(Text.literal("Forge Opened"), false);
-                    client.execute(() -> client.player.networkHandler.sendChatMessage("@forge"));
-                }
-            }
-            while (profileKeyBinding.wasPressed()) {
-                assert client.player != null;
-                if (!(client.world == null)) {
-                    var targetedEntity = client.crosshairTarget != null && client.crosshairTarget.getType() == net.minecraft.util.hit.HitResult.Type.ENTITY ?
-                            ((net.minecraft.util.hit.EntityHitResult) client.crosshairTarget).getEntity() : null;
-                    if (targetedEntity instanceof PlayerEntity) {
-                        client.execute(() -> client.player.networkHandler.sendCommand("profile " + targetedEntity.getName().getString()));
-                    }
-                }
-            }
+
         });
 
         UseEntityCallback.EVENT.register((SellEvent::entityInteract));
