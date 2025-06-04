@@ -1,6 +1,6 @@
-package dev.lycanea.mwonmod.client;
+package dev.lycanea.mwonmod.util;
 
-import dev.lycanea.mwonmod.client.MwonmodClient;
+import dev.lycanea.mwonmod.Mwonmod;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
@@ -43,18 +43,18 @@ public class KeyBindings {
     }
     public static void onKey(MinecraftClient client) {
 
-        // if (!MwonmodClient.onMelonKing()) return;
+        // if (!Mwonmod.onMelonKing()) return;
 
         while (bankKeyBinding.wasPressed()) {
             assert client.player != null;
-            if (!(client.world == null) && MwonmodClient.onMelonKing()) {
+            if (!(client.world == null) && Mwonmod.onMelonKing()) {
                 // client.player.sendMessage(Text.literal("Bank Opened"), false);
                 client.execute(() -> client.player.networkHandler.sendChatMessage("@bank"));
             }
         }
         while (forgeKeyBinding.wasPressed()) {
             assert client.player != null;
-            if (!(client.world == null) && MwonmodClient.onMelonKing()) {
+            if (!(client.world == null) && Mwonmod.onMelonKing()) {
                 client.player.sendMessage(Text.literal("Forge Opened"), false);
                 client.execute(() -> client.player.networkHandler.sendChatMessage("@forge"));
             }

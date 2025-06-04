@@ -1,7 +1,8 @@
-package dev.lycanea.mwonmod.client.mixin;
+package dev.lycanea.mwonmod.mixin;
 
-import dev.lycanea.mwonmod.client.Config;
-import dev.lycanea.mwonmod.client.GameState;
+import dev.lycanea.mwonmod.Config;
+import dev.lycanea.mwonmod.util.GameState;
+
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.scoreboard.*;

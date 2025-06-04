@@ -1,4 +1,4 @@
-package dev.lycanea.mwonmod.client;
+package dev.lycanea.mwonmod.util.region;
 
 import net.minecraft.util.math.Vec3i;
 

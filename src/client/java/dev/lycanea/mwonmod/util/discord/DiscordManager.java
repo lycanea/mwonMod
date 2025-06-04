@@ -1,4 +1,9 @@
-package dev.lycanea.mwonmod.client;
+package dev.lycanea.mwonmod.util.discord;
+
+import dev.lycanea.mwonmod.Mwonmod;
+import static dev.lycanea.mwonmod.Mwonmod.LOGGER;
+import dev.lycanea.mwonmod.Config;
+import dev.lycanea.mwonmod.util.GameState;
 
 import com.jagrosh.discordipc.IPCClient;
 import com.jagrosh.discordipc.entities.DiscordBuild;
@@ -10,8 +15,6 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 
 import java.time.*;
 import java.util.Objects;
-
-import static dev.lycanea.mwonmod.client.MwonmodClient.LOGGER;
 
 public class DiscordManager {
     public static IPCClient client;
@@ -35,7 +38,7 @@ public class DiscordManager {
     }
 
     public static void updateStatus() {
-        if (GameState.melonJoin != null && Config.HANDLER.instance().discordRichPresence && MwonmodClient.onMelonKing()) {
+        if (GameState.melonJoin != null && Config.HANDLER.instance().discordRichPresence && Mwonmod.onMelonKing()) {
             // get ready for a shit ton of ternary statements
             setEnabled(true);
             java.text.NumberFormat formatter = java.text.NumberFormat.getNumberInstance();

@@ -1,4 +1,7 @@
-package dev.lycanea.mwonmod.client;
+package dev.lycanea.mwonmod.util.region;
+
+import dev.lycanea.mwonmod.Mwonmod;
+import dev.lycanea.mwonmod.Config;
 
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
@@ -22,11 +25,11 @@ public class RegionRenderer {
     public static void init() {
         WorldRenderEvents.LAST.register((context) -> {
             MinecraftClient client = MinecraftClient.getInstance();
-            if (client.player == null || client.world == null || !Config.HANDLER.instance().debugMode || !MwonmodClient.onMelonKing() || !MinecraftClient.getInstance().getDebugHud().shouldShowDebugHud()) return;
+            if (client.player == null || client.world == null || !Config.HANDLER.instance().debugMode || !Mwonmod.onMelonKing() || !MinecraftClient.getInstance().getDebugHud().shouldShowDebugHud()) return;
 
             Vec3d cameraPos = context.camera().getPos();
 
-            Region currentRegion = MwonmodClient.getCurrentRegion();
+            Region currentRegion = Mwonmod.getCurrentRegion();
             if (currentRegion == null) return;
 
             Box box = new Box(new Vec3d(currentRegion.min.getX(), currentRegion.min.getY(), currentRegion.min.getZ()),

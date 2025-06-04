@@ -15,7 +15,6 @@ loom {
 
     mods {
         "mwonmod" {
-            sourceSet sourceSets.main
             sourceSet sourceSets.client
         }
     }

@@ -1,4 +1,4 @@
-package dev.lycanea.mwonmod.client;
+package dev.lycanea.mwonmod;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;

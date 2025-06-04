@@ -1,4 +1,4 @@
-package dev.lycanea.mwonmod.client;
+package dev.lycanea.mwonmod.util.discord;
 
 import com.jagrosh.discordipc.IPCClient;
 import com.jagrosh.discordipc.IPCListener;

@@ -1,6 +1,12 @@
-package dev.lycanea.mwonmod.client;
+package dev.lycanea.mwonmod;
 
-import dev.lycanea.mwonmod.client.KeyBindings;
+import dev.lycanea.mwonmod.util.KeyBindings;
+import dev.lycanea.mwonmod.util.GameState;
+import dev.lycanea.mwonmod.util.InventoryScanResult;
+import dev.lycanea.mwonmod.util.TimeUtils;
+import dev.lycanea.mwonmod.util.region.*;
+import dev.lycanea.mwonmod.util.discord.DiscordManager;
+import dev.lycanea.mwonmod.events.*;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -50,7 +56,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
-public class MwonmodClient implements ClientModInitializer {
+public class Mwonmod implements ClientModInitializer {
     public static final String MOD_ID = "mwonmod";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static MinecraftClient MC = MinecraftClient.getInstance();
@@ -76,7 +82,7 @@ public class MwonmodClient implements ClientModInitializer {
 
         itemData = loadJsonFile(ITEM_DATA_PATH);
 
-        InputStream inputStream = MwonmodClient.class.getClassLoader().getResourceAsStream("assets/mwonmod/data/locations.json");
+        InputStream inputStream = Mwonmod.class.getClassLoader().getResourceAsStream("assets/mwonmod/data/locations.json");
         locationData = RegionLoader.loadRegionsFromJson(inputStream);
         RegionRenderer.init();
 
@@ -133,7 +139,7 @@ public class MwonmodClient implements ClientModInitializer {
 
     public static JsonObject loadJsonFile(String PATH) {
         JsonObject ret = null;
-        try (InputStream stream = MwonmodClient.class.getClassLoader().getResourceAsStream(PATH)) {
+        try (InputStream stream = Mwonmod.class.getClassLoader().getResourceAsStream(PATH)) {
             if (stream == null) {
                 LOGGER.error("Could not find data file: " + UPGRADES_PATH);
                 return null;
@@ -205,7 +211,7 @@ public class MwonmodClient implements ClientModInitializer {
             }
         }
 
-        if (!(client.player == null) && !(client.world == null) && onMelonKing() && MwonmodClient.inventory_rundown) {
+        if (!(client.player == null) && !(client.world == null) && onMelonKing() && Mwonmod.inventory_rundown) {
 
             // okay uhh quick note to self, you first need to completely remove the inventory scan thing and just do that in here so you have more control over it, enchanted melons should be counted seperate from regular melons for example
             int barX = client.getWindow().getScaledWidth() / 2 - 50;
@@ -386,7 +392,7 @@ public class MwonmodClient implements ClientModInitializer {
         String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
         try {
             if (os.contains("nux") || os.contains("nix")) {
-                InputStream iconStream = MwonmodClient.class.getResourceAsStream("/assets/mwonmod/melon.png");
+                InputStream iconStream = Mwonmod.class.getResourceAsStream("/assets/mwonmod/melon.png");
                 if (iconStream == null) {
                     LOGGER.error("Icon resource not found.");
                     return;
@@ -403,7 +409,7 @@ public class MwonmodClient implements ClientModInitializer {
                 if (SystemTray.isSupported()) {
                     SystemTray tray = SystemTray.getSystemTray();
                     Image icon = Toolkit.getDefaultToolkit().getImage(
-                            MwonmodClient.class.getResource("/icon.png")
+                            Mwonmod.class.getResource("/icon.png")
                     );
                     TrayIcon trayIcon = new TrayIcon(icon, "MyMod Notification");
                     trayIcon.setImageAutoSize(true);

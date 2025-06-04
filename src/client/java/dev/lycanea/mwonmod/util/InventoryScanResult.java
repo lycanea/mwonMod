@@ -1,4 +1,4 @@
-package dev.lycanea.mwonmod.client;
+package dev.lycanea.mwonmod.util;
 
 import net.minecraft.item.Item;
 

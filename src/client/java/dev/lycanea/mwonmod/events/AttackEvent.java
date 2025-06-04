@@ -1,4 +1,7 @@
-package dev.lycanea.mwonmod.client;
+package dev.lycanea.mwonmod.events;
+
+import dev.lycanea.mwonmod.Mwonmod;
+import dev.lycanea.mwonmod.Config;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,7 +15,7 @@ import java.util.Objects;
 
 public class AttackEvent {
     public static ActionResult entityAttack(PlayerEntity playerEntity, World world, Hand hand, Entity entity, @Nullable EntityHitResult entityHitResult) {
-        if (!MwonmodClient.onMelonKing()) return ActionResult.PASS;
+        if (!Mwonmod.onMelonKing()) return ActionResult.PASS;
         if (!Config.HANDLER.instance().preventAttackingWithHoe) return ActionResult.PASS;
         if (Objects.equals(playerEntity.getInventory().getMainHandStack().getItem().getName().getString(), "Wooden Hoe")) {
             return ActionResult.FAIL;

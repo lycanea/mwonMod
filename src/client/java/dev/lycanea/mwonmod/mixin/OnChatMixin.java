@@ -1,9 +1,10 @@
-package dev.lycanea.mwonmod.client.mixin;
+package dev.lycanea.mwonmod.mixin;
+
+import dev.lycanea.mwonmod.Config;
+import dev.lycanea.mwonmod.Mwonmod;
+import dev.lycanea.mwonmod.util.GameState;
 
 import com.google.gson.JsonObject;
-import dev.lycanea.mwonmod.client.Config;
-import dev.lycanea.mwonmod.client.GameState;
-import dev.lycanea.mwonmod.client.MwonmodClient;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
@@ -32,9 +33,9 @@ public class OnChatMixin {
             GameState.melonJoin = LocalDateTime.now();
         }
 
-        if (!MwonmodClient.onMelonKing()) return;
+        if (!Mwonmod.onMelonKing()) return;
         if (Config.HANDLER.instance().what && Objects.equals(message, "> What?")) {
-            MwonmodClient.notification("> What?", "> What?");
+            Mwonmod.notification("> What?", "> What?");
         }
         Pattern auctionPattern = Pattern.compile("^>\\s*(?:First up,|And next,|Next,|And now,|And lastly,|Now,|Up next,)?\\s*(?:a|an|some)\\s+(.+?)!$");
         Pattern newKingPattern = Pattern.compile("^>\\s*([\\w]+)\\s+is\\s+the\\s+new\\s+(?:king|queen|monarch)!$");
@@ -48,7 +49,7 @@ public class OnChatMixin {
                 MinecraftClient.getInstance().player.sendMessage(Text.literal("Auction Item: " + auctionMatcher.group(1)), false);
             try {
                 var itemKey = auctionMatcher.group(1).toLowerCase().replaceAll(" ", "_");
-                var itemElement = MwonmodClient.itemData.get(itemKey);
+                var itemElement = Mwonmod.itemData.get(itemKey);
                 if (itemElement == null) {
                     if (Config.HANDLER.instance().debugMode)
                         MinecraftClient.getInstance().player.sendMessage(Text.literal("Item data not found for: " + itemKey), false);
@@ -64,7 +65,7 @@ public class OnChatMixin {
             assert MinecraftClient.getInstance().player != null;
             if (Config.HANDLER.instance().kingChangeNotification) {
                 GameState.currentMonarch = kingMatcher.group(1);
-                MwonmodClient.notification("New Monarch", kingMatcher.group(1));
+                Mwonmod.notification("New Monarch", kingMatcher.group(1));
             }
         }
     }

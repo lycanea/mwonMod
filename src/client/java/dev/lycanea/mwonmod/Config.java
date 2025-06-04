@@ -1,4 +1,4 @@
-package dev.lycanea.mwonmod.client;
+package dev.lycanea.mwonmod;
 
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;

@@ -1,4 +1,7 @@
-package dev.lycanea.mwonmod.client;
+package dev.lycanea.mwonmod.events;
+
+import dev.lycanea.mwonmod.Mwonmod;
+import dev.lycanea.mwonmod.Config;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
@@ -20,13 +23,13 @@ import java.util.Objects;
 
 public class SellEvent {
     public static ActionResult entityInteract(PlayerEntity playerEntity, World world, Hand hand, Entity entity, @Nullable EntityHitResult entityHitResult) {
-        if (!MwonmodClient.onMelonKing()) return ActionResult.PASS;
+        if (!Mwonmod.onMelonKing()) return ActionResult.PASS;
         if (!Config.HANDLER.instance().preventFullInventorySelling) {
             return ActionResult.PASS;
         }
-        if (Config.HANDLER.instance().debugMode) MwonmodClient.LOGGER.info(String.valueOf(entity.getCustomName()));
+        if (Config.HANDLER.instance().debugMode) Mwonmod.LOGGER.info(String.valueOf(entity.getCustomName()));
         if (Objects.equals(String.valueOf(entity.getCustomName()), "empty[siblings=[empty[style={color=white}], literal{Merchant}[style={color=green}]]]")) {
-            if (MwonmodClient.scanInventory(playerEntity, Arrays.asList(Items.GOLD_NUGGET, Items.MELON_SLICE)).emptySlots() <= Config.HANDLER.instance().fullInvEmptySlots) {
+            if (Mwonmod.scanInventory(playerEntity, Arrays.asList(Items.GOLD_NUGGET, Items.MELON_SLICE)).emptySlots() <= Config.HANDLER.instance().fullInvEmptySlots) {
                 assert MinecraftClient.getInstance().player != null;
                 MinecraftClient.getInstance().player.playSound(Sound.sound(Key.key("minecraft:entity.shulker.hurt_closed"), Sound.Source.MASTER, 1.0F, 1.0F));
                 MinecraftClient.getInstance().player.showTitle(Title.title(net.kyori.adventure.text.Component.text(""), net.kyori.adventure.text.Component.text("Inventory Full"), Title.Times.times(Duration.ZERO,Duration.of(500, ChronoUnit.MILLIS),Duration.ZERO)));

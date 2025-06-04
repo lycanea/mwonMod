@@ -1,7 +1,7 @@
-package dev.lycanea.mwonmod.client.mixin;
+package dev.lycanea.mwonmod.mixin;
 
+import dev.lycanea.mwonmod.Mwonmod;
 
-import dev.lycanea.mwonmod.client.MwonmodClient;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -35,15 +35,15 @@ public abstract class InventoryScreenMixin extends HandledScreen<PlayerScreenHan
     private void buttonPress(ButtonWidget btn) {
         assert MinecraftClient.getInstance().player != null;
         MinecraftClient.getInstance().player.sendMessage(Text.literal("Toggled Inventory Rundown"), false);
-        MwonmodClient.inventory_rundown = !MwonmodClient.inventory_rundown;
-        btn.setMessage(Text.literal(MwonmodClient.inventory_rundown ? "ON" : "OFF"));
+        Mwonmod.inventory_rundown = !Mwonmod.inventory_rundown;
+        btn.setMessage(Text.literal(Mwonmod.inventory_rundown ? "ON" : "OFF"));
     }
 
     @Inject(method = "init", at = @At("TAIL"))
     private void onInit(CallbackInfo ci) {
         // Place your button relative to this.x, this.y:
         inventoryRundownButton = ButtonWidget.builder(
-                Text.literal(MwonmodClient.inventory_rundown ? "ON" : "OFF"),
+                Text.literal(Mwonmod.inventory_rundown ? "ON" : "OFF"),
                 this::buttonPress
         ).dimensions(0, 0, 30, 20).build();
 
@@ -53,7 +53,7 @@ public abstract class InventoryScreenMixin extends HandledScreen<PlayerScreenHan
     @Inject(method = "render", at = @At("TAIL"))
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (inventoryRundownButton != null) {
-            if (!MwonmodClient.onMelonKing()) {
+            if (!Mwonmod.onMelonKing()) {
                 inventoryRundownButton.visible = false;
                 return;
             }

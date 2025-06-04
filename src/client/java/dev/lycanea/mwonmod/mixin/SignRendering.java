@@ -1,8 +1,9 @@
-package dev.lycanea.mwonmod.client.mixin;
+package dev.lycanea.mwonmod.mixin;
 
-import dev.lycanea.mwonmod.client.Config;
-import dev.lycanea.mwonmod.client.GameState;
-import dev.lycanea.mwonmod.client.MwonmodClient;
+import dev.lycanea.mwonmod.Config;
+import dev.lycanea.mwonmod.Mwonmod;
+import dev.lycanea.mwonmod.util.GameState;
+
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.SignBlockEntityRenderer;
@@ -23,7 +24,7 @@ public class SignRendering {
         NumberFormat formatter = NumberFormat.getIntegerInstance();
 
         if (!Config.HANDLER.instance().bankSignImprovements) return;
-        if (!MwonmodClient.onMelonKing()) return;
+        if (!Mwonmod.onMelonKing()) return;
 
         sign.changeText(signText -> {
             if (signText.getMessage(3, true).getString().startsWith("Banked: ")) {
