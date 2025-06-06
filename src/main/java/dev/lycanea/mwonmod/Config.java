@@ -22,92 +22,101 @@ public class Config {
             .build();
 
     // Only fields with @SerialEntry are serialized
-    @TickBox
-    @AutoGen(category = "General", group = "auction")
-    @SerialEntry
-    public boolean auctionTimer = true;
+
+    //QOL
 
     @TickBox
-    @AutoGen(category = "General")
-    @SerialEntry
-    public boolean flawlessTimer = true;
-
-    @TickBox
-    @AutoGen(category = "General")
+    @AutoGen(category = "QOL", group = "UI")
     @SerialEntry
     public boolean signUpgradeTooltip = true;
 
     @TickBox
-    @AutoGen(category = "General", group = "misc")
-    @SerialEntry
-    public boolean kingChangeNotification = false;
-
-    @MasterTickBox(value = {"fullInvEmptySlots"})
-    @AutoGen(category = "General", group = "misc")
-    @SerialEntry
-    public boolean preventFullInventorySelling = false;
-
-    @IntSlider(min = 0, max = 10, step = 1)
-    @AutoGen(category = "General", group = "misc")
-    @SerialEntry
-    public int fullInvEmptySlots = 0;
-
-    @TickBox
-    @AutoGen(category = "General", group = "misc")
-    @SerialEntry
-    public boolean hideSellFailMessage = false;
-
-    @TickBox
-    @AutoGen(category = "General", group = "misc")
-    @SerialEntry
-    public boolean preventAttackingWithHoe = false;
-
-    @TickBox
-    @AutoGen(category = "General", group = "misc")
+    @AutoGen(category = "QOL", group = "UI")
     @SerialEntry
     public boolean bankSignImprovements = true;
 
     @TickBox
-    @AutoGen(category = "General", group = "misc")
+    @AutoGen(category = "QOL", group = "UI")
     @SerialEntry
     public boolean scoreboardImprovements = true;
 
+    @MasterTickBox(value = {"fullInvEmptySlots"})
+    @AutoGen(category = "QOL", group = "Utilities")
+    @SerialEntry
+    public boolean preventFullInventorySelling = false;
+
+    @IntSlider(min = 0, max = 10, step = 1)
+    @AutoGen(category = "QOL", group = "Utilities")
+    @SerialEntry
+    public int fullInvEmptySlots = 0;
+
     @TickBox
-    @AutoGen(category = "General", group = "auction")
+    @AutoGen(category = "QOL", group = "Misc")
+    @SerialEntry
+    public boolean hideSellFailMessage = false;
+
+    @TickBox
+    @AutoGen(category = "QOL", group = "Misc")
+    @SerialEntry
+    public boolean preventAttackingWithHoe = false;
+
+    //Auction
+
+    @TickBox
+    @AutoGen(category = "Auction", group = "Timers")
+    @SerialEntry
+    public boolean auctionTimer = true;
+
+    @TickBox
+    @AutoGen(category = "Auction", group = "Notifications")
     @SerialEntry
     public boolean auctionDesktopNotification = false;
 
     @TickBox
-    @AutoGen(category = "General", group = "auction")
+    @AutoGen(category = "Auction", group = "Notifications")
     @SerialEntry
     public boolean auctionTitleNotification = false;
 
+    //Misc
+
+    @TickBox
+    @AutoGen(category = "Misc", group = "Timers")
+    @SerialEntry
+    public boolean flawlessTimer = true;
+
+    @TickBox
+    @AutoGen(category = "Misc", group = "Notifications")
+    @SerialEntry
+    public boolean kingChangeNotification = false;
+
     @MasterTickBox(value = {"richPresenceLine1","richPresenceLine2","richPresencePathIcon"})
-    @AutoGen(category = "General", group = "discord")
+    @AutoGen(category = "Misc", group = "Discord")
     @SerialEntry
     public boolean discordRichPresence = false;
 
     @Dropdown(values = {"Empty","Medals","Trophies","Karma","Location","Personal Gold","Coins/City Gold","Path","Monarch"})
-    @AutoGen(category = "General", group = "discord")
+    @AutoGen(category = "Misc", group = "Discord")
     @SerialEntry
     @CustomDescription(value = "Personal Gold requires entering housing once to update\nIf data is missing, mwonmod will just exclude that line from your status")
     public String richPresenceLine1 = "Monarch";
 
     @Dropdown(values = {"Empty","Medals","Trophies","Karma","Location","Personal Gold","Coins/City Gold","Path","Monarch"})
-    @AutoGen(category = "General", group = "discord")
+    @AutoGen(category = "Misc", group = "Discord")
     @SerialEntry
     @CustomDescription(value = "Personal Gold requires entering housing once to update\nIf data is missing, mwonmod will just exclude that line from your status")
     public String richPresenceLine2 = "Coins/City Gold";
 
     @TickBox
-    @AutoGen(category = "General", group = "discord")
+    @AutoGen(category = "Misc", group = "Discord")
     @SerialEntry
     public Boolean richPresencePathIcon = true;
 
     @TickBox
-    @AutoGen(category = "Silly")
+    @AutoGen(category = "Misc", group = "Silly")
     @SerialEntry
     public boolean what = false;
+
+    //Developer
 
     @TickBox
     @AutoGen(category = "Developer")

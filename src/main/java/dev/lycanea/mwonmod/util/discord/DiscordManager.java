@@ -52,11 +52,13 @@ public class DiscordManager {
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine1, "Trophies")) line1 = ((GameState.trophies == null) ? null:"Trophies: " + formatter.format(GameState.trophies));
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine1, "Karma")) line1 = ((GameState.karma == null) ? null:"Karma: " + formatter.format(GameState.karma));
             String line2 = null;
-            if (Objects.equals(Config.HANDLER.instance().richPresenceLine2, "Coins/City Gold")) line2 = (Objects.equals(GameState.currentPath, "Underground") || Objects.equals(GameState.currentPath, "Depths")) ? ("Gold: " + formatter.format(GameState.bank_gold != null ? GameState.bank_gold:0)) : ("Coins: " + formatter.format(GameState.coins));
+            if (Objects.equals(Config.HANDLER.instance().richPresenceLine2, "Coins/City Gold")) line2 = (Objects.equals(GameState.currentPath, "Underground") || Objects.equals(GameState.currentPath, "Depths")) ? ("Gold: " + formatter.format(GameState.bank_gold != null ? GameState.bank_gold:0)) : ("Coins: " + formatter.format(GameState.coins != null ? GameState.coins:0));
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine2, "Path")) line2 = "Path: " + GameState.currentPath;
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine2, "Monarch")) line2 = "Monarch: " + GameState.currentMonarch;
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine2, "Location")) line2 = ((GameState.playerLocation == null) ? null:"Location: " + GameState.playerLocation);
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine2, "Personal Gold")) line2 = ((GameState.personal_bank == null) ? null:"Personal Gold: " + formatter.format(GameState.personal_bank));
+            if (Objects.equals(Config.HANDLER.instance().richPresenceLine2, "Medals")) line2 = ((GameState.medals == null) ? null:"Medals: " + formatter.format(GameState.medals));
+            if (Objects.equals(Config.HANDLER.instance().richPresenceLine2, "Trophies")) line2 = ((GameState.trophies == null) ? null:"Trophies: " + formatter.format(GameState.trophies));
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine2, "Karma")) line2 = ((GameState.karma == null) ? null:"Karma: " + formatter.format(GameState.karma));
             setStatus(line2,
                     line1,
