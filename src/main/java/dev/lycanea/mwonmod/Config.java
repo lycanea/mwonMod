@@ -55,6 +55,11 @@ public class Config {
     @TickBox
     @AutoGen(category = "General", group = "misc")
     @SerialEntry
+    public boolean hideSellFailMessage = false;
+
+    @TickBox
+    @AutoGen(category = "General", group = "misc")
+    @SerialEntry
     public boolean preventAttackingWithHoe = false;
 
     @TickBox

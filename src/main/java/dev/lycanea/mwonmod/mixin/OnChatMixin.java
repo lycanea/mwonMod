@@ -6,11 +6,14 @@ import dev.lycanea.mwonmod.util.GameState;
 
 import com.google.gson.JsonObject;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.network.ClientConnection;
+import net.minecraft.network.listener.PacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -20,11 +23,18 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Mixin(ClientPlayNetworkHandler.class)
+@Mixin(ClientConnection.class)
 public class OnChatMixin {
-    @Inject(method = "onGameMessage", at = @At("HEAD"))
-    private void onGameMessage(GameMessageS2CPacket packet, CallbackInfo ci) {
-        String message = packet.content().getString();
+    @Inject(method = "handlePacket", at = @At("HEAD"), cancellable = true)
+    private static <T extends PacketListener> void onGameMessage(Packet<T> packet, PacketListener listener, CallbackInfo ci) {
+        if (packet instanceof GameMessageS2CPacket(Text content, boolean overlay)) {
+            handleChatPacket(content, overlay, ci);
+        }
+    }
+
+    @Unique
+    private static void handleChatPacket(Text content, boolean overlay, CallbackInfo ci) {
+        String message = content.getString();
 
         Pattern melonJoinPattern = Pattern.compile("^» Joined game: < Melon King > \\(\\d(\\.\\d*)*\\) by DeepSeaBlue\\.$");
         Matcher melonJoinMatcher = melonJoinPattern.matcher(message);
@@ -34,6 +44,9 @@ public class OnChatMixin {
         }
 
         if (!Mwonmod.onMelonKing()) return;
+        if (Config.HANDLER.instance().hideSellFailMessage && Objects.equals(message, "> You don't have any Super Enchanted Melons. Get them by cooking four Enchanted Melon Slices, which are gotten by cooking four Melon Slices.")) {
+            ci.cancel();
+        }
         if (Config.HANDLER.instance().what && Objects.equals(message, "> What?")) {
             Mwonmod.notification("> What?", "> What?");
         }
