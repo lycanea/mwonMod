@@ -5,6 +5,13 @@
 *.ipr
 *.iws
 
+# codies awfull generated things
+.classpath
+.factorypath
+.project
+.settings/
+bin/
+
 # IntelliJ
 out/
 # mpeltonen/sbt-idea plugin
