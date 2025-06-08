@@ -65,7 +65,13 @@ public class KeyBindings {
                 var targetedEntity = client.crosshairTarget != null && client.crosshairTarget.getType() == net.minecraft.util.hit.HitResult.Type.ENTITY ?
                         ((net.minecraft.util.hit.EntityHitResult) client.crosshairTarget).getEntity() : null;
                 if (targetedEntity instanceof PlayerEntity) {
-                    client.execute(() -> client.player.networkHandler.sendCommand("profile " + targetedEntity.getName().getString()));
+                    client.execute(() -> {
+                        String rawName = targetedEntity.getName().getString();
+                        if (rawName.matches("^[a-zA-Z0-9_]+$")) {
+                            client.player.networkHandler.sendCommand("profile " + rawName);
+                            client.player.sendMessage(Text.of(rawName), false);
+                        }
+                    });
                 }
             }
         }
