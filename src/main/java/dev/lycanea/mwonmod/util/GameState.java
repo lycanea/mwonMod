@@ -15,5 +15,6 @@ public class GameState {
     public static Integer karma;
     public static Integer trophies;
     public static Integer personal_bank;
+    public static Integer portable_bank;
     public static Vec3d housing_pos;
 }

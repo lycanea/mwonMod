@@ -1,15 +1,22 @@
 package dev.lycanea.mwonmod.mixin;
 
+import dev.dfonline.flint.util.Toaster;
 import dev.lycanea.mwonmod.Config;
 import dev.lycanea.mwonmod.Mwonmod;
 import dev.lycanea.mwonmod.util.GameState;
 
 import com.google.gson.JsonObject;
+import net.fabricmc.loader.api.FabricLoader;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
+import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,11 +31,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Mixin(ClientConnection.class)
-public class OnChatMixin {
+public class OnPacketMixin {
     @Inject(method = "handlePacket", at = @At("HEAD"), cancellable = true)
     private static <T extends PacketListener> void onGameMessage(Packet<T> packet, PacketListener listener, CallbackInfo ci) {
         if (packet instanceof GameMessageS2CPacket(Text content, boolean overlay)) {
             handleChatPacket(content, overlay, ci);
+        }
+        if (packet instanceof OpenScreenS2CPacket openScreenPacket) {
+            if (Mwonmod.onMelonKing()) {
+                Text screenTitle = openScreenPacket.getName();
+                Pattern bankPattern = Pattern.compile("Portable Bank \\| (\\d+)/10000 gold");
+                Matcher bankMatcher = bankPattern.matcher(screenTitle.getString());
+
+                if (bankMatcher.find()) {
+                    GameState.portable_bank = Integer.parseInt(bankMatcher.group(1));
+                }
+            }
         }
     }
 
@@ -40,6 +58,21 @@ public class OnChatMixin {
         Matcher melonJoinMatcher = melonJoinPattern.matcher(message);
 
         if (melonJoinMatcher.find()) {
+            String version = '(' + FabricLoader.getInstance().getModContainer("mwonmod").get().getMetadata().getVersion().getFriendlyString() + ')';
+            Component versionComponent = Component.text(version, Style.style()
+                    .color(TextColor.color(128, 128, 128)) // Gray color for version
+                    .decoration(TextDecoration.ITALIC, true) // Optional: to make it italicized
+                    .build());
+
+            Style mainStyle = Style.style().color(TextColor.color(203, 64, 22)).build();
+
+            Toaster.toast(
+                    Component.text("MwonMod"),
+                    Component.text("Using Alpha version ", mainStyle)
+                            .append(versionComponent)
+                            .append(Component.text(", please report bugs on the Discord!", mainStyle))
+            );
+
             GameState.melonJoin = LocalDateTime.now();
         }
 
