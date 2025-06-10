@@ -82,8 +82,7 @@ public class Mwonmod implements ClientModInitializer {
 
         itemData = loadJsonFile(ITEM_DATA_PATH);
 
-        InputStream inputStream = Mwonmod.class.getClassLoader().getResourceAsStream("assets/mwonmod/data/locations.json");
-        locationData = RegionLoader.loadRegionsFromJson(inputStream);
+        RegionLoader.init();
         RegionRenderer.init();
 
         // make flint check the players plot
@@ -96,15 +95,16 @@ public class Mwonmod implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
 
             if (onMelonKing()) {
-                if (getCurrentRegion() != null) {
-                    if (!Objects.equals(getCurrentRegion().name, previousRegion.get())) {
-                        previousRegion.set(getCurrentRegion().name);
+                if (RegionLoader.getCurrentRegion() != null) {
+                  String regionName = RegionLoader.getCurrentRegion().name;
+                    if (!Objects.equals(regionName, previousRegion.get())) {
+                        previousRegion.set(regionName);
                         if (Objects.equals(previousRegion.get(), "housing")) {
                             assert MinecraftClient.getInstance().player != null;
                             GameState.housing_pos = MinecraftClient.getInstance().player.getPos();
                         }
                     }
-                    GameState.playerLocation = getCurrentRegion().name;
+                    GameState.playerLocation = regionName;
                 } else {
                     GameState.playerLocation = null;
                 }
@@ -294,24 +294,6 @@ public class Mwonmod implements ClientModInitializer {
 
     private static String serializeVec(Vec3d vec) {
         return "<" + (int) vec.x + ", " + (int) vec.y + ", " + (int) vec.z + ">";
-    }
-    public static Region getCurrentRegion() {
-        if (MinecraftClient.getInstance().player == null || MinecraftClient.getInstance().world == null || locationData == null) return null;
-
-        BlockPos pos = MinecraftClient.getInstance().player.getBlockPos();
-
-        for (Region region : locationData) {
-            if (pos.getX() >= Math.min(region.min.getX(), region.max.getX()) &&
-                    pos.getX() <= Math.max(region.min.getX(), region.max.getX()) &&
-                    pos.getY() >= Math.min(region.min.getY(), region.max.getY()) &&
-                    pos.getY() <= Math.max(region.min.getY(), region.max.getY()) &&
-                    pos.getZ() >= Math.min(region.min.getZ(), region.max.getZ()) &&
-                    pos.getZ() <= Math.max(region.min.getZ(), region.max.getZ())) {
-                return region;
-            }
-        }
-
-        return null;
     }
 
     public static Text convertOrderedTextToTextWithStyle(OrderedText orderedText) {

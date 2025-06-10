@@ -2,6 +2,7 @@ package dev.lycanea.mwonmod.util.region;
 
 import dev.lycanea.mwonmod.Mwonmod;
 import dev.lycanea.mwonmod.Config;
+import dev.lycanea.mwonmod.util.region.RegionLoader;
 
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
@@ -29,7 +30,7 @@ public class RegionRenderer {
 
             Vec3d cameraPos = context.camera().getPos();
 
-            Region currentRegion = Mwonmod.getCurrentRegion();
+            Region currentRegion = RegionLoader.getCurrentRegion();
             if (currentRegion == null) return;
 
             Box box = new Box(new Vec3d(currentRegion.min.getX(), currentRegion.min.getY(), currentRegion.min.getZ()),
