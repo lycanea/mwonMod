@@ -165,7 +165,8 @@ public class Mwonmod implements ClientModInitializer {
         if (Config.HANDLER.instance().debugMode) {
             List<String> debugLines = new ArrayList<>(List.of(
                     "DEBUG MODE",
-                    "ON MWON: " + onMelonKing()
+                    "ON MWON: " + onMelonKing(),
+                    "ON BETA: " + GameState.beta_plot
             ));
             if (GameState.housing_pos != null) debugLines.add("HOUSING LOCATION: " + GameState.housing_pos);
             if (GameState.currentPath != null) debugLines.add("CURRENT PATH: " + GameState.currentPath);
@@ -349,10 +350,11 @@ public class Mwonmod implements ClientModInitializer {
 
     public static boolean onMelonKing() {
 //        return true;
+        if (Flint.getUser().getPlot() == null) {GameState.beta_plot=false;return false;}
+        GameState.beta_plot = Flint.getUser().getPlot().getId() == 202028;
         if (Config.HANDLER.instance().ignoreMelonKingCheck) return true;
         if (Flint.getUser().getMode() != Mode.PLAY) return false;
-        if (Flint.getUser().getPlot() == null) return false;
-        return Flint.getUser().getPlot().getId() == 22467;
+        return Flint.getUser().getPlot().getId() == 22467 || Flint.getUser().getPlot().getId() == 202028;
     }
 
     public void drawDebugLines(DrawContext context, MinecraftClient client, List<String> lines, int startY, int lineSpacing, int color) {

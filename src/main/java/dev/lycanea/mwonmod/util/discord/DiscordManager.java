@@ -41,6 +41,16 @@ public class DiscordManager {
         if (GameState.melonJoin != null && Config.HANDLER.instance().discordRichPresence && Mwonmod.onMelonKing()) {
             // get ready for a shit ton of ternary statements
             setEnabled(true);
+            if (GameState.beta_plot) {
+                setStatus("On Beta Plot",
+                        "Playing around and breaking things",
+                        OffsetDateTime.of(GameState.melonJoin, ZoneOffset.systemDefault().getRules().getStandardOffset(Instant.now())),
+                        "melonbeta",
+                        "Running MwonMod " + ((FabricLoader.getInstance().getModContainer("mwonmod").map(ModContainer::getMetadata).map(ModMetadata::getVersion).map(Object::toString).orElse("0.0").equals("0.0.0")) ? "Development":FabricLoader.getInstance().getModContainer("mwonmod").map(ModContainer::getMetadata).map(ModMetadata::getVersion).map(Object::toString).orElse("0.0")),
+                        "redactedpath",
+                        "REDACTED :3");
+                return;
+            }
             java.text.NumberFormat formatter = java.text.NumberFormat.getNumberInstance();
             String line1 = null;
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine1, "Coins/City Gold")) line1 = (Objects.equals(GameState.currentPath, "Underground") || Objects.equals(GameState.currentPath, "Depths")) ? ("Gold: " + formatter.format(GameState.bank_gold != null ? GameState.bank_gold:0)) : ("Coins: " + formatter.format(GameState.coins != null ? GameState.coins:0));

@@ -17,4 +17,5 @@ public class GameState {
     public static Integer personal_bank;
     public static Integer portable_bank;
     public static Vec3d housing_pos;
+    public static boolean beta_plot;
 }

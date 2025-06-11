@@ -54,7 +54,7 @@ public class OnPacketMixin {
     private static void handleChatPacket(Text content, boolean overlay, CallbackInfo ci) {
         String message = content.getString();
 
-        Pattern melonJoinPattern = Pattern.compile("^» Joined game: < Melon King > \\(\\d(\\.\\d*)*\\) by DeepSeaBlue\\.$");
+        Pattern melonJoinPattern = Pattern.compile("^» Joined game: < Melon King > \\((\\d(?:\\.\\d*)*|BETA)\\) by DeepSeaBlue\\.$");
         Matcher melonJoinMatcher = melonJoinPattern.matcher(message);
 
         if (melonJoinMatcher.find()) {
