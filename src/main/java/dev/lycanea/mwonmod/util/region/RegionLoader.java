@@ -1,7 +1,7 @@
 package dev.lycanea.mwonmod.util.region;
 
 import dev.lycanea.mwonmod.Mwonmod;
-import dev.lycanea.mwonmod.util.region.Region;
+import dev.lycanea.mwonmod.util.GameState;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
@@ -18,17 +18,21 @@ import java.util.List;
 
 public class RegionLoader {
     public static final Vector2i plot_origin = new Vector2i(-975,-4270);
+    public static final Vector2i beta_plot_origin = new Vector2i(104000,14000);
     public static List<Region> locationData;
 
-    public static final void init() {
+    public static void init() {
         InputStream inputStream = Mwonmod.class.getClassLoader().getResourceAsStream("assets/mwonmod/data/locations.json");
         locationData = RegionLoader.loadRegionsFromJson(inputStream);
     }
 
     public static Region getCurrentRegion() {
-        if (MinecraftClient.getInstance().player == null || MinecraftClient.getInstance().world == null || locationData == null) return null;
+        if (MinecraftClient.getInstance().player == null || MinecraftClient.getInstance().world == null || locationData == null || !Mwonmod.onMelonKing()) return null;
 
-        BlockPos pos = MinecraftClient.getInstance().player.getBlockPos();
+        BlockPos pos = MinecraftClient.getInstance().player.getBlockPos().add(-plot_origin.x, 0, -plot_origin.y);
+        if (GameState.beta_plot) {
+            pos = MinecraftClient.getInstance().player.getBlockPos().add(-beta_plot_origin.x, 0, -beta_plot_origin.y);
+        }
 
         for (Region region : locationData) {
             if (pos.getX() >= Math.min(region.min.getX(), region.max.getX()) &&
@@ -60,15 +64,15 @@ public class RegionLoader {
                 JsonObject max = obj.getAsJsonObject("max");
 
                 Vec3i minVec = new Vec3i(
-                        min.get("x").getAsInt() + plot_origin.x,
+                        min.get("x").getAsInt(),
                         min.get("y").getAsInt(),
-                        min.get("z").getAsInt() + plot_origin.y
+                        min.get("z").getAsInt()
                 );
 
                 Vec3i maxVec = new Vec3i(
-                        max.get("x").getAsInt() + plot_origin.x,
+                        max.get("x").getAsInt(),
                         max.get("y").getAsInt(),
-                        max.get("z").getAsInt() + plot_origin.y
+                        max.get("z").getAsInt()
                 );
 
                 regions.add(new Region(name, minVec, maxVec));

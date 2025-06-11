@@ -2,7 +2,7 @@ package dev.lycanea.mwonmod.util.region;
 
 import dev.lycanea.mwonmod.Mwonmod;
 import dev.lycanea.mwonmod.Config;
-import dev.lycanea.mwonmod.util.region.RegionLoader;
+import dev.lycanea.mwonmod.util.GameState;
 
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
@@ -33,8 +33,12 @@ public class RegionRenderer {
             Region currentRegion = RegionLoader.getCurrentRegion();
             if (currentRegion == null) return;
 
-            Box box = new Box(new Vec3d(currentRegion.min.getX(), currentRegion.min.getY(), currentRegion.min.getZ()),
-                              new Vec3d(currentRegion.max.getX()+1, currentRegion.max.getY()+1, currentRegion.max.getZ()+1)).expand(0.01); // Small expand to prevent z-fighting
+            Box box = new Box(new Vec3d(currentRegion.min.getX()+RegionLoader.plot_origin.x, currentRegion.min.getY(), currentRegion.min.getZ()+RegionLoader.plot_origin.y),
+                              new Vec3d(currentRegion.max.getX()+RegionLoader.plot_origin.x+1, currentRegion.max.getY()+1, currentRegion.max.getZ()+RegionLoader.plot_origin.y+1)).expand(0.01); // Small expand to prevent z-fighting
+            if (GameState.beta_plot) {
+                box = new Box(new Vec3d(currentRegion.min.getX()+RegionLoader.beta_plot_origin.x, currentRegion.min.getY(), currentRegion.min.getZ()+RegionLoader.beta_plot_origin.y),
+                        new Vec3d(currentRegion.max.getX()+RegionLoader.beta_plot_origin.x+1, currentRegion.max.getY()+1, currentRegion.max.getZ()+RegionLoader.beta_plot_origin.y+1)).expand(0.01);
+            }
 
             box = box.offset(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 
