@@ -244,7 +244,7 @@ public class Mwonmod implements ClientModInitializer {
         if (Config.HANDLER.instance().signUpgradeTooltip) {
             Vec3d hit = client.player.raycast(4.5, 0, false).getPos();
             String vecKey = serializeVec(hit);
-            BlockEntity state = client.world.getBlockEntity(new BlockPos((int) hit.x, (int) hit.y, (int) hit.z).subtract(new Vec3i(1, 0, 1)));
+            BlockEntity state = client.world.getBlockEntity(new BlockPos((int) hit.x, (int) hit.y, (int) hit.z).subtract(new Vec3i(GameState.beta_plot ? 0:1, 0, GameState.beta_plot ? 0:1))); // beta plot is +x and +z so blockpos offset isnt needed im p sure
 
             ArrayList<Text> signTooltip = new ArrayList<>();
             if (state instanceof SignBlockEntity signBlock) {
