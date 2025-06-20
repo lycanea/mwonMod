@@ -1,9 +1,6 @@
 package dev.lycanea.mwonmod;
 
-import dev.lycanea.mwonmod.util.KeyBindings;
-import dev.lycanea.mwonmod.util.GameState;
-import dev.lycanea.mwonmod.util.InventoryScanResult;
-import dev.lycanea.mwonmod.util.TimeUtils;
+import dev.lycanea.mwonmod.util.*;
 import dev.lycanea.mwonmod.util.region.*;
 import dev.lycanea.mwonmod.util.discord.DiscordManager;
 import dev.lycanea.mwonmod.events.*;
@@ -11,18 +8,18 @@ import dev.lycanea.mwonmod.events.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import dev.dfonline.flint.Flint;
 import dev.dfonline.flint.FlintAPI;
 import dev.dfonline.flint.hypercube.Mode;
+import dev.lycanea.mwonmod.util.sound.BossMusicConfig;
+import dev.lycanea.mwonmod.util.sound.BossMusicHelper;
+import dev.lycanea.mwonmod.util.sound.SoundRegister;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
-import net.fabricmc.loader.api.FabricLoader;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import net.minecraft.block.entity.BlockEntity;
@@ -35,6 +32,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.text.*;
 import net.minecraft.util.Colors;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -56,6 +54,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
+import static dev.lycanea.mwonmod.util.region.RegionLoader.beta_plot_origin;
+import static dev.lycanea.mwonmod.util.region.RegionLoader.plot_origin;
+
 public class Mwonmod implements ClientModInitializer {
     public static final String MOD_ID = "mwonmod";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -64,7 +65,6 @@ public class Mwonmod implements ClientModInitializer {
     private static final String ITEM_DATA_PATH = "assets/mwonmod/data/items.json";
     private static final String UPGRADES_PATH = "assets/mwonmod/data/melonmod_upgrades.json";
     public static JsonObject itemData;
-    public static List<Region> locationData;
     public static Map<String, String> upgradeData;
     private static boolean auctionNotificationSent = false;
 
@@ -84,6 +84,7 @@ public class Mwonmod implements ClientModInitializer {
 
         RegionLoader.init();
         RegionRenderer.init();
+        SoundRegister.initialize();
 
         // make flint check the players plot
         FlintAPI.confirmLocationWithLocate();
@@ -93,15 +94,27 @@ public class Mwonmod implements ClientModInitializer {
         KeyBindings.setup();
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-
             if (onMelonKing()) {
                 if (RegionLoader.getCurrentRegion() != null) {
-                  String regionName = RegionLoader.getCurrentRegion().name;
+                    String regionName = RegionLoader.getCurrentRegion().name;
                     if (!Objects.equals(regionName, previousRegion.get())) {
                         previousRegion.set(regionName);
-                        if (Objects.equals(previousRegion.get(), "housing")) {
+                        if (Objects.equals(regionName, "housing")) {
                             assert MinecraftClient.getInstance().player != null;
                             GameState.housing_pos = MinecraftClient.getInstance().player.getPos();
+                        }
+                        if (BossMusicHelper.currentBoss == null) {
+                            for (Map.Entry<Identifier, BossMusicConfig> entry : BossMusicHelper.musicMap.entrySet()) {
+                                Identifier key = entry.getKey();
+                                BossMusicConfig value = entry.getValue();
+                                if (Objects.equals(regionName, value.region())) {
+                                    BossMusicHelper.playBoss(key, MinecraftClient.getInstance());
+                                }
+                            }
+                        } else {
+                            if (!Objects.equals(BossMusicHelper.musicMap.get(BossMusicHelper.currentBoss).region(), regionName)) {
+                                BossMusicHelper.stop(MinecraftClient.getInstance());
+                            }
                         }
                     }
                     GameState.playerLocation = regionName;
@@ -120,18 +133,7 @@ public class Mwonmod implements ClientModInitializer {
         DiscordManager.initialise();
 
         // setup clientside commands
-        if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
-            ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager
-                .literal("itemlookup")
-                .then(ClientCommandManager.argument("value", StringArgumentType.string())
-                    .executes(context -> {
-                        final String value = StringArgumentType.getString(context, "value");
-                        JsonObject lookupItemData = itemData.get(value.toLowerCase().replaceAll(" ", "_")).getAsJsonObject();
-                        assert MinecraftClient.getInstance().player != null;
-                        MinecraftClient.getInstance().player.sendMessage(Text.literal(String.valueOf(lookupItemData.get("name").getAsString())).styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(lookupItemData.get("description").getAsString() )))), false);
-                        return 1;
-                    }))));
-        }
+        ClientCommandRegistrationCallback.EVENT.register(Commands::registerCommands);
 
         // set up the overlay rendering thingy
         HudRenderCallback.EVENT.register((context, tickDelta) -> renderHUDOverlay(context));
@@ -179,6 +181,13 @@ public class Mwonmod implements ClientModInitializer {
             if (GameState.trophies != null) debugLines.add("CURRENT TROPHIES: " + GameState.trophies);
             if (GameState.karma != null) debugLines.add("CURRENT KARMA: " + GameState.karma);
             if (GameState.melonJoin != null) debugLines.add("MWON TIMER: " + Duration.between(GameState.melonJoin, LocalDateTime.now()).getSeconds());
+
+            assert MinecraftClient.getInstance().player != null;
+            BlockPos pos = MinecraftClient.getInstance().player.getBlockPos().add(-plot_origin.x, 0, -plot_origin.y);
+            if (GameState.beta_plot) {
+                pos = MinecraftClient.getInstance().player.getBlockPos().add(-beta_plot_origin.x, 0, -beta_plot_origin.y);
+            }
+            debugLines.add("PLOTSPACE POS: " + pos);
 
             int startY = context.getScaledWindowHeight() - 390;
             drawDebugLines(context, client, debugLines, startY, 10, 0x82B7ED);
