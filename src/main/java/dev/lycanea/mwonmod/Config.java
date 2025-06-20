@@ -116,6 +116,11 @@ public class Config {
     @SerialEntry
     public boolean what = false;
 
+    @TickBox
+    @AutoGen(category = "Misc", group = "Silly")
+    @SerialEntry
+    public boolean down = false;
+
     //Developer
 
     @TickBox

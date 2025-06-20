@@ -34,6 +34,7 @@
   "yacl3.config.mwonmod:config.richPresencePathIcon": "Rich Presence Show Current Path",
   "yacl3.config.mwonmod:config.category.Misc.group.Silly": "...",
   "yacl3.config.mwonmod:config.what": "> What?",
+  "yacl3.config.mwonmod:config.down": "> Down.",
 
   "yacl3.config.mwonmod:config.category.Developer": "Developer",
   "yacl3.config.mwonmod:config.debugMode": "Enable Debug Mode",

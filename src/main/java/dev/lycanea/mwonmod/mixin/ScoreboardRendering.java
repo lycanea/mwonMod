@@ -15,23 +15,26 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ScoreboardRendering {
     @Inject(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At("HEAD"))
     private void onRenderScoreboard(DrawContext drawContext, ScoreboardObjective objective, CallbackInfo ci) {
-        if (!Config.HANDLER.instance().scoreboardImprovements) return;
         java.text.NumberFormat formatter = java.text.NumberFormat.getNumberInstance();
         for (ScoreboardEntry entry : objective.getScoreboard().getScoreboardEntries(objective)) {
             Team team = objective.getScoreboard().getScoreHolderTeam(entry.owner());
             String display = entry.owner();
             if (team == null) continue;
             if (team.getPrefix().getString().startsWith("Coins: ")) {
-                objective.getScoreboard().removeScore(ScoreHolder.fromName(display), objective);
                 float value = Float.parseFloat(team.getPrefix().getString().substring(7));
                 GameState.coins = value;
-                objective.getScoreboard().getOrCreateScore(ScoreHolder.fromName("§7Coins: §e" + formatter.format(value)), objective,true).setScore(entry.value());
+                if (Config.HANDLER.instance().scoreboardImprovements) {
+                    objective.getScoreboard().removeScore(ScoreHolder.fromName(display), objective);
+                    objective.getScoreboard().getOrCreateScore(ScoreHolder.fromName("§7Coins: §e" + formatter.format(value)), objective, true).setScore(entry.value());
+                }
             }
             if (team.getPrefix().getString().startsWith("Bank Gold: ")) {
-                objective.getScoreboard().removeScore(ScoreHolder.fromName(display), objective);
                 float value = Float.parseFloat(team.getPrefix().getString().substring(11));
                 GameState.bank_gold = value;
-                objective.getScoreboard().getOrCreateScore(ScoreHolder.fromName("§7Bank Gold: §6" + formatter.format(value)), objective,true).setScore(entry.value());
+                if (Config.HANDLER.instance().scoreboardImprovements) {
+                    objective.getScoreboard().removeScore(ScoreHolder.fromName(display), objective);
+                    objective.getScoreboard().getOrCreateScore(ScoreHolder.fromName("§7Bank Gold: §6" + formatter.format(value)), objective, true).setScore(entry.value());
+                }
             }
             if (team.getPrefix().getString().startsWith("Path: ")) {
                 GameState.currentPath = team.getPrefix().getString().substring(6);

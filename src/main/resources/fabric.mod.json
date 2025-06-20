@@ -4,7 +4,14 @@
 	"version": "${version}",
 	"name": "mwonmod",
 	"description": "a clientside mod for the melon king game on diamondfire",
-	"authors": ["lycanea"],
+	"authors": [
+		{"name": "Lycanea", "contact": {"email": "lyca@lycanea.dev", "homepage": "https://lycanea.dev"}}
+	],
+	"contributors": [
+		{"name": "Leeney (Music)", "contact":  {"homepage": "https://en.pronouns.page/@Leeney"}},
+		{"name": "Codie28 (General Programming)", "contact":  {"homepage": "https://github.com/Codie28"}},
+		{"name": "firef1a (Upgrade Preview + Data)", "contact":  {"homepage": "https://github.com/firef1a"}}
+	],
 	"contact": {
 		"email": "mwon@lycanea.dev",
 		"homepage": "https://lycanea.dev",

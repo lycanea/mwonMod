@@ -80,8 +80,13 @@ public class OnPacketMixin {
         if (Config.HANDLER.instance().hideSellFailMessage && Objects.equals(message, "> You don't have any Super Enchanted Melons. Get them by cooking four Enchanted Melon Slices, which are gotten by cooking four Melon Slices.")) {
             ci.cancel();
         }
-        if (Config.HANDLER.instance().what && Objects.equals(message, "> What?")) {
+        if (Config.HANDLER.instance().what && Objects.equals(message, "> What?") && MinecraftClient.getInstance().player != null) {
             Mwonmod.notification("> What?", "> What?");
+            MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().player.networkHandler.sendChatMessage("> What?"));
+        }
+        if (Config.HANDLER.instance().down && Objects.equals(message, "> Down.") && MinecraftClient.getInstance().player != null) {
+            Mwonmod.notification("> Down.", "> Down.");
+            MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().player.networkHandler.sendChatMessage("> Down."));
         }
         Pattern auctionPattern = Pattern.compile("^>\\s*(?:First up,|And next,|Next,|And now,|And lastly,|Now,|Up next,)?\\s*(?:a|an|some)\\s+(.+?)!$");
         Pattern newKingPattern = Pattern.compile("^>\\s*([\\w]+)\\s+is\\s+the\\s+new\\s+(?:king|queen|monarch)!$");
