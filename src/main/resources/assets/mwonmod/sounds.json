@@ -1,0 +1,14 @@
+{
+  "carrot_boss_intro": {
+    "category": "master",
+    "sounds": [
+      { "name": "mwonmod:carrot_boss_intro", "stream": true }
+    ]
+  },
+  "carrot_boss_loop": {
+    "category": "master",
+    "sounds": [
+      { "name": "mwonmod:carrot_boss_loop", "stream": true }
+    ]
+  }
+}
