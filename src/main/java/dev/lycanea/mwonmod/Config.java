@@ -40,6 +40,11 @@ public class Config {
     @SerialEntry
     public boolean scoreboardImprovements = true;
 
+    @TickBox
+    @AutoGen(category = "QOL", group = "Utilities")
+    @SerialEntry
+    public boolean preventDroppingReflectives = false;
+
     @MasterTickBox(value = {"fullInvEmptySlots"})
     @AutoGen(category = "QOL", group = "Utilities")
     @SerialEntry
