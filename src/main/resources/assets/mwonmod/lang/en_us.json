@@ -9,6 +9,7 @@
   "yacl3.config.mwonmod:config.bankSignImprovements": "Bank Sign Improvements",
   "yacl3.config.mwonmod:config.scoreboardImprovements": "Scoreboard Improvements",
   "yacl3.config.mwonmod:config.category.QOL.group.Utilities": "Utilities",
+  "yacl3.config.mwonmod:config.preventDroppingReflectives": "Prevent Dropping Reflectives",
   "yacl3.config.mwonmod:config.preventFullInventorySelling": "Prevent Full Inventory Selling",
   "yacl3.config.mwonmod:config.fullInvEmptySlots": "Full Inventory Threshold",
   "yacl3.config.mwonmod:config.category.QOL.group.Misc": "Miscellaneous",
