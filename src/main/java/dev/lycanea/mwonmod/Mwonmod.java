@@ -11,9 +11,6 @@ import com.google.gson.JsonParser;
 import dev.dfonline.flint.Flint;
 import dev.dfonline.flint.FlintAPI;
 import dev.dfonline.flint.hypercube.Mode;
-import dev.lycanea.mwonmod.util.sound.BossMusicConfig;
-import dev.lycanea.mwonmod.util.sound.BossMusicHelper;
-import dev.lycanea.mwonmod.util.sound.SoundRegister;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -32,7 +29,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.text.*;
 import net.minecraft.util.Colors;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -85,7 +81,6 @@ public class Mwonmod implements ClientModInitializer {
 
         RegionLoader.init();
         RegionRenderer.init();
-        SoundRegister.initialize();
 
         // make flint check the players plot
         FlintAPI.confirmLocationWithLocate();
@@ -103,19 +98,6 @@ public class Mwonmod implements ClientModInitializer {
                         if (Objects.equals(regionName, "housing")) {
                             assert MinecraftClient.getInstance().player != null;
                             GameState.housing_pos = MinecraftClient.getInstance().player.getPos();
-                        }
-                        if (BossMusicHelper.currentBoss == null) {
-                            for (Map.Entry<Identifier, BossMusicConfig> entry : BossMusicHelper.musicMap.entrySet()) {
-                                Identifier key = entry.getKey();
-                                BossMusicConfig value = entry.getValue();
-                                if (Objects.equals(regionName, value.region())) {
-                                    BossMusicHelper.playBoss(key, MinecraftClient.getInstance());
-                                }
-                            }
-                        } else {
-                            if (!Objects.equals(BossMusicHelper.musicMap.get(BossMusicHelper.currentBoss).region(), regionName)) {
-                                BossMusicHelper.stop(MinecraftClient.getInstance());
-                            }
                         }
                     }
                     GameState.playerLocation = regionName;
