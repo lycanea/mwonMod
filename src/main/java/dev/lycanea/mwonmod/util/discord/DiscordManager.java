@@ -56,7 +56,7 @@ public class DiscordManager {
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine1, "Coins/City Gold")) line1 = (Objects.equals(GameState.currentPath, "Underground") || Objects.equals(GameState.currentPath, "Depths")) ? ("Gold: " + formatter.format(GameState.bank_gold != null ? GameState.bank_gold:0)) : ("Coins: " + formatter.format(GameState.coins != null ? GameState.coins:0));
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine1, "Path")) line1 = "Path: " + GameState.currentPath;
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine1, "Monarch")) line1 = "Monarch: " + GameState.currentMonarch;
-            if (Objects.equals(Config.HANDLER.instance().richPresenceLine1, "Location")) line1 = ((GameState.playerLocation == null) ? null:"Location: " + GameState.playerLocation);
+            if (Objects.equals(Config.HANDLER.instance().richPresenceLine1, "Location")) line1 = ((GameState.playerLocation == null) ? null:"Location: " + (GameState.playerLocation.substring(0, 1).toUpperCase() + GameState.playerLocation.substring(1)).replace("_", " "));
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine1, "Personal Gold")) line1 = ((GameState.personal_bank == null) ? null:"Personal Gold: " + formatter.format(GameState.personal_bank));
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine1, "Medals")) line1 = ((GameState.medals == null) ? null:"Medals: " + formatter.format(GameState.medals));
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine1, "Trophies")) line1 = ((GameState.trophies == null) ? null:"Trophies: " + formatter.format(GameState.trophies));
@@ -65,7 +65,7 @@ public class DiscordManager {
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine2, "Coins/City Gold")) line2 = (Objects.equals(GameState.currentPath, "Underground") || Objects.equals(GameState.currentPath, "Depths")) ? ("Gold: " + formatter.format(GameState.bank_gold != null ? GameState.bank_gold:0)) : ("Coins: " + formatter.format(GameState.coins != null ? GameState.coins:0));
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine2, "Path")) line2 = "Path: " + GameState.currentPath;
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine2, "Monarch")) line2 = "Monarch: " + GameState.currentMonarch;
-            if (Objects.equals(Config.HANDLER.instance().richPresenceLine2, "Location")) line2 = ((GameState.playerLocation == null) ? null:"Location: " + GameState.playerLocation);
+            if (Objects.equals(Config.HANDLER.instance().richPresenceLine2, "Location")) line2 = ((GameState.playerLocation == null) ? null:"Location: " + (GameState.playerLocation.substring(0, 1).toUpperCase() + GameState.playerLocation.substring(1)).replace("_", " "));
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine2, "Personal Gold")) line2 = ((GameState.personal_bank == null) ? null:"Personal Gold: " + formatter.format(GameState.personal_bank));
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine2, "Medals")) line2 = ((GameState.medals == null) ? null:"Medals: " + formatter.format(GameState.medals));
             if (Objects.equals(Config.HANDLER.instance().richPresenceLine2, "Trophies")) line2 = ((GameState.trophies == null) ? null:"Trophies: " + formatter.format(GameState.trophies));
