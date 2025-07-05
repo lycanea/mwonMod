@@ -67,6 +67,7 @@ public class Mwonmod implements ClientModInitializer {
     public static JsonObject itemData;
     public static Map<String, String> upgradeData;
     private static boolean auctionNotificationSent = false;
+    public static Region activeRegion = null;
 
     @Override
     public void onInitializeClient() {
@@ -125,6 +126,19 @@ public class Mwonmod implements ClientModInitializer {
 
             DiscordManager.updateStatus();
 
+            if (activeRegion != null && client.player != null) {
+                assert MinecraftClient.getInstance().player != null;
+                BlockPos pos = MinecraftClient.getInstance().player.getBlockPos().add(-plot_origin.x, 0, -plot_origin.y);
+                if (GameState.beta_plot) {
+                    pos = MinecraftClient.getInstance().player.getBlockPos().add(-beta_plot_origin.x, 0, -beta_plot_origin.y);
+                }
+                Vec3i playerPos = new Vec3i(
+                    pos.getX(),
+                    pos.getY(),
+                    pos.getZ()
+                );
+                activeRegion.expandTo(playerPos);
+            }
         });
 
         UseEntityCallback.EVENT.register((SellEvent::entityInteract));
@@ -415,5 +429,13 @@ public class Mwonmod implements ClientModInitializer {
         } catch (IOException | AWTException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void setActiveRegion(Region region) {
+        activeRegion = region;
+    }
+
+    public static void clearActiveRegion() {
+        activeRegion = null;
     }
 }
