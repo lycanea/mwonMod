@@ -24,9 +24,8 @@ import java.util.Objects;
 public class SellEvent {
     public static ActionResult entityInteract(PlayerEntity playerEntity, World world, Hand hand, Entity entity, @Nullable EntityHitResult entityHitResult) {
         if (!Mwonmod.onMelonKing()) return ActionResult.PASS;
-        if (!Config.HANDLER.instance().preventFullInventorySelling) {
-            return ActionResult.PASS;
-        }
+        if (!Config.HANDLER.instance().preventFullInventorySelling) return ActionResult.PASS;
+
 //        if (Config.HANDLER.instance().debugMode) Mwonmod.LOGGER.info(String.valueOf(entity.getCustomName()));
         if (Objects.equals(String.valueOf(entity.getCustomName()), "empty[siblings=[empty[style={color=white}], literal{Merchant}[style={color=green}]]]") || Objects.equals(String.valueOf(entity.getCustomName()), "empty[siblings=[empty[style={color=white}], literal{Salesman}[style={color=red}]]]") || Objects.equals(String.valueOf(entity.getCustomName()), "empty[siblings=[empty[style={color=white}], literal{Salesman}[style={color=dark_aqua}]]]") || Objects.equals(String.valueOf(entity.getCustomName()), "empty[siblings=[empty[style={color=white}], literal{Salesman}[style={color=gray}]]]")) {
             if (Mwonmod.scanInventory(playerEntity, Arrays.asList(Items.GOLD_NUGGET, Items.MELON_SLICE)).emptySlots() <= Config.HANDLER.instance().fullInvEmptySlots) {
