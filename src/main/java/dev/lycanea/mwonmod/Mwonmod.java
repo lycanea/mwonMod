@@ -47,7 +47,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
 import static dev.lycanea.mwonmod.util.region.RegionLoader.beta_plot_origin;
@@ -81,46 +80,15 @@ public class Mwonmod implements ClientModInitializer {
 
         RegionLoader.init();
         RegionRenderer.init();
+        RegionUpdater.init();
 
         // make flint check the players plot
         FlintAPI.confirmLocationWithLocate();
 
-        AtomicReference<String> previousRegion = new AtomicReference<>();
-
         KeyBindings.setup();
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (onMelonKing()) {
-                if (RegionLoader.getCurrentRegion() != null) {
-                    String regionName = RegionLoader.getCurrentRegion().name;
-                    if (!Objects.equals(regionName, previousRegion.get())) {
-                        previousRegion.set(regionName);
-                        if (Objects.equals(regionName, "housing")) {
-                            assert MinecraftClient.getInstance().player != null;
-                            GameState.housing_pos = MinecraftClient.getInstance().player.getPos();
-                        }
-                    }
-                    GameState.playerLocation = regionName;
-                } else {
-                    GameState.playerLocation = null;
-                }
-            }
-
             DiscordManager.updateStatus();
-
-            if (activeRegion != null && client.player != null) {
-                assert MinecraftClient.getInstance().player != null;
-                BlockPos pos = MinecraftClient.getInstance().player.getBlockPos().add(-plot_origin.x, 0, -plot_origin.y);
-                if (GameState.beta_plot) {
-                    pos = MinecraftClient.getInstance().player.getBlockPos().add(-beta_plot_origin.x, 0, -beta_plot_origin.y);
-                }
-                Vec3i playerPos = new Vec3i(
-                    pos.getX(),
-                    pos.getY(),
-                    pos.getZ()
-                );
-                activeRegion.expandTo(playerPos);
-            }
         });
 
         UseEntityCallback.EVENT.register((SellEvent::entityInteract));
@@ -419,5 +387,9 @@ public class Mwonmod implements ClientModInitializer {
 
     public static void clearActiveRegion() {
         activeRegion = null;
+    }
+
+    public static void expandActiveRegionTo(Vec3i pos) {
+        activeRegion.expandTo(pos);
     }
 }
