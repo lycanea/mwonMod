@@ -2,13 +2,16 @@ package dev.lycanea.mwonmod.util.region;
 
 import dev.lycanea.mwonmod.Mwonmod;
 import dev.lycanea.mwonmod.util.GameState;
-import dev.lycanea.mwonmod.util.region.RegionLoader;
 
+import dev.lycanea.mwonmod.util.sound.BossMusicConfig;
+import dev.lycanea.mwonmod.util.sound.BossMusicHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.BlockPos;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.Objects;
 
@@ -30,6 +33,19 @@ public class RegionUpdater {
                     if (Objects.equals(regionName, "housing")) {
                         assert MinecraftClient.getInstance().player != null;
                         GameState.housing_pos = MinecraftClient.getInstance().player.getPos();
+                    }
+                    if (BossMusicHelper.currentBoss == null) {
+                        for (Map.Entry<Identifier, BossMusicConfig> entry : BossMusicHelper.musicMap.entrySet()) {
+                            Identifier key = entry.getKey();
+                            BossMusicConfig value = entry.getValue();
+                            if (Objects.equals(regionName, value.region())) {
+                                BossMusicHelper.playBoss(key, MinecraftClient.getInstance());
+                            }
+                        }
+                    } else {
+                        if (!Objects.equals(BossMusicHelper.musicMap.get(BossMusicHelper.currentBoss).region(), regionName)) {
+                            BossMusicHelper.stop(MinecraftClient.getInstance());
+                        }
                     }
                 }
                 GameState.playerLocation = regionName;

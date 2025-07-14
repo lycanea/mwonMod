@@ -11,6 +11,7 @@ import com.google.gson.JsonParser;
 import dev.dfonline.flint.Flint;
 import dev.dfonline.flint.FlintAPI;
 import dev.dfonline.flint.hypercube.Mode;
+import dev.lycanea.mwonmod.util.sound.SoundRegister;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -81,6 +82,7 @@ public class Mwonmod implements ClientModInitializer {
         RegionLoader.init();
         RegionRenderer.init();
         RegionUpdater.init();
+        SoundRegister.initialize();
 
         // make flint check the players plot
         FlintAPI.confirmLocationWithLocate();
