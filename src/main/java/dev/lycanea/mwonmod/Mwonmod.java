@@ -25,8 +25,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
 import net.minecraft.text.*;
 import net.minecraft.util.Colors;
 import net.minecraft.util.math.BlockPos;
@@ -68,6 +66,7 @@ public class Mwonmod implements ClientModInitializer {
     public void onInitializeClient() {
         Config.HANDLER.load();
         // upgrade data
+        // i forgot why the fuck we load this here but when i tried changing it, it caused like atleast 4 different crash issues
         JsonObject upgrade_dataJson = loadJsonFile(UPGRADES_PATH);
         upgradeData = new HashMap<>();
         if (upgrade_dataJson != null) {
@@ -193,21 +192,33 @@ public class Mwonmod implements ClientModInitializer {
             int barWidth = 100;
             int barHeight = 6;
 
-            List<Item> itemsToCount = Arrays.asList(Items.GOLD_NUGGET, Items.MELON_SLICE);
+            List<String> itemsToCount = Arrays.asList("melon", "enchanted_melon", "super_enchanted_melon", "gold", "shard", "compressed_shard");
             InventoryScanResult result = scanInventory(client.player, itemsToCount);
 
             double emptyPercent = (double) result.emptySlots() / 36;
-            double goldPercent = (double) result.itemSlots().get(Items.GOLD_NUGGET) / 36;
-            double melonPercent = (double) result.itemSlots().get(Items.MELON_SLICE) / 36;
+            double goldPercent = (double) result.itemSlots().get("gold") / 36;
+            double shardPercent = (double) result.itemSlots().get("shard") / 36;
+            double compressedShardPercent = (double) result.itemSlots().get("compressed_shard") / 36;
+            double melonPercent = (double) result.itemSlots().get("melon") / 36;
+            double enchantedMelonPercent = (double) result.itemSlots().get("enchanted_melon") / 36;
+            double superEnchantedMelonPercent = (double) result.itemSlots().get("super_enchanted_melon") / 36;
             double emptyWidth = (barWidth * emptyPercent);
             double goldWidth = (barWidth * goldPercent);
+            double shardWidth = (barWidth * shardPercent);
+            double compressedShardWidth = (barWidth * compressedShardPercent);
             double melonWidth = (barWidth * melonPercent);
+            double enchantedMelonWidth = (barWidth * enchantedMelonPercent);
+            double superEnchantedMelonWidth = (barWidth * superEnchantedMelonPercent);
 
-            context.fill(barX-1, barY-1, barX+1 + barWidth, barY+1 + barHeight, 0xFFFFFFFF);
-            context.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF555555);
-            context.fill(barX, barY, (int) (barX + emptyWidth), barY + barHeight, 0xFF888888);
-            context.fill((int) (barX + emptyWidth), barY, (int) (barX + emptyWidth + goldWidth), barY + barHeight, 0xFFFFFF00);
-            context.fill((int) (barX + emptyWidth + goldWidth), barY, (int) (barX + emptyWidth + goldWidth + melonWidth), barY + barHeight, 0xFF00FFFF);
+            context.fill(barX-1, barY-1, barX+1 + barWidth, barY+1 + barHeight, 0xFF000000); // Border
+            context.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF555555); // Misc
+            context.fill(barX, barY, (int) (barX + emptyWidth), barY + barHeight, 0xFF888888); // Background
+            context.fill((int) (barX + emptyWidth), barY, (int) (barX + emptyWidth + goldWidth), barY + barHeight, 0xFFFFE100); // Gold
+            context.fill((int) (barX + emptyWidth + goldWidth), barY, (int) (barX + emptyWidth + goldWidth + shardWidth), barY + barHeight, 0xFF00AAFF); // Shard
+            context.fill((int) (barX + emptyWidth + goldWidth + shardWidth), barY, (int) (barX + emptyWidth + goldWidth + shardWidth + compressedShardWidth), barY + barHeight, 0xFF0066DB); // CShard
+            context.fill((int) (barX + emptyWidth + goldWidth + shardWidth + compressedShardWidth), barY, (int) (barX + emptyWidth + goldWidth + shardWidth + compressedShardWidth + melonWidth), barY + barHeight, 0xFF00FF43); // Melon
+            context.fill((int) (barX + emptyWidth + goldWidth + shardWidth + compressedShardWidth + melonWidth), barY, (int) (barX + emptyWidth + goldWidth + shardWidth + compressedShardWidth + melonWidth + enchantedMelonWidth), barY + barHeight, 0xFF00BF32); // EMelon
+            context.fill((int) (barX + emptyWidth + goldWidth + shardWidth + compressedShardWidth + melonWidth + enchantedMelonWidth), barY, (int) (barX + emptyWidth + goldWidth + shardWidth + compressedShardWidth + melonWidth + enchantedMelonWidth + superEnchantedMelonWidth), barY + barHeight, 0xFF008A24); // SEMelon
         }
 
         if (client.getWindow() == null) return;
@@ -294,13 +305,13 @@ public class Mwonmod implements ClientModInitializer {
         return Texts.join(components, Text.empty());
     }
 
-    public static InventoryScanResult scanInventory(PlayerEntity player, List<Item> itemsToCount) {
-        Map<Item, Integer> counts = new HashMap<>();
-        Map<Item, Integer> slotCounts = new HashMap<>();
-        for (Item item : itemsToCount) {
+    public static InventoryScanResult scanInventory(PlayerEntity player, List<String> itemsToCount) {
+        Map<String, Integer> counts = new HashMap<>();
+        Map<String, Integer> slotCounts = new HashMap<>();
+        for (String item : itemsToCount) {
             counts.put(item, 0);
         }
-        for (Item item : itemsToCount) {
+        for (String item : itemsToCount) {
             slotCounts.put(item, 0);
         }
         int emptySlots = 0;
@@ -310,10 +321,10 @@ public class Mwonmod implements ClientModInitializer {
             if (stack.isEmpty()) {
                 emptySlots++;
             } else {
-                Item item = stack.getItem();
-                if (counts.containsKey(item)) {
-                    counts.put(item, counts.get(item) + stack.getCount());
-                    slotCounts.put(item, slotCounts.get(item) + 1);
+                String itemId = ItemUtils.getItemID(stack);
+                if (counts.containsKey(itemId)) {
+                    counts.put(itemId, counts.get(itemId) + stack.getCount());
+                    slotCounts.put(itemId, slotCounts.get(itemId) + 1);
                 }
             }
         }
@@ -368,7 +379,7 @@ public class Mwonmod implements ClientModInitializer {
                     Image icon = Toolkit.getDefaultToolkit().getImage(
                             Mwonmod.class.getResource("/icon.png")
                     );
-                    TrayIcon trayIcon = new TrayIcon(icon, "MyMod Notification");
+                    TrayIcon trayIcon = new TrayIcon(icon, "Mwonmod Notification");
                     trayIcon.setImageAutoSize(true);
                     tray.add(trayIcon);
                     trayIcon.displayMessage(title, message, TrayIcon.MessageType.INFO);

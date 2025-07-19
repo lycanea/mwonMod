@@ -3,14 +3,12 @@ package dev.lycanea.mwonmod.util;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import dev.lycanea.mwonmod.Config;
 import dev.lycanea.mwonmod.Mwonmod;
 import dev.lycanea.mwonmod.util.region.Region;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
@@ -65,6 +63,16 @@ public class Commands {
                             return 1;
                         })
                     ))
+                .then(literal("helditem")
+                    .executes(context -> {
+                        MinecraftClient client = MinecraftClient.getInstance();
+                        client.player.sendMessage(
+                                Text.literal("item ID: " + ItemUtils.getItemID(context.getSource().getPlayer().getMainHandStack())),
+                                false
+                        );
+                        return 1;
+                    })
+                )
                 .then(literal("region")
                     .then(ClientCommandManager.argument("action", StringArgumentType.string())
                     .then(ClientCommandManager.argument("name", StringArgumentType.string())
@@ -122,17 +130,5 @@ public class Commands {
         }
 
         dispatcher.register(mwonmodCommand);
-    }
-
-    private static void openConfigScreen() {
-        MinecraftClient.getInstance().execute(() -> {
-            Screen parent = MinecraftClient.getInstance().currentScreen;
-            Screen configScreen = Config.HANDLER.generateGui().generateScreen(parent);
-            if (configScreen != null) {
-                MinecraftClient.getInstance().setScreen(configScreen);
-            } else {
-                System.out.println("Failed to open config screen: screen was null");
-            }
-        });
     }
 }

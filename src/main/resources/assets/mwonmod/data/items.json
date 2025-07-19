@@ -1,6 +1,82 @@
 {
-  "magical_dice": {
-    "name": "Magical Dice",
-    "description": "it does the thing known as enchant rerolling"
+  "royal_scythe": {
+    "name": "Royal Scythe",
+    "description": "The hoe given to a monarch when they are doing a run.",
+    "custom_model_data": 276311
+  },
+  "hoe": {
+    "name": "Farming Hoe",
+    "description": "",
+    "custom_model_data": 276312
+  },
+  "perfect_hoe": {
+    "name": "Perfect Hoe",
+    "description": "The Farming Hoe with maxed stats, autosmelter and the Farming reforge",
+    "custom_model_data": 276313
+  },
+  "divine_hoe": {
+    "name": "Divine Hoe",
+    "description": "An upgraded tier of the Farming Hoe with 1 added to all stats",
+    "custom_model_data": 276314
+  },
+  "gold": {
+    "name": "Gold",
+    "description": "",
+    "custom_model_data": 276321
+  },
+  "shard": {
+    "name": "Shard",
+    "description": "",
+    "custom_model_data": 276322
+  },
+  "compressed_shard": {
+    "name": "CShard",
+    "description": "",
+    "custom_model_data": 276323
+  },
+  "melon": {
+    "name": "Melon",
+    "description": "",
+    "custom_model_data": 276331
+  },
+  "enchanted_melon": {
+    "name": "EMelon",
+    "description": "",
+    "custom_model_data": 276332
+  },
+  "super_enchanted_melon": {
+    "name": "SEMelon",
+    "description": "",
+    "custom_model_data": 276333
+  },
+  "ultra_enchanted_melon": {
+    "name": "UEMelon",
+    "description": "",
+    "custom_model_data": 276334
+  },
+  "grenade": {
+    "name": "Grenade",
+    "description": "",
+    "custom_model_data": 276341
+  },
+  "flashbang": {
+    "name": "Flashbang",
+    "description": "",
+    "custom_model_data": 276342
+  },
+  "conquest_start": {
+    "name": "ConqStart",
+    "description": "",
+    "custom_model_data": 1
+  },
+  "guard_promote": {
+    "name": "GuardPromote",
+    "description": "",
+    "custom_model_data": 1
+  },
+  "guard_demote": {
+    "name": "GuardPromote",
+    "description": "",
+    "custom_model_data": 1
   }
 }

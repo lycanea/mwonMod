@@ -34,7 +34,7 @@ public class TimeUtils {
         ZonedDateTime nowUtc = ZonedDateTime.now(ZoneOffset.UTC);
 
         long currentMinutes = nowUtc.toEpochSecond();
-        long nextFlawless = 4620 - currentMinutes % 4620;
+        long nextFlawless = 4618 - currentMinutes % 4620;
 
         // despawns at 1:14:38 spawn timer time
         // despawns at nextFlawless = 4478

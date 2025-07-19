@@ -6,10 +6,11 @@
   "client": [
     "ActionBarMixin",
     "InventoryScreenMixin",
+    "ItemDropMixin",
+    "ItemRendererMixin",
     "OnPacketMixin",
     "ScoreboardRendering",
-    "SignRendering",
-    "ItemDropMixin"
+    "SignRendering"
   ],
   "injectors": {
     "defaultRequire": 1
