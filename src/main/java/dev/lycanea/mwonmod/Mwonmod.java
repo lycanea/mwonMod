@@ -27,6 +27,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.*;
 import net.minecraft.util.Colors;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -61,6 +62,7 @@ public class Mwonmod implements ClientModInitializer {
     public static Map<String, String> upgradeData;
     private static boolean auctionNotificationSent = false;
     public static Region activeRegion = null;
+    public static List<String> players = List.of();
 
     @Override
     public void onInitializeClient() {
@@ -88,6 +90,21 @@ public class Mwonmod implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             DiscordManager.updateStatus();
+            if (client.player != null && client.player.getScoreboardTeam() != null && onMelonKing()) {
+                List<String> playerJoins = client.player.getScoreboardTeam().getPlayerList().stream()
+                        .filter(item -> !players.contains(item))
+                        .toList();
+                List<String> playerLeaves = players.stream()
+                        .filter(item -> !client.player.getScoreboardTeam().getPlayerList().stream().toList().contains(item))
+                        .toList();
+                if (!playerJoins.isEmpty()) {
+                    client.player.sendMessage(Text.of("Player Join: " + playerJoins.getFirst()).copy().formatted(Formatting.AQUA), false);
+                }
+                if (!playerLeaves.isEmpty()) {
+                    client.player.sendMessage(Text.of("Player Leave: " + playerLeaves.getFirst()).copy().formatted(Formatting.RED), false);
+                }
+                players = client.player.getScoreboardTeam().getPlayerList().stream().toList();
+            }
         });
 
         UseEntityCallback.EVENT.register((SellEvent::entityInteract));
@@ -225,7 +242,7 @@ public class Mwonmod implements ClientModInitializer {
         if (client.player == null) return;
         if (client.world == null) return;
 
-        if (Config.HANDLER.instance().signUpgradeTooltip) {
+        if (Config.HANDLER.instance().signUpgradeTooltip && onMelonKing()) {
             Vec3d hit = client.player.raycast(4.5, 0, false).getPos();
             String vecKey = serializeVec(hit);
             BlockEntity state = client.world.getBlockEntity(new BlockPos((int) hit.x, (int) hit.y, (int) hit.z).subtract(new Vec3i(GameState.beta_plot ? 0:1, 0, GameState.beta_plot ? 0:1))); // beta plot is +x and +z so blockpos offset isnt needed im p sure
