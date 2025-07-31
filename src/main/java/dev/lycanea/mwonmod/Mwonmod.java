@@ -202,8 +202,6 @@ public class Mwonmod implements ClientModInitializer {
         }
 
         if (!(client.player == null) && !(client.world == null) && onMelonKing() && Mwonmod.inventory_rundown) {
-
-            // okay uhh quick note to self, you first need to completely remove the inventory scan thing and just do that in here so you have more control over it, enchanted melons should be counted seperate from regular melons for example
             int barX = client.getWindow().getScaledWidth() / 2 - 50;
             int barY = client.getWindow().getScaledHeight() - 90;
             int barWidth = 100;
@@ -264,7 +262,7 @@ public class Mwonmod implements ClientModInitializer {
                         if (top.equals("Bought!")) color = Colors.GREEN;
                         if (top.equals("Can't Buy") || Pattern.compile(".\\d/.\\d").matcher(top).find())
                             color = Colors.LIGHT_RED;
-                        if (top.equals("Locked") || top.equals("Locked!") || top.equals("Path Locked!"))
+                        if (top.equals("Locked") || top.equals("Locked!") || top.equals("Path Locked!") || top.equals("Disabled"))
                             color = Colors.RED;
 
 

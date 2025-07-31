@@ -4,6 +4,7 @@ import dev.lycanea.mwonmod.Mwonmod;
 import dev.lycanea.mwonmod.Config;
 
 import dev.lycanea.mwonmod.util.GameState;
+import dev.lycanea.mwonmod.util.ItemUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ActionResult;
@@ -19,10 +20,8 @@ public class AttackEvent {
         if (!Mwonmod.onMelonKing()) return ActionResult.PASS;
         if (!Config.HANDLER.instance().preventAttackingWithHoe) return ActionResult.PASS;
         if (!Objects.equals(GameState.playerLocation, "main_farm")) return ActionResult.PASS;
-        if (Objects.equals(playerEntity.getInventory().getMainHandStack().getItem().getName().getString(), "Wooden Hoe")) {
-            return ActionResult.FAIL;
-        }
-        if (Objects.equals(playerEntity.getInventory().getMainHandStack().getItem().getName().getString(), "Golden Hoe")) {
+        String itemId = ItemUtils.getItemID(playerEntity.getMainHandStack());
+        if (Objects.equals(itemId, "hoe") || Objects.equals(itemId, "perfect_hoe") || Objects.equals(itemId, "divine_hoe") || Objects.equals(itemId, "royal_scythe")) {
             return ActionResult.FAIL;
         }
         return ActionResult.PASS;
