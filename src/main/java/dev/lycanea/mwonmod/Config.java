@@ -65,6 +65,11 @@ public class Config {
     @SerialEntry
     public boolean preventAttackingWithHoe = false;
 
+    @TickBox
+    @AutoGen(category = "QOL", group = "Misc")
+    @SerialEntry
+    public boolean codespaceHider = true;
+
     //Auction
 
     @TickBox

@@ -35,7 +35,7 @@ public class SignRendering {
             pos = sign.getPos().getX() - beta_plot_origin.x;
         }
         if (pos < 0) {
-            ci.cancel();
+            if (Config.HANDLER.instance().codespaceHider) ci.cancel();
             return;
         }
 

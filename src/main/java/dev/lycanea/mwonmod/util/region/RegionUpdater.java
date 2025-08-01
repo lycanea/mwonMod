@@ -2,13 +2,14 @@ package dev.lycanea.mwonmod.util.region;
 
 import dev.lycanea.mwonmod.Mwonmod;
 import dev.lycanea.mwonmod.util.GameState;
-import dev.lycanea.mwonmod.util.region.RegionLoader;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.BlockPos;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
+import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.Objects;
 
@@ -29,7 +30,7 @@ public class RegionUpdater {
                     previousRegion.set(regionName);
                     if (Objects.equals(regionName, "housing")) {
                         assert MinecraftClient.getInstance().player != null;
-                        GameState.housing_pos = MinecraftClient.getInstance().player.getPos();
+                        GameState.housing_pos = MinecraftClient.getInstance().player.getPos().floorAlongAxes(EnumSet.of(Direction.Axis.X, Direction.Axis.Y, Direction.Axis.Z));
                     }
                 }
                 GameState.playerLocation = regionName;
