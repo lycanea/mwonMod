@@ -1,21 +1,25 @@
 package dev.lycanea.mwonmod.mixin;
 
 import dev.lycanea.mwonmod.Config;
+import dev.lycanea.mwonmod.Mwonmod;
 import dev.lycanea.mwonmod.util.GameState;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.scoreboard.*;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(InGameHud.class)
 public class ScoreboardRendering {
+    @Unique
+    java.text.NumberFormat formatter = java.text.NumberFormat.getNumberInstance();
     @Inject(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At("HEAD"))
     private void onRenderScoreboard(DrawContext drawContext, ScoreboardObjective objective, CallbackInfo ci) {
-        java.text.NumberFormat formatter = java.text.NumberFormat.getNumberInstance();
+        if (!Mwonmod.onMelonKing()) return;
         for (ScoreboardEntry entry : objective.getScoreboard().getScoreboardEntries(objective)) {
             Team team = objective.getScoreboard().getScoreHolderTeam(entry.owner());
             String display = entry.owner();
