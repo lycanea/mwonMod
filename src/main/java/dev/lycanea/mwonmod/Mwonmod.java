@@ -207,33 +207,23 @@ public class Mwonmod implements ClientModInitializer {
             int barWidth = 100;
             int barHeight = 6;
 
-            List<String> itemsToCount = Arrays.asList("melon", "enchanted_melon", "super_enchanted_melon", "gold", "shard", "compressed_shard");
-            InventoryScanResult result = scanInventory(client.player, itemsToCount);
+            Map<String, Integer> items = java.util.Map.of("gold", 0xFFFFE100, "shard", 0xFF00AAFF, "compressed_shard", 0xFF0066DB, "melon", 0xFF00FF43, "enchanted_melon", 0xFF00BF32, "super_enchanted_melon", 0xFF008A24);
+            InventoryScanResult result = scanInventory(client.player, items.keySet().stream().toList());
 
             double emptyPercent = (double) result.emptySlots() / 36;
-            double goldPercent = (double) result.itemSlots().get("gold") / 36;
-            double shardPercent = (double) result.itemSlots().get("shard") / 36;
-            double compressedShardPercent = (double) result.itemSlots().get("compressed_shard") / 36;
-            double melonPercent = (double) result.itemSlots().get("melon") / 36;
-            double enchantedMelonPercent = (double) result.itemSlots().get("enchanted_melon") / 36;
-            double superEnchantedMelonPercent = (double) result.itemSlots().get("super_enchanted_melon") / 36;
             double emptyWidth = (barWidth * emptyPercent);
-            double goldWidth = (barWidth * goldPercent);
-            double shardWidth = (barWidth * shardPercent);
-            double compressedShardWidth = (barWidth * compressedShardPercent);
-            double melonWidth = (barWidth * melonPercent);
-            double enchantedMelonWidth = (barWidth * enchantedMelonPercent);
-            double superEnchantedMelonWidth = (barWidth * superEnchantedMelonPercent);
 
             context.fill(barX-1, barY-1, barX+1 + barWidth, barY+1 + barHeight, 0xFF000000); // Border
             context.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF555555); // Misc
-            context.fill(barX, barY, (int) (barX + emptyWidth), barY + barHeight, 0xFF888888); // Background
-            context.fill((int) (barX + emptyWidth), barY, (int) (barX + emptyWidth + goldWidth), barY + barHeight, 0xFFFFE100); // Gold
-            context.fill((int) (barX + emptyWidth + goldWidth), barY, (int) (barX + emptyWidth + goldWidth + shardWidth), barY + barHeight, 0xFF00AAFF); // Shard
-            context.fill((int) (barX + emptyWidth + goldWidth + shardWidth), barY, (int) (barX + emptyWidth + goldWidth + shardWidth + compressedShardWidth), barY + barHeight, 0xFF0066DB); // CShard
-            context.fill((int) (barX + emptyWidth + goldWidth + shardWidth + compressedShardWidth), barY, (int) (barX + emptyWidth + goldWidth + shardWidth + compressedShardWidth + melonWidth), barY + barHeight, 0xFF00FF43); // Melon
-            context.fill((int) (barX + emptyWidth + goldWidth + shardWidth + compressedShardWidth + melonWidth), barY, (int) (barX + emptyWidth + goldWidth + shardWidth + compressedShardWidth + melonWidth + enchantedMelonWidth), barY + barHeight, 0xFF00BF32); // EMelon
-            context.fill((int) (barX + emptyWidth + goldWidth + shardWidth + compressedShardWidth + melonWidth + enchantedMelonWidth), barY, (int) (barX + emptyWidth + goldWidth + shardWidth + compressedShardWidth + melonWidth + enchantedMelonWidth + superEnchantedMelonWidth), barY + barHeight, 0xFF008A24); // SEMelon
+            context.fill(barX, barY, (int) (barX + emptyWidth), barY + barHeight, 0xFF888888); // Empty
+
+            double offset = emptyWidth;
+            for (Map.Entry<String, Integer> entry : items.entrySet()) {
+                double percent = (double) result.itemSlots().get(entry.getKey()) / 36;
+                double width = (barWidth * percent);
+                context.fill((int) (barX + offset), barY, (int) (barX + offset + width), barY + barHeight, entry.getValue());
+                offset += width;
+            }
         }
 
         if (client.getWindow() == null) return;
