@@ -1,6 +1,8 @@
 package dev.lycanea.mwonmod.util.region;
 
 import dev.lycanea.mwonmod.Mwonmod;
+import dev.lycanea.mwonmod.music.CustomMusicManager;
+import dev.lycanea.mwonmod.music.CustomSong;
 import dev.lycanea.mwonmod.util.GameState;
 
 import net.minecraft.client.MinecraftClient;
@@ -18,7 +20,7 @@ import static dev.lycanea.mwonmod.util.region.RegionLoader.plot_origin;
 
 public class RegionUpdater {
 
-  public static final void init() {
+  public static void init() {
 
     AtomicReference<String> previousRegion = new AtomicReference<>();
 
@@ -26,6 +28,7 @@ public class RegionUpdater {
         if (Mwonmod.onMelonKing()) {
             if (RegionLoader.getCurrentRegion() != null) {
                 String regionName = RegionLoader.getCurrentRegion().name;
+                CustomMusicManager.setCurrentSong(CustomSong.NONE);
                 if (!Objects.equals(regionName, previousRegion.get())) {
                     previousRegion.set(regionName);
                     if (Objects.equals(regionName, "housing")) {

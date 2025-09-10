@@ -4,6 +4,8 @@ import com.google.gson.JsonObject;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import dev.lycanea.mwonmod.Mwonmod;
+import dev.lycanea.mwonmod.music.CustomMusicManager;
+import dev.lycanea.mwonmod.music.CustomSong;
 import dev.lycanea.mwonmod.util.region.Region;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
@@ -70,6 +72,18 @@ public class Commands {
                                 Text.literal("item ID: " + ItemUtils.getItemID(context.getSource().getPlayer().getMainHandStack())),
                                 false
                         );
+                        return 1;
+                    })
+                )
+                .then(literal("songtest")
+                    .executes(context -> {
+                        CustomMusicManager.setCurrentSong(CustomSong.SONG_ONE);
+                        return 1;
+                    })
+                )
+                .then(literal("songtest2")
+                    .executes(context -> {
+                        CustomMusicManager.setCurrentSong(CustomSong.NONE);
                         return 1;
                     })
                 )

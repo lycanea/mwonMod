@@ -1,5 +1,6 @@
 package dev.lycanea.mwonmod;
 
+import dev.lycanea.mwonmod.music.CustomMusicManager;
 import dev.lycanea.mwonmod.util.*;
 import dev.lycanea.mwonmod.util.region.*;
 import dev.lycanea.mwonmod.util.discord.DiscordManager;
@@ -105,6 +106,7 @@ public class Mwonmod implements ClientModInitializer {
                 }
                 players = client.player.getScoreboardTeam().getPlayerList().stream().toList();
             }
+            CustomMusicManager.tick(client);
         });
 
         UseEntityCallback.EVENT.register((SellEvent::entityInteract));

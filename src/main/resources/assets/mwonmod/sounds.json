@@ -1,0 +1,11 @@
+{
+    "song_one": {
+        "category": "music",
+        "sounds": [
+            {
+                "name": "mwonmod:song_one",
+                "stream": true
+            }
+        ]
+    }
+}
