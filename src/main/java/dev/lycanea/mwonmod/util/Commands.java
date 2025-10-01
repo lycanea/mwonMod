@@ -18,6 +18,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
+import java.net.URI;
+
 import static dev.lycanea.mwonmod.Mwonmod.itemData;
 import static dev.lycanea.mwonmod.util.region.RegionLoader.beta_plot_origin;
 import static dev.lycanea.mwonmod.util.region.RegionLoader.plot_origin;
@@ -32,10 +34,7 @@ public class Commands {
                     MinecraftClient.getInstance().player.sendMessage(
                             Text.literal("Join the Developer Discord plz thx :3")
                                     .styled(style -> style.withClickEvent(
-                                            new ClickEvent(
-                                                    ClickEvent.Action.OPEN_URL,
-                                                    "https://discord.gg/ZsyGyMuvbz"
-                                            )
+                                            new ClickEvent.OpenUrl(URI.create("https://discord.gg/ZsyGyMuvbz"))
                                     )),
                             false
                     );
@@ -55,8 +54,7 @@ public class Commands {
                             MinecraftClient.getInstance().player.sendMessage(
                                 Text.literal(lookupItemData.get("name").getAsString())
                                     .styled(style -> style.withHoverEvent(
-                                        new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
+                                        new HoverEvent.ShowText(
                                             Text.of(lookupItemData.get("description").getAsString())
                                         )
                                     )),
@@ -129,8 +127,7 @@ public class Commands {
                                 client.player.sendMessage(
                                     Text.literal("Unknown region action: " + action)
                                         .styled(style -> style.withHoverEvent(
-                                            new HoverEvent(
-                                                HoverEvent.Action.SHOW_TEXT,
+                                            new HoverEvent.ShowText(
                                                 Text.of("Valid actions are: start, stop")
                                             )
                                         )),

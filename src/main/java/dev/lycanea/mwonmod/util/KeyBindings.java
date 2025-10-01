@@ -39,7 +39,7 @@ public class KeyBindings {
                 "lycanea.mwonmod.keybinds" // The translation key of the keybinding's category.
         ));
 
-        ClientTickEvents.END_CLIENT_TICK.register(client -> { onKey(client); });
+        ClientTickEvents.END_CLIENT_TICK.register(KeyBindings::onKey);
     }
     public static void onKey(MinecraftClient client) {
 
@@ -68,7 +68,7 @@ public class KeyBindings {
                     client.execute(() -> {
                         String rawName = targetedEntity.getName().getString();
                         if (rawName.matches("^[a-zA-Z0-9_]+$")) {
-                            client.player.networkHandler.sendCommand("profile " + rawName);
+                            client.player.networkHandler.sendChatCommand("profile " + rawName);
                             client.player.sendMessage(Text.of(rawName), false);
                         }
                     });

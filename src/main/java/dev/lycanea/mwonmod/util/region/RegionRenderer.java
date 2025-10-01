@@ -19,33 +19,33 @@ import java.util.function.Function;
 import static net.minecraft.client.render.RenderPhase.*;
 
 public class RegionRenderer {
-    private static final Function<Double, RenderLayer.MultiPhase> asd;
-    static {
-        asd = Util.memoize((lineWidth) -> RenderLayer.of("debug_line_strip", VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.DEBUG_LINES, 1536, RenderLayer.MultiPhaseParameters.builder().program(POSITION_COLOR_PROGRAM).lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(lineWidth))).transparency(NO_TRANSPARENCY).cull(DISABLE_CULLING).depthTest(ALWAYS_DEPTH_TEST).build(false)));
-    }
+//    private static final Function<Double, RenderLayer.MultiPhase> asd;
+//    static {
+//        asd = Util.memoize((lineWidth) -> RenderLayer.of("debug_line_strip", VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.DEBUG_LINES, 1536, RenderLayer.MultiPhaseParameters.builder().program(POSITION_COLOR_PROGRAM).lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(lineWidth))).transparency(NO_TRANSPARENCY).cull(DISABLE_CULLING).depthTest(ALWAYS_DEPTH_TEST).build(false)));
+//    }
     public static void init() {
-        WorldRenderEvents.LAST.register((context) -> {
-            MinecraftClient client = MinecraftClient.getInstance();
-            if (client.player == null || client.world == null || !Config.HANDLER.instance().debugMode || !Mwonmod.onMelonKing() || !MinecraftClient.getInstance().getDebugHud().shouldShowDebugHud()) return;
-
-            Vec3d cameraPos = context.camera().getPos();
-
-            Region currentRegion = RegionLoader.getCurrentRegion();
-            if (currentRegion == null) return;
-
-            Box box = new Box(new Vec3d(currentRegion.min.getX()+RegionLoader.plot_origin.x, currentRegion.min.getY(), currentRegion.min.getZ()+RegionLoader.plot_origin.y),
-                              new Vec3d(currentRegion.max.getX()+RegionLoader.plot_origin.x+1, currentRegion.max.getY()+1, currentRegion.max.getZ()+RegionLoader.plot_origin.y+1)).expand(0.01); // Small expand to prevent z-fighting
-            if (GameState.beta_plot) {
-                box = new Box(new Vec3d(currentRegion.min.getX()+RegionLoader.beta_plot_origin.x, currentRegion.min.getY(), currentRegion.min.getZ()+RegionLoader.beta_plot_origin.y),
-                        new Vec3d(currentRegion.max.getX()+RegionLoader.beta_plot_origin.x+1, currentRegion.max.getY()+1, currentRegion.max.getZ()+RegionLoader.beta_plot_origin.y+1)).expand(0.01);
-            }
-
-            box = box.offset(-cameraPos.x, -cameraPos.y, -cameraPos.z);
-
-            RenderLayer renderLayer = asd.apply(10.0);
-            VertexConsumer cons = context.consumers().getBuffer(renderLayer);
-            drawBoxOutline(context.matrixStack(), cons, box, 1f, 0f, 0f, 1f);
-        });
+//        WorldRenderEvents.LAST.register((context) -> {
+//            MinecraftClient client = MinecraftClient.getInstance();
+//            if (client.player == null || client.world == null || !Config.HANDLER.instance().debugMode || !Mwonmod.onMelonKing() || !MinecraftClient.getInstance().getDebugHud().shouldShowDebugHud()) return;
+//
+//            Vec3d cameraPos = context.camera().getPos();
+//
+//            Region currentRegion = RegionLoader.getCurrentRegion();
+//            if (currentRegion == null) return;
+//
+//            Box box = new Box(new Vec3d(currentRegion.min.getX()+RegionLoader.plot_origin.x, currentRegion.min.getY(), currentRegion.min.getZ()+RegionLoader.plot_origin.y),
+//                              new Vec3d(currentRegion.max.getX()+RegionLoader.plot_origin.x+1, currentRegion.max.getY()+1, currentRegion.max.getZ()+RegionLoader.plot_origin.y+1)).expand(0.01); // Small expand to prevent z-fighting
+//            if (GameState.beta_plot) {
+//                box = new Box(new Vec3d(currentRegion.min.getX()+RegionLoader.beta_plot_origin.x, currentRegion.min.getY(), currentRegion.min.getZ()+RegionLoader.beta_plot_origin.y),
+//                        new Vec3d(currentRegion.max.getX()+RegionLoader.beta_plot_origin.x+1, currentRegion.max.getY()+1, currentRegion.max.getZ()+RegionLoader.beta_plot_origin.y+1)).expand(0.01);
+//            }
+//
+//            box = box.offset(-cameraPos.x, -cameraPos.y, -cameraPos.z);
+//
+//            RenderLayer renderLayer = asd.apply(10.0);
+//            VertexConsumer cons = context.consumers().getBuffer(renderLayer);
+//            drawBoxOutline(context.matrixStack(), cons, box, 1f, 0f, 0f, 1f);
+//        });
     }
 
     private static void drawBoxOutline(MatrixStack matrices, VertexConsumer consumer, Box box, float r, float g, float b, float a) {

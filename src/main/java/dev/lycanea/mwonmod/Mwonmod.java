@@ -15,7 +15,8 @@ import dev.dfonline.flint.hypercube.Mode;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.kyori.adventure.text.Component;
@@ -24,11 +25,13 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.*;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -118,7 +121,7 @@ public class Mwonmod implements ClientModInitializer {
         ClientCommandRegistrationCallback.EVENT.register(Commands::registerCommands);
 
         // set up the overlay rendering thingy
-        HudRenderCallback.EVENT.register((context, tickDelta) -> renderHUDOverlay(context));
+        HudElementRegistry.attachElementBefore(VanillaHudElements.CROSSHAIR, Identifier.of("mwonmod:overlay"), (context, tickCounter) -> renderHUDOverlay(context));
     }
 
     public static JsonObject loadJsonFile(String PATH) {
@@ -172,7 +175,7 @@ public class Mwonmod implements ClientModInitializer {
             debugLines.add("PLOTSPACE POS: " + pos);
 
             int startY = context.getScaledWindowHeight() - 390;
-            drawDebugLines(context, client, debugLines, startY, 10, 0x82B7ED);
+            drawDebugLines(context, client, debugLines, startY, 10, 0xFF82B7ED);
         }
         if (!(client.player == null) && !(client.world == null) && onMelonKing()) {
             long auctionwaitMillis = TimeUtils.auctionTime();
@@ -233,11 +236,12 @@ public class Mwonmod implements ClientModInitializer {
         if (client.world == null) return;
 
         if (Config.HANDLER.instance().signUpgradeTooltip && onMelonKing()) {
+
             Vec3d hit = client.player.raycast(4.5, 0, false).getPos();
             String vecKey = serializeVec(hit);
             BlockEntity state = client.world.getBlockEntity(new BlockPos((int) hit.x, (int) hit.y, (int) hit.z).subtract(new Vec3i(GameState.beta_plot ? 0:1, 0, GameState.beta_plot ? 0:1))); // beta plot is +x and +z so blockpos offset isnt needed im p sure
 
-            ArrayList<Text> signTooltip = new ArrayList<>();
+            ArrayList<TooltipComponent> signTooltip = new ArrayList<>();
             if (state instanceof SignBlockEntity signBlock) {
                 for (Text[] textList : new Text[][]{signBlock.getFrontText().getMessages(true), signBlock.getBackText().getMessages(true)}) {
                     if (textList.length == 4 && !textList[0].getString().trim().isEmpty()) {
@@ -269,17 +273,17 @@ public class Mwonmod implements ClientModInitializer {
                         upgradeDesc = upgradeDesc.replace(" queen ", " monarch ").replace(" king ", " monarch ");
                         List<OrderedText> otList = MC.textRenderer.wrapLines(StringVisitable.plain(upgradeDesc), client.getWindow().getScaledWidth() / 3);
 
-                        signTooltip = new ArrayList<>(List.of(Text.literal(m).withColor(color)));
+                        signTooltip = new ArrayList<>(List.of(TooltipComponent.of(Text.literal(m).withColor(color).asOrderedText())));
                         for (OrderedText t : otList) {
                             Text nt = convertOrderedTextToTextWithStyle(t);
-                            signTooltip.add(Text.literal(nt.getString()).withColor(Colors.LIGHT_GRAY));
+                            signTooltip.add(TooltipComponent.of(Text.literal(nt.getString()).withColor(Colors.LIGHT_GRAY).asOrderedText()));
                         }
                     }
                 }
             }
 
             if (!signTooltip.isEmpty()) {
-                context.drawTooltip(client.textRenderer, signTooltip, client.getWindow().getScaledWidth() / 2, client.getWindow().getScaledHeight() / 2);
+                context.drawTooltipImmediately(client.textRenderer, signTooltip, client.getWindow().getScaledWidth() / 2, client.getWindow().getScaledHeight() / 2, HoveredTooltipPositioner.INSTANCE, null);
             }
         }
     }
@@ -324,7 +328,7 @@ public class Mwonmod implements ClientModInitializer {
         int emptySlots = 0;
 
         // Scan main inventory
-        for (var stack : player.getInventory().main) {
+        for (var stack : player.getInventory().getMainStacks()) {
             if (stack.isEmpty()) {
                 emptySlots++;
             } else {
@@ -341,10 +345,10 @@ public class Mwonmod implements ClientModInitializer {
 
     public static boolean onMelonKing() {
 //        return true;
-        if (Flint.getUser().getPlot() == null) {GameState.beta_plot=false;return false;}
-        GameState.beta_plot = Flint.getUser().getPlot().getId() == 202028;
         if (Config.HANDLER.instance().ignoreMelonKingCheck) return true;
+        if (Flint.getUser().getPlot() == null) {GameState.beta_plot=false;return false;}
         if (Flint.getUser().getMode() != Mode.PLAY) return false;
+        GameState.beta_plot = Flint.getUser().getPlot().getId() == 202028;
         return Flint.getUser().getPlot().getId() == 22467 || Flint.getUser().getPlot().getId() == 202028;
     }
 
@@ -354,11 +358,11 @@ public class Mwonmod implements ClientModInitializer {
             maxWidth = Math.max(maxWidth, client.textRenderer.getWidth(line));
         }
 
-        context.fill(RenderLayer.getEndPortal(), 0, startY - 2, maxWidth + 4, startY + (lines.size() * lineSpacing), 0x80000000);
+        context.fill(0, startY - 2, maxWidth + 4, startY + (lines.size() * lineSpacing), 0xFF000000);
 
         int y = startY;
         for (String line : lines) {
-            context.drawText(client.textRenderer, line, 0, y, color, true);
+            context.drawText(client.advanceValidatingTextRenderer, line, 0, y, color, false);
             y += lineSpacing;
         }
     }

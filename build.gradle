@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.10-SNAPSHOT'
+    id 'fabric-loom' version '1.11-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -16,6 +16,7 @@ repositories {
     // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html
     // for more information about repositories.
+    maven { url = "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1" }
     maven {
         name = "Terraformers"
         url = "https://maven.terraformersmc.com/"
@@ -41,6 +42,8 @@ repositories {
 }
 
 dependencies {
+    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+
     implementation include('com.github.jagrosh:DiscordIPC:a8d6631')
     implementation include('org.json:json:20230227')
     implementation include('com.kohlschutter.junixsocket:junixsocket-common:2.6.2')
@@ -53,11 +56,11 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    modCompileOnlyApi("com.terraformersmc:modmenu:${project.modmenu_version}")
-    modCompileOnlyApi "dev.isxander:yet-another-config-lib:${project.yacl_version}"
+    modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}")
+    modImplementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
     implementation 'org.slf4j:slf4j-api:1.7.36'
 
-    modCompileOnlyApi("maven.modrinth:flint:${project.flint_version}")
+    modImplementation("maven.modrinth:flint:${project.flint_version}")
     modImplementation include("net.kyori:adventure-platform-fabric:${project.adventure_fabric_version}") {
         exclude group: "net.fabricmc.fabric-api"
     }

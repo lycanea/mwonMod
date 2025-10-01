@@ -8,6 +8,7 @@ import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier;
 
 import java.util.Objects;
 import java.util.Set;
@@ -23,14 +24,14 @@ public class ItemUtils {
         NbtCompound customData = stack.getComponents().getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).copyNbt();
         String customName = stack.getComponents().getOrDefault(DataComponentTypes.CUSTOM_NAME, NbtComponent.DEFAULT).toString();
         String itemType = stack.getItem().toString();
-        Set<String> dataKeys = customData.getCompound("PublicBukkitValues").getKeys();
+        Set<String> dataKeys = customData.getCompound("PublicBukkitValues").get().getKeys();
 
         if (dataKeys.contains("hypercube:kingbound")) {
             if (Objects.equals(itemType, "minecraft:stone_hoe")) return "royal_scythe";
         }
         if (dataKeys.contains("hypercube:autosmelter")) {
-            if (customData.getCompound("PublicBukkitValues").getDouble("hypercube:searching") > 5) return "divine_hoe";
-            if (customData.getCompound("PublicBukkitValues").getDouble("hypercube:autosmelter") == 1 && customData.getCompound("PublicBukkitValues").getDouble("hypercube:reforge") == 11 && customData.getCompound("PublicBukkitValues").getDouble("hypercube:searching") == 5 && customData.getCompound("PublicBukkitValues").getDouble("hypercube:movement") == 5 && customData.getCompound("PublicBukkitValues").getDouble("hypercube:gathering") == 5) {
+            if (customData.getCompound("PublicBukkitValues").get().getInt("hypercube:searching").get() > 5) return "divine_hoe";
+            if (customData.getCompound("PublicBukkitValues").get().getInt("hypercube:autosmelter").get() == 1 && customData.getCompound("PublicBukkitValues").get().getInt("hypercube:reforge").get() == 11 && customData.getCompound("PublicBukkitValues").get().getInt("hypercube:searching").get() == 5 && customData.getCompound("PublicBukkitValues").get().getInt("hypercube:movement").get() == 5 && customData.getCompound("PublicBukkitValues").get().getInt("hypercube:gathering").get() == 5) {
                 return "perfect_hoe";}
             return "hoe";
         }
@@ -68,11 +69,11 @@ public class ItemUtils {
         if (itemDataElement != null) {
             JsonObject itemData = itemDataElement.getAsJsonObject();
             JsonElement itemModelData = itemData.get("custom_model_data");
-            if (itemModelData != null) {
-                stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(itemModelData.getAsInt()));
-            }
+//            if (itemModelData != null) {
+//                stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(itemModelData.getAsInt())); TEXTURE PACK FORMATTING CHANGE, 1.21.8 NEEDS FLOAT LIST FOR CUSTOM MODEL DATA, CHANGE LATER LMFAO
+//            }
         }
-//        stack.set(DataComponentTypes.ITEM_MODEL, Identifier.of("minecraft:dirt"));
+        stack.set(DataComponentTypes.ITEM_MODEL, Identifier.of("minecraft:dirt"));
         return stack;
     }
 }

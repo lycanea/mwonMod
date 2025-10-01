@@ -107,7 +107,7 @@ public class OnPacketMixin {
                     return;
                 }
                 JsonObject itemData = itemElement.getAsJsonObject();
-                MinecraftClient.getInstance().player.sendMessage(Text.literal("Auction Item: " + itemData.get("name").getAsString()).styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(itemData.get("description").getAsString())))), false);
+                MinecraftClient.getInstance().player.sendMessage(Text.literal("Auction Item: " + itemData.get("name").getAsString()).styled(style -> style.withHoverEvent(new HoverEvent.ShowText(Text.of(itemData.get("description").getAsString())))), false);
             } catch (Exception e) {
                 if (Config.HANDLER.instance().debugMode)
                     MinecraftClient.getInstance().player.sendMessage(Text.literal("Error accessing item data: " + e.getMessage()), false);
