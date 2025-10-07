@@ -4,7 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.lycanea.mwonmod.Mwonmod;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -24,14 +23,16 @@ public class ItemUtils {
         NbtCompound customData = stack.getComponents().getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).copyNbt();
         String customName = stack.getComponents().getOrDefault(DataComponentTypes.CUSTOM_NAME, NbtComponent.DEFAULT).toString();
         String itemType = stack.getItem().toString();
+        if (customData.getCompound("PublicBukkitValues").isEmpty()) return customName; // this is bad for stuff like gold but hey atleast its not crashing now, fix later
         Set<String> dataKeys = customData.getCompound("PublicBukkitValues").get().getKeys();
+        NbtCompound bukkitValuse = customData.getCompound("PublicBukkitValues").get();
 
         if (dataKeys.contains("hypercube:kingbound")) {
             if (Objects.equals(itemType, "minecraft:stone_hoe")) return "royal_scythe";
         }
         if (dataKeys.contains("hypercube:autosmelter")) {
-            if (customData.getCompound("PublicBukkitValues").get().getInt("hypercube:searching").get() > 5) return "divine_hoe";
-            if (customData.getCompound("PublicBukkitValues").get().getInt("hypercube:autosmelter").get() == 1 && customData.getCompound("PublicBukkitValues").get().getInt("hypercube:reforge").get() == 11 && customData.getCompound("PublicBukkitValues").get().getInt("hypercube:searching").get() == 5 && customData.getCompound("PublicBukkitValues").get().getInt("hypercube:movement").get() == 5 && customData.getCompound("PublicBukkitValues").get().getInt("hypercube:gathering").get() == 5) {
+            if (bukkitValuse.getInt("hypercube:searching", -1) > 5) return "divine_hoe";
+            if (bukkitValuse.getInt("hypercube:autosmelter", -1) == 1 && bukkitValuse.getInt("hypercube:reforge", -1) == 11 && bukkitValuse.getInt("hypercube:searching", -1) == 5 && bukkitValuse.getInt("hypercube:movement", -1) == 5 && bukkitValuse.getInt("hypercube:gathering", -1) == 5) {
                 return "perfect_hoe";}
             return "hoe";
         }
