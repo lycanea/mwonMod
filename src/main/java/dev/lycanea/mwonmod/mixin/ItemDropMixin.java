@@ -2,7 +2,6 @@ package dev.lycanea.mwonmod.mixin;
 
 import dev.lycanea.mwonmod.Config;
 import dev.lycanea.mwonmod.Mwonmod;
-import net.kyori.adventure.sound.Sound;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.Item;
@@ -29,7 +28,7 @@ public class ItemDropMixin {
                     .map(Text::getString)
                     .forEach(str -> {
                         if (Config.HANDLER.instance().preventDroppingReflectives && "Reflection".equals(str)) {
-                            player.playSound((Sound) SoundEvents.ITEM_SHIELD_BLOCK);
+                            player.playSound(SoundEvents.ITEM_SHIELD_BLOCK.value());
                             cir.setReturnValue(false);
                             cir.cancel();
                         }
