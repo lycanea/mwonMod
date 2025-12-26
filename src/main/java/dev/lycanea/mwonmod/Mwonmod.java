@@ -191,17 +191,19 @@ public class Mwonmod implements ClientModInitializer {
             if (auctionNotificationSent && auctionwaitMillis > 30000) {
                 auctionNotificationSent = false;
             }
+            int flawlessTimerOffset = 3;
             if (Config.HANDLER.instance().auctionTimer) {
                 long auctionminutes = auctionwaitMillis / 60000;
                 long auctionseconds = (auctionwaitMillis % 60000) / 1000;
-                context.drawTextWithShadow(client.textRenderer, String.format("Next Auction:  00:%02d:%02d", auctionminutes, auctionseconds), 3, 3, 0xFFFFFF);
+                context.drawTextWithShadow(client.textRenderer, String.format("Next Auction:  00:%02d:%02d", auctionminutes, auctionseconds), 3, 3, 0xFFFFFFFF);
+                flawlessTimerOffset += 9;
             }
             if (Config.HANDLER.instance().flawlessTimer) {
                 long flawlessWait = TimeUtils.flawlessTime();
                 if (flawlessWait < 4428) {
-                    context.drawTextWithShadow(client.textRenderer, String.format("Next Flawless: %02d:%02d:%02d", flawlessWait / 60 / 60, (flawlessWait + 1) / 60 % 60, (flawlessWait + 1)%60), 3, 12, 0xFFFFFF);
+                    context.drawTextWithShadow(client.textRenderer, String.format("Next Flawless: %02d:%02d:%02d", flawlessWait / 60 / 60, (flawlessWait + 1) / 60 % 60, (flawlessWait + 1)%60), 3, flawlessTimerOffset, 0xFFFFFFFF);
                 } else {
-                    context.drawTextWithShadow(client.textRenderer, "Next Flawless: Now", 3, 12, 0xFFFFFF);
+                    context.drawTextWithShadow(client.textRenderer, "Next Flawless: Now", 3, flawlessTimerOffset, 0xFFFFFFFF);
                 }
             }
         }
@@ -252,7 +254,7 @@ public class Mwonmod implements ClientModInitializer {
                         if (!m2.isEmpty()) m += " " + m2;
                         if (m.contains("City Improvement:")) m = m2;
 
-                        int color = 0xFFFFFF;
+                        int color = 0xFFFFFFFF;
 
                         if (top.equals("[Right Click]")) color = 0xfcdb6d;
                         if (top.equals("Bought!")) color = Colors.GREEN;
