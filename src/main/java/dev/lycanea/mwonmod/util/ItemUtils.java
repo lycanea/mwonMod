@@ -23,20 +23,22 @@ public class ItemUtils {
         NbtCompound customData = stack.getComponents().getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).copyNbt();
         String customName = stack.getComponents().getOrDefault(DataComponentTypes.CUSTOM_NAME, NbtComponent.DEFAULT).toString();
         String itemType = stack.getItem().toString();
-        if (customData.getCompound("PublicBukkitValues").isEmpty()) return customName; // this is bad for stuff like gold but hey atleast its not crashing now, fix later
-        Set<String> dataKeys = customData.getCompound("PublicBukkitValues").get().getKeys();
-        NbtCompound bukkitValuse = customData.getCompound("PublicBukkitValues").get();
+        if (customData.getCompound("PublicBukkitValues").isPresent()) {
+            NbtCompound bukkitValues = customData.getCompound("PublicBukkitValues").get();
+            Set<String> dataKeys = bukkitValues.getKeys();
 
-        if (dataKeys.contains("hypercube:kingbound")) {
-            if (Objects.equals(itemType, "minecraft:stone_hoe")) return "royal_scythe";
+            if (dataKeys.contains("hypercube:kingbound")) {
+                if (Objects.equals(itemType, "minecraft:stone_hoe")) return "royal_scythe";
+            }
+            if (dataKeys.contains("hypercube:autosmelter")) {
+                if (bukkitValues.getInt("hypercube:searching", -1) > 5) return "divine_hoe";
+                if (bukkitValues.getInt("hypercube:autosmelter", -1) == 1 && bukkitValues.getInt("hypercube:reforge", -1) == 11 && bukkitValues.getInt("hypercube:searching", -1) == 5 && bukkitValues.getInt("hypercube:movement", -1) == 5 && bukkitValues.getInt("hypercube:gathering", -1) == 5) {
+                    return "perfect_hoe";
+                }
+                return "hoe";
+            }
+            if (dataKeys.contains("hypercube:crystaltier")) return "enchant_crystal";
         }
-        if (dataKeys.contains("hypercube:autosmelter")) {
-            if (bukkitValuse.getInt("hypercube:searching", -1) > 5) return "divine_hoe";
-            if (bukkitValuse.getInt("hypercube:autosmelter", -1) == 1 && bukkitValuse.getInt("hypercube:reforge", -1) == 11 && bukkitValuse.getInt("hypercube:searching", -1) == 5 && bukkitValuse.getInt("hypercube:movement", -1) == 5 && bukkitValuse.getInt("hypercube:gathering", -1) == 5) {
-                return "perfect_hoe";}
-            return "hoe";
-        }
-        if (dataKeys.contains("hypercube:crystaltier")) return "enchant_crystal";
 
         if (Objects.equals(customName, "empty[siblings=[literal{Gold}[style={color=gold,!bold,!italic,!underlined,!strikethrough,!obfuscated}]]]")) return "gold";
         if (Objects.equals(customName, "empty[siblings=[literal{Shard}[style={color=dark_aqua,!bold,!italic,!underlined,!strikethrough,!obfuscated}]]]")) return "shard";
