@@ -210,13 +210,14 @@ public class Mwonmod implements ClientModInitializer {
         }
 
         if (!(client.player == null) && !(client.world == null) && onMelonKing() && Mwonmod.inventory_rundown) {
-            int barX = client.getWindow().getScaledWidth() / 2 - 50;
             int barY = client.getWindow().getScaledHeight() - 90;
             int barWidth = 100;
             int barHeight = 6;
             if(Config.HANDLER.instance().showPercentageInInventoryOverview) {
                 barHeight = 9;
+                barWidth = 120;
             }
+            int barX = client.getWindow().getScaledWidth() / 2 - (barWidth / 2);
 
             Map<String, Integer> items = java.util.Map.of("gold", 0xFFFFE100, "shard", 0xFF00AAFF, "compressed_shard", 0xFF0066DB, "melon", 0xFF00FF43, "enchanted_melon", 0xFF00BF32, "super_enchanted_melon", 0xFF008A24);
             InventoryScanResult result = scanInventory(client.player, items.keySet().stream().toList());
@@ -237,10 +238,12 @@ public class Mwonmod implements ClientModInitializer {
             }
 
             if(Config.HANDLER.instance().showPercentageInInventoryOverview) {
-                String inventoryOverviewText = String.valueOf(Math.floor(emptyPercent * 100)).replace(".0", "") +
-                        "%" +
+                String inventoryOverviewText =
+                        " "
+                        + String.valueOf(Math.floor(emptyPercent * 100)).replace(".0", "") +
+                        "% empty" +
                         " " +
-                        "(" + result.emptySlots() + " empty)";
+                        "(" + result.emptySlots() + " slots)";
                 context.drawText(
                         MinecraftClient.getInstance().textRenderer,
                         inventoryOverviewText,
