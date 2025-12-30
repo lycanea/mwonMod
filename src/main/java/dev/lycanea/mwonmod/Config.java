@@ -68,6 +68,11 @@ public class Config {
     @TickBox
     @AutoGen(category = "QOL", group = "Misc")
     @SerialEntry
+    public boolean showPercentageInInventoryOverview = false;
+
+    @TickBox
+    @AutoGen(category = "QOL", group = "Misc")
+    @SerialEntry
     public boolean codespaceHider = true;
 
     //Auction

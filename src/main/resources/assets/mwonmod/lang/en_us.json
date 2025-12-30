@@ -16,6 +16,7 @@
   "yacl3.config.mwonmod:config.hideSellFailMessage": "Hide \"You don't have any Super Enchanted Melons\" Messages",
   "yacl3.config.mwonmod:config.preventAttackingWithHoe": "Prevent Attacking With Hoe",
   "yacl3.config.mwonmod:config.codespaceHider": "Melon King Codespace Hider",
+  "yacl3.config.mwonmod:config.showPercentageInInventoryOverview": "Show Percentage in Inventory Overview",
 
   "yacl3.config.mwonmod:config.category.Auction": "Auction Improvements",
   "yacl3.config.mwonmod:config.category.Auction.group.Timers": "Timers",

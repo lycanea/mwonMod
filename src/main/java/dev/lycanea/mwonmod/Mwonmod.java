@@ -213,7 +213,10 @@ public class Mwonmod implements ClientModInitializer {
             int barX = client.getWindow().getScaledWidth() / 2 - 50;
             int barY = client.getWindow().getScaledHeight() - 90;
             int barWidth = 100;
-            int barHeight = 9;
+            int barHeight = 6;
+            if(Config.HANDLER.instance().showPercentageInInventoryOverview) {
+                barHeight = 9;
+            }
 
             Map<String, Integer> items = java.util.Map.of("gold", 0xFFFFE100, "shard", 0xFF00AAFF, "compressed_shard", 0xFF0066DB, "melon", 0xFF00FF43, "enchanted_melon", 0xFF00BF32, "super_enchanted_melon", 0xFF008A24);
             InventoryScanResult result = scanInventory(client.player, items.keySet().stream().toList());
@@ -233,21 +236,20 @@ public class Mwonmod implements ClientModInitializer {
                 offset += width;
             }
 
-            var inventoryOverviewText = new StringBuilder();
-            inventoryOverviewText.append(
-                    String.valueOf(Math.floor(emptyPercent * 100)).replace(".0", "")
-            );
-            inventoryOverviewText.append("%");
-            inventoryOverviewText.append(" ");
-            inventoryOverviewText.append("(").append(result.emptySlots()).append(" empty)");
-            context.drawText(
-                    MinecraftClient.getInstance().textRenderer,
-                    inventoryOverviewText.toString(),
-                    barX + 1,
-                    barY + 1,
-                    Colors.BLACK,
-                    false
-            );
+            if(Config.HANDLER.instance().showPercentageInInventoryOverview) {
+                String inventoryOverviewText = String.valueOf(Math.floor(emptyPercent * 100)).replace(".0", "") +
+                        "%" +
+                        " " +
+                        "(" + result.emptySlots() + " empty)";
+                context.drawText(
+                        MinecraftClient.getInstance().textRenderer,
+                        inventoryOverviewText,
+                        barX + 1,
+                        barY + 1,
+                        Colors.BLACK,
+                        false
+                );
+            }
         }
 
         if (client.getWindow() == null) return;
