@@ -3,6 +3,7 @@ package dev.lycanea.mwonmod.mixin;
 import dev.dfonline.flint.util.Toaster;
 import dev.lycanea.mwonmod.Config;
 import dev.lycanea.mwonmod.Mwonmod;
+import dev.lycanea.mwonmod.util.BossState;
 import dev.lycanea.mwonmod.util.GameState;
 
 import com.google.gson.JsonObject;
@@ -17,6 +18,7 @@ import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,6 +38,11 @@ public class OnPacketMixin {
     private static <T extends PacketListener> void onGameMessage(Packet<T> packet, PacketListener listener, CallbackInfo ci) {
         if (packet instanceof GameMessageS2CPacket(Text content, boolean overlay)) {
             handleChatPacket(content, overlay, ci);
+        }
+        if (packet instanceof PlaySoundS2CPacket PlaySoundS2CPacket && Mwonmod.onMelonKing()) {
+            if (Objects.equals(PlaySoundS2CPacket.getSound().getIdAsString(), "minecraft:entity.sheep.shear") && Config.HANDLER.instance().muteSellingSound) {
+                ci.cancel();
+            }
         }
         if (packet instanceof OpenScreenS2CPacket openScreenPacket) {
             if (Mwonmod.onMelonKing()) {
@@ -68,15 +75,23 @@ public class OnPacketMixin {
 
             Toaster.toast(
                     Component.text("MwonMod"),
-                    Component.text("Using Alpha version ", mainStyle)
+                    Component.text("Version: ", mainStyle)
                             .append(versionComponent)
-                            .append(Component.text(", please report bugs on the Discord!", mainStyle))
+                            .append(Component.text(", bugs may occur!", mainStyle))
             );
 
             GameState.melonJoin = LocalDateTime.now();
         }
 
         if (!Mwonmod.onMelonKing()) return;
+        if (message.equals("» All combatants perished, so the battle was lost.")) {
+            BossState.updateBoss(null);
+        }
+        if (BossState.dialogueToBoss.containsKey(message)) {
+            String bossID = BossState.dialogueToBoss.get(message);
+            BossState.updateBoss(bossID);
+        }
+
         if (Config.HANDLER.instance().hideSellFailMessage && Objects.equals(message, "> You don't have any Super Enchanted Melons. Get them by cooking four Enchanted Melon Slices, which are gotten by cooking four Melon Slices.")) {
             ci.cancel();
         }
@@ -115,6 +130,9 @@ public class OnPacketMixin {
         } else if (kingMatcher.find()) {
             assert MinecraftClient.getInstance().player != null;
             if (Config.HANDLER.instance().kingChangeNotification) {
+                GameState.bank_gold = 0;
+                GameState.coins = 0;
+                BossState.updateBoss(null);
                 GameState.currentMonarch = kingMatcher.group(1);
                 Mwonmod.notification("New Monarch", kingMatcher.group(1));
             }

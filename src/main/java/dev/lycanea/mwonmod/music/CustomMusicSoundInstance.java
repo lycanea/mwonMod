@@ -6,10 +6,10 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.random.Random;
 
-public class LoopingSoundInstance extends AbstractSoundInstance implements TickableSoundInstance {
+public class CustomMusicSoundInstance extends AbstractSoundInstance implements TickableSoundInstance {
     private boolean done = false;
 
-    public LoopingSoundInstance(SoundEvent soundEvent) {
+    public CustomMusicSoundInstance(SoundEvent soundEvent) {
         super(soundEvent, SoundCategory.MUSIC, Random.create());
         this.volume = 1.0f;
         this.pitch = 1.0f;

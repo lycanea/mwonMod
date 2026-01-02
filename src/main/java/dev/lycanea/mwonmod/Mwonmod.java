@@ -24,7 +24,6 @@ import net.kyori.adventure.title.Title;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -83,6 +82,8 @@ public class Mwonmod implements ClientModInitializer {
         }
 
         itemData = loadJsonFile(ITEM_DATA_PATH);
+
+        BossState.init();
 
         RegionLoader.init();
         RegionRenderer.init();
@@ -149,6 +150,7 @@ public class Mwonmod implements ClientModInitializer {
     }
 
     private void renderHUDOverlay(DrawContext context) {
+        // we really should move this to a seperate class and... clean it up more
         MinecraftClient client = MinecraftClient.getInstance();
         if (Config.HANDLER.instance().debugMode) {
             List<String> debugLines = new ArrayList<>(List.of(
@@ -167,6 +169,7 @@ public class Mwonmod implements ClientModInitializer {
             if (GameState.trophies != null) debugLines.add("CURRENT TROPHIES: " + GameState.trophies);
             if (GameState.karma != null) debugLines.add("CURRENT KARMA: " + GameState.karma);
             if (GameState.melonJoin != null) debugLines.add("MWON TIMER: " + Duration.between(GameState.melonJoin, LocalDateTime.now()).getSeconds());
+            if (BossState.boss != null) debugLines.add("CURRENT BOSS: " + BossState.boss.bossID);
 
             assert MinecraftClient.getInstance().player != null;
             BlockPos pos = MinecraftClient.getInstance().player.getBlockPos().add(-plot_origin.x, 0, -plot_origin.y);
@@ -175,7 +178,7 @@ public class Mwonmod implements ClientModInitializer {
             }
             debugLines.add("PLOTSPACE POS: " + pos);
 
-            int startY = context.getScaledWindowHeight() - 390;
+            int startY = context.getScaledWindowHeight() /2 - debugLines.toArray().length*5;
             drawDebugLines(context, client, debugLines, startY, 10, 0xFF82B7ED);
         }
         if (!(client.player == null) && !(client.world == null) && onMelonKing()) {

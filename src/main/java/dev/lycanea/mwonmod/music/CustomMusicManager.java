@@ -1,5 +1,6 @@
 package dev.lycanea.mwonmod.music;
 
+import dev.lycanea.mwonmod.util.BossState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.sound.SoundEvent;
@@ -12,6 +13,13 @@ public class CustomMusicManager {
 
     public static void setCurrentSong(CustomSong song) {
         currentSong = song;
+    }
+
+    public static void init() {
+        BossState.BossChangeCallback.EVENT.register((previousBoss, currentBoss) -> {
+
+            return null;
+        });
     }
 
     public static void tick(MinecraftClient client) {
@@ -33,7 +41,7 @@ public class CustomMusicManager {
         if (soundId == null) return;
 
         SoundEvent soundEvent = SoundEvent.of(soundId);
-        LoopingSoundInstance sound = new LoopingSoundInstance(soundEvent);
+        CustomMusicSoundInstance sound = new CustomMusicSoundInstance(soundEvent);
         currentSound = sound;
 
         client.getSoundManager().play(sound);
@@ -41,7 +49,7 @@ public class CustomMusicManager {
 
     public static void stopCurrentSong(MinecraftClient client) {
         if (currentSound != null) {
-            if (currentSound instanceof LoopingSoundInstance looping) {
+            if (currentSound instanceof CustomMusicSoundInstance looping) {
                 looping.stop();
             }
             client.getSoundManager().stop(currentSound);

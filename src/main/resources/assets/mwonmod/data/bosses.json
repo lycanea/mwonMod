@@ -1,0 +1,107 @@
+{
+  "pumpkin_king_easy": {
+    "dialogue": [
+      "Pumpkin King > It’s beautiful out, no?",
+      "Pumpkin King > Peace and quiet, free from the stressful tasks brought upon us by interkingdom politics.",
+      "Pumpkin King > A bit too quiet, some might say. I am more than aware of the crimes your people have committed.",
+      "Pumpkin King > A king of taproots, ripped away from his people and throne. Though an absentee king, how much involvement is too much?",
+      "Pumpkin King > The monarch of fungal networks, slaughtered, in spite of all his advantages. It was a lesson of hubris you failed to learn.",
+      "Pumpkin King > The eldest lord of the grass, his legacy burned from history itself. Now nothing more than a page in the books, no thanks to you.",
+      "Pumpkin King > Your predecessor, a poetic reflection of your fate. Time is cruel, but most of all to the realm you hail from.",
+      "Pumpkin King > And now, me. Your journey could have ended, but I was not a friend, but a mere road block.",
+      "Pumpkin King > ...Why?",
+      "> His words flitter away like smoke through your fingers. Order was never your cup of melon juice.",
+      "> He can only speak to you in a language you know intimately.",
+      "> Your journey ends here, the hands of war stretched thin enough to snap in two. After all, when you reach the top, there's only one way to go.",
+      "> Down."
+    ],
+    "phases": [
+      {"audio": "mwonmod:pumpkin_king_phaseOne"}
+    ],
+    "arena": "economics_room"
+  },
+
+  "carrot_king_normal": {
+    "dialogue": [
+      "Carrot King > It appears you have fallen for my trap.",
+      "Carrot King > Your rash decision to attack my kingdom shall only end in the loss of your lives.",
+      "Carrot King > Now fight, or die trying!",
+      "Carrot King > Freeze!",
+      "Carrot King > Fry!",
+      "Carrot King > Feel the wrath of the Carrot Kingdom!",
+      "Carrot King > You have exhausted my machinery.",
+      "Carrot King > I doubt you will be simply leaving me be, though.",
+      "Carrot King > I suppose I should have forseen an event such as this.",
+      "Carrot King > Though I was not expecting there to be so many of you.",
+      "Carrot King > I could have sworn I have seen some of your faces more than once...",
+      "Carrot King > In fact, it's almost as if your soldiers simply cannot die."
+    ],
+    "phases": [
+      {"trigger": 2, "name": "phase1"}, {"trigger": 6, "name": "defeat"}
+    ]
+  },
+  "mushroom_king_normal": {
+    "dialogue": [
+      "Mushroom King > Your kingdom's technology is inferior to mine by far.",
+      "Mushroom King > Yet still, you have the audacity to challenge me in battle?",
+      "Mushroom King > Then let us see who will reign victorious.",
+      "Mushroom King > I hear of your undying soldiers, words from the Taproot himself. Meet my own.",
+      "Mushroom King > Come here, cowards!",
+      "Mushroom King > Feel the full force of my machine!",
+      "Mushroom King > You have... slain me, it seems...",
+      "Mushroom King > If you have defeated me despite my best attempts...",
+      "Mushroom King > ...Then so be it."
+    ],
+    "phases": [
+      {"trigger": 2, "name": "phase1"}, {"trigger": 6, "name": "defeat"}
+    ]
+  },
+  "wheat_king_normal": {
+    "dialogue": [
+      "Wheat King > My kingdom was destroyed centuries before the first historians came to be.",
+      "Wheat King > Yet still, I live on, the magic from my spires giving me what little vitality I have left.",
+      "Wheat King > And you wish to destroy that? What would you gain from such acts?",
+      "Wheat King > Though, if I cannot convince you otherwise, then it seems we must do battle.",
+      "Wheat King > Respect your elders!",
+      "Wheat King > You dare destroy half of what I use to live?",
+      "Wheat King > This shall not bode well for you.",
+      "Wheat King > You broke them both...",
+      "Wheat King > I suppose that marks the end of my fragile life.",
+      "Wheat King > I cannot live on without their magic...",
+      "Wheat King > So this shall be my final farewell.",
+      "Wheat King > I despise you."
+    ],
+    "phases": [
+      {"trigger": 3, "name": "phase1"}, {"trigger": 6, "name": "half_killed"}, {"trigger": 7, "name": "defeat"}
+    ]
+  },
+  "melon_king_normal": {
+    "dialogue": [
+      "Melon King > I knew I would see you again.",
+      "Melon King > Neither of us are going anywhere.",
+      "Melon King > At least not any time soon.",
+      "Melon King > That said...",
+      "Melon King > How about a rematch?",
+      "Melon King > I can't... do this... anymore...",
+      "Melon King > Slay me... and claim... your reward...",
+      "Melon King > Well, there's no point in hiding it.",
+      "Melon King > You know what comes next.",
+      "title spam dialogue",
+      "Melon King > I can't... keep going...",
+      "Melon King > Despite my best efforts...",
+      "Melon King > Despite all the power I've used against you...",
+      "Melon King > You just keep coming back...",
+      "Melon King > Once and once again...",
+      "Melon King > I would envy you, Toxicpid...",
+      "Melon King > But your suffering is...",
+      "Melon King > Far greater than my own...",
+      "Melon King > Regardless... it seems that...",
+      "Melon King > This is the end of the road for me...",
+      "Melon King > Yet still, I have a feeling...",
+      "Melon King > We shall meet again."
+    ],
+    "phases": [
+      {"trigger": 4, "name": "phase1"}, {"trigger":  5, "name": "fakeout"}, {"trigger": 8, "name": "phase2"}, {"trigger": 10, "name": "defeat"}
+    ]
+  }
+}

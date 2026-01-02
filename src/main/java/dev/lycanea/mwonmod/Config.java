@@ -75,6 +75,11 @@ public class Config {
     @SerialEntry
     public boolean codespaceHider = true;
 
+    @TickBox
+    @AutoGen(category = "QOL", group = "Misc")
+    @SerialEntry
+    public boolean muteSellingSound = true;
+
     //Auction
 
     @TickBox

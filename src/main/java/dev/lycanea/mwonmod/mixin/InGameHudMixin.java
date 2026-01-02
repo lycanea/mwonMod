@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Mixin(InGameHud.class)
-public class ActionBarMixin {
+public class InGameHudMixin {
     @Inject(method = "setOverlayMessage", at = @At("HEAD"))
     private void onSetOverlayMessage(Text message, boolean tinted, CallbackInfo ci) {
         Matcher MelonKingActionbarMatcher = Pattern.compile("Trophies: (?<trophy>\\d*) Karma: (?<karma>\\d*) Medals: (?<medals>\\d*)").matcher(message.getString());
@@ -23,5 +23,10 @@ public class ActionBarMixin {
             GameState.karma = Integer.valueOf(MelonKingActionbarMatcher.group("karma"));
             GameState.medals = Integer.valueOf(MelonKingActionbarMatcher.group("medals"));
         }
+    }
+
+    @Inject(method = "setTitle", at = @At("HEAD"))
+    private void onSetTitle(Text message, CallbackInfo ci) {
+//        Mwonmod.LOGGER.info("Title: {}", message.getString());
     }
 }

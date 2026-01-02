@@ -4,7 +4,7 @@
   "package": "dev.lycanea.mwonmod.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "ActionBarMixin",
+    "InGameHudMixin",
     "ChestRendering",
     "InventoryScreenMixin",
     "ItemDropMixin",
