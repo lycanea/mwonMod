@@ -1,5 +1,6 @@
 package dev.lycanea.mwonmod.util.discord;
 
+import com.jagrosh.discordipc.entities.pipe.PipeStatus;
 import dev.lycanea.mwonmod.Mwonmod;
 import static dev.lycanea.mwonmod.Mwonmod.LOGGER;
 import dev.lycanea.mwonmod.Config;
@@ -22,25 +23,33 @@ public class DiscordManager {
     public static boolean enabled = Config.HANDLER.instance().discordRichPresence;
 
     public static void initialise() {
-        if (!enabled) return;
-
         if (client == null) {
             client = new IPCClient(1376119105136103496L);
             client.setListener(listener);
         }
+    }
 
-        try {
-            client.connect(DiscordBuild.ANY);
-            LOGGER.info("Connected Discord Client");
-        } catch (NoDiscordClientException e) {
-            throw new RuntimeException("No Discord client found", e);
+    public static void tick() {
+        if (client != null) {
+            if (!listener.isConnected() && enabled) {
+                try {
+                    client.connect(DiscordBuild.ANY);
+                    LOGGER.info("Connected Discord Client");
+                } catch (NoDiscordClientException | RuntimeException ignored) {}
+            }
+            if (listener.isConnected() && !enabled) {
+                client.close();
+            }
+        }
+        if (enabled && listener.isConnected()) {
+            DiscordManager.updateStatus();
         }
     }
 
     public static void updateStatus() {
+        if (!listener.isConnected()) return;
         if (GameState.melonJoin != null && Config.HANDLER.instance().discordRichPresence && Mwonmod.onMelonKing()) {
             // get ready for a shit ton of ternary statements
-            setEnabled(true);
             if (GameState.beta_plot) {
                 setStatus("On Beta Plot",
                         "Playing around and breaking things",
@@ -77,15 +86,11 @@ public class DiscordManager {
                     "Running MwonMod " + ((FabricLoader.getInstance().getModContainer("mwonmod").map(ModContainer::getMetadata).map(ModMetadata::getVersion).map(Object::toString).orElse("0.0").equals("0.0.0")) ? "Development":FabricLoader.getInstance().getModContainer("mwonmod").map(ModContainer::getMetadata).map(ModMetadata::getVersion).map(Object::toString).orElse("0.0")),
                     ((Config.HANDLER.instance().richPresencePathIcon && GameState.currentPath != null) ? GameState.currentPath.toLowerCase():null),
                     ((Config.HANDLER.instance().richPresencePathIcon && GameState.currentPath != null) ? "Path: " + GameState.currentPath:null));
-        } else {
-            setEnabled(false);
         }
     }
 
     public static void setStatus(String state, String details, OffsetDateTime startTimestamp, String largeImageKey, String largeImageText, String smallImageKey, String smallImageText) {
-        if (!enabled || client == null) return;
-
-        if (!listener.isConnected()) return;
+        if (!enabled || client == null || client.getStatus() == PipeStatus.CONNECTED || !listener.isConnected()) return;
 
         RichPresence presence = new RichPresence.Builder()
                 .setState(state)
@@ -96,18 +101,5 @@ public class DiscordManager {
                 .build();
 
         client.sendRichPresence(presence);
-    }
-
-    public static void setEnabled(boolean value) {
-        if (enabled == value) return; // No change
-
-        enabled = value;
-
-        if (!enabled && client != null) {
-            client.close();
-            client = null; // Clean up
-        } else if (enabled && client == null) {
-            initialise();
-        }
     }
 }

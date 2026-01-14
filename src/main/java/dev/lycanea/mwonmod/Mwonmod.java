@@ -95,7 +95,7 @@ public class Mwonmod implements ClientModInitializer {
         KeyBindings.setup();
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            DiscordManager.updateStatus();
+            DiscordManager.tick();
             if (client.player != null && client.player.getScoreboardTeam() != null && onMelonKing()) {
                 List<String> playerJoins = client.player.getScoreboardTeam().getPlayerList().stream()
                         .filter(item -> !players.contains(item))
