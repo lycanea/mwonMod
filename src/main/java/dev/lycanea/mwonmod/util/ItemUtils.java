@@ -3,16 +3,15 @@ package dev.lycanea.mwonmod.util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.lycanea.mwonmod.Mwonmod;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.Identifier;
-
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 
 public class ItemUtils {
     public static String getItemID(ItemStack stack) {
@@ -20,19 +19,19 @@ public class ItemUtils {
             return null;
         }
 
-        NbtCompound customData = stack.getComponents().getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).copyNbt();
-        String customName = stack.getComponents().getOrDefault(DataComponentTypes.CUSTOM_NAME, NbtComponent.DEFAULT).toString();
+        CompoundTag customData = stack.getComponents().getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        String customName = stack.getComponents().getOrDefault(DataComponents.CUSTOM_NAME, CustomData.EMPTY).toString();
         String itemType = stack.getItem().toString();
         if (customData.getCompound("PublicBukkitValues").isPresent()) {
-            NbtCompound bukkitValues = customData.getCompound("PublicBukkitValues").get();
-            Set<String> dataKeys = bukkitValues.getKeys();
+            CompoundTag bukkitValues = customData.getCompound("PublicBukkitValues").get();
+            Set<String> dataKeys = bukkitValues.keySet();
 
             if (dataKeys.contains("hypercube:kingbound")) {
                 if (Objects.equals(itemType, "minecraft:stone_hoe")) return "royal_scythe";
             }
             if (dataKeys.contains("hypercube:autosmelter")) {
-                if (bukkitValues.getInt("hypercube:searching", -1) > 5) return "divine_hoe";
-                if (bukkitValues.getInt("hypercube:autosmelter", -1) == 1 && bukkitValues.getInt("hypercube:reforge", -1) == 11 && bukkitValues.getInt("hypercube:searching", -1) == 5 && bukkitValues.getInt("hypercube:movement", -1) == 5 && bukkitValues.getInt("hypercube:gathering", -1) == 5) {
+                if (bukkitValues.getIntOr("hypercube:searching", -1) > 5) return "divine_hoe";
+                if (bukkitValues.getIntOr("hypercube:autosmelter", -1) == 1 && bukkitValues.getIntOr("hypercube:reforge", -1) == 11 && bukkitValues.getIntOr("hypercube:searching", -1) == 5 && bukkitValues.getIntOr("hypercube:movement", -1) == 5 && bukkitValues.getIntOr("hypercube:gathering", -1) == 5) {
                     return "perfect_hoe";
                 }
                 return "hoe";
@@ -64,9 +63,9 @@ public class ItemUtils {
     public static ItemStack modifyItemForRendering(ItemStack stack) {
         String itemID = getItemID(stack);
         if (itemID != null) {
-            NbtCompound customData = stack.getComponents().getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).copyNbt();
+            CompoundTag customData = stack.getComponents().getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
             customData.putString("mwonmod_item", itemID);
-            stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(customData));
+            stack.set(DataComponents.CUSTOM_DATA, CustomData.of(customData));
         }
         JsonElement itemDataElement = Mwonmod.itemData.get(itemID);
         if (itemDataElement != null) {
@@ -76,7 +75,7 @@ public class ItemUtils {
 //                stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(itemModelData.getAsInt())); TEXTURE PACK FORMATTING CHANGE, 1.21.8 NEEDS FLOAT LIST FOR CUSTOM MODEL DATA, CHANGE LATER LMFAO
 //            }
         }
-        stack.set(DataComponentTypes.ITEM_MODEL, Identifier.of("minecraft:dirt"));
+        stack.set(DataComponents.ITEM_MODEL, Identifier.parse("minecraft:dirt"));
         return stack;
     }
 }

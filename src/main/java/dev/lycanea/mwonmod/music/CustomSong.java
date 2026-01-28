@@ -1,6 +1,6 @@
 package dev.lycanea.mwonmod.music;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public enum CustomSong {
     NONE,
@@ -8,7 +8,7 @@ public enum CustomSong {
 
     public Identifier getSoundId() {
         return switch (this) {
-            case SONG_ONE -> Identifier.of("mwonmod:song_one");
+            case SONG_ONE -> Identifier.parse("mwonmod:song_one");
             default -> null;
         };
     }

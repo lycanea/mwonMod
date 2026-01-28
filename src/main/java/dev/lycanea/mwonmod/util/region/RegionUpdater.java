@@ -4,13 +4,11 @@ import dev.lycanea.mwonmod.Mwonmod;
 import dev.lycanea.mwonmod.music.CustomMusicManager;
 import dev.lycanea.mwonmod.music.CustomSong;
 import dev.lycanea.mwonmod.util.GameState;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.math.BlockPos;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.Objects;
@@ -32,8 +30,8 @@ public class RegionUpdater {
                 if (!Objects.equals(regionName, previousRegion.get())) {
                     previousRegion.set(regionName);
                     if (Objects.equals(regionName, "housing")) {
-                        assert MinecraftClient.getInstance().player != null;
-                        GameState.housing_pos = MinecraftClient.getInstance().player.getPos().floorAlongAxes(EnumSet.of(Direction.Axis.X, Direction.Axis.Y, Direction.Axis.Z));
+                        assert Minecraft.getInstance().player != null;
+                        GameState.housing_pos = Minecraft.getInstance().player.position().align(EnumSet.of(Direction.Axis.X, Direction.Axis.Y, Direction.Axis.Z));
                     }
                 }
                 GameState.playerLocation = regionName;
@@ -43,10 +41,10 @@ public class RegionUpdater {
         }
 
         if (Mwonmod.activeRegion != null && client.player != null) {
-            assert MinecraftClient.getInstance().player != null;
-            BlockPos pos = MinecraftClient.getInstance().player.getBlockPos().add(-plot_origin.x, 0, -plot_origin.y);
+            assert Minecraft.getInstance().player != null;
+            BlockPos pos = Minecraft.getInstance().player.blockPosition().offset(-plot_origin.x, 0, -plot_origin.y);
             if (GameState.beta_plot) {
-                pos = MinecraftClient.getInstance().player.getBlockPos().add(-beta_plot_origin.x, 0, -beta_plot_origin.y);
+                pos = Minecraft.getInstance().player.blockPosition().offset(-beta_plot_origin.x, 0, -beta_plot_origin.y);
             }
             Vec3i playerPos = new Vec3i(
                 pos.getX(),

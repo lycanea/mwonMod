@@ -5,25 +5,25 @@ import dev.lycanea.mwonmod.Config;
 
 import dev.lycanea.mwonmod.util.GameState;
 import dev.lycanea.mwonmod.util.ItemUtils;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.EntityHitResult;
 
 public class AttackEvent {
-    public static ActionResult entityAttack(PlayerEntity playerEntity, World world, Hand hand, Entity entity, @Nullable EntityHitResult entityHitResult) {
-        if (!Mwonmod.onMelonKing()) return ActionResult.PASS;
-        if (!Config.HANDLER.instance().preventAttackingWithHoe) return ActionResult.PASS;
-        if (!Objects.equals(GameState.playerLocation, "main_farm")) return ActionResult.PASS;
-        String itemId = ItemUtils.getItemID(playerEntity.getMainHandStack());
+    public static InteractionResult entityAttack(Player playerEntity, Level world, InteractionHand hand, Entity entity, @Nullable EntityHitResult entityHitResult) {
+        if (!Mwonmod.onMelonKing()) return InteractionResult.PASS;
+        if (!Config.HANDLER.instance().preventAttackingWithHoe) return InteractionResult.PASS;
+        if (!Objects.equals(GameState.playerLocation, "main_farm")) return InteractionResult.PASS;
+        String itemId = ItemUtils.getItemID(playerEntity.getMainHandItem());
         if (Objects.equals(itemId, "hoe") || Objects.equals(itemId, "perfect_hoe") || Objects.equals(itemId, "divine_hoe") || Objects.equals(itemId, "royal_scythe")) {
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
         }
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
 }

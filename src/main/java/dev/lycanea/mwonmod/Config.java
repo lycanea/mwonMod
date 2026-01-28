@@ -5,7 +5,7 @@ import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.autogen.*;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 import dev.isxander.yacl3.platform.YACLPlatform;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 import java.lang.Boolean;
 
@@ -14,7 +14,7 @@ public class Config {
     // Create and configure the handler: file path, format (JSON5), pretty print, etc.
     public static final ConfigClassHandler<Config> HANDLER =
         ConfigClassHandler.createBuilder(Config.class)
-            .id(Identifier.of("mwonmod", "config"))
+            .id(Identifier.fromNamespaceAndPath("mwonmod", "config"))
             .serializer(config -> GsonConfigSerializerBuilder.create(config)
                     .setPath(YACLPlatform.getConfigDir().resolve("mwonmod.json5"))
                 .setJson5(true)

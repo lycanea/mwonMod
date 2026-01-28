@@ -1,6 +1,6 @@
 package dev.lycanea.mwonmod.util.region;
 
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.core.Vec3i;
 
 public class Region {
     public String name;

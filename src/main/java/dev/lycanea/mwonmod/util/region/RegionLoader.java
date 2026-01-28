@@ -2,12 +2,7 @@ package dev.lycanea.mwonmod.util.region;
 
 import dev.lycanea.mwonmod.Mwonmod;
 import dev.lycanea.mwonmod.util.GameState;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
-
 import com.google.gson.*;
-import net.minecraft.util.math.Vec3i;
 import org.joml.Vector2i;
 
 import java.io.InputStreamReader;
@@ -15,6 +10,9 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 
 public class RegionLoader {
     public static final Vector2i plot_origin = new Vector2i(-975,-4270);
@@ -27,11 +25,11 @@ public class RegionLoader {
     }
 
     public static Region getCurrentRegion() {
-        if (MinecraftClient.getInstance().player == null || MinecraftClient.getInstance().world == null || locationData == null || !Mwonmod.onMelonKing()) return null;
+        if (Minecraft.getInstance().player == null || Minecraft.getInstance().level == null || locationData == null || !Mwonmod.onMelonKing()) return null;
 
-        BlockPos pos = MinecraftClient.getInstance().player.getBlockPos().add(-plot_origin.x, 0, -plot_origin.y);
+        BlockPos pos = Minecraft.getInstance().player.blockPosition().offset(-plot_origin.x, 0, -plot_origin.y);
         if (GameState.beta_plot) {
-            pos = MinecraftClient.getInstance().player.getBlockPos().add(-beta_plot_origin.x, 0, -beta_plot_origin.y);
+            pos = Minecraft.getInstance().player.blockPosition().offset(-beta_plot_origin.x, 0, -beta_plot_origin.y);
         }
 
         for (Region region : locationData) {

@@ -4,8 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.util.ActionResult;
-
+import net.minecraft.world.InteractionResult;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +32,7 @@ public class BossState {
 
     public static void updateBoss(String updatedBossID) {
         Boss updatedBoss = new Boss(updatedBossID);
-        ActionResult result = BossChangeCallback.EVENT.invoker().trigger(boss, updatedBoss);
+        InteractionResult result = BossChangeCallback.EVENT.invoker().trigger(boss, updatedBoss);
         boss = updatedBoss;
     }
 
@@ -41,15 +40,15 @@ public class BossState {
         Event<BossChangeCallback> EVENT = EventFactory.createArrayBacked(BossChangeCallback.class,
                 (listeners) -> (Boss previousBoss, Boss currentBoss) -> {
             for (BossChangeCallback event : listeners) {
-                ActionResult result = event.trigger(previousBoss, currentBoss);
+                InteractionResult result = event.trigger(previousBoss, currentBoss);
 
-                if (result != ActionResult.PASS) { // all this actionresult stuff is useless but idk im copying from the fabric docs
+                if (result != InteractionResult.PASS) { // all this actionresult stuff is useless but idk im copying from the fabric docs
                     return result;
                 }
             }
 
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         });
-        ActionResult trigger(Boss previousBoss, Boss currentBoss);
+        InteractionResult trigger(Boss previousBoss, Boss currentBoss);
     }
 }

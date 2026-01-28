@@ -10,14 +10,13 @@ import dev.lycanea.mwonmod.util.region.Region;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import java.net.URI;
 
 import static dev.lycanea.mwonmod.Mwonmod.itemData;
@@ -26,14 +25,14 @@ import static dev.lycanea.mwonmod.util.region.RegionLoader.plot_origin;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
 
 public class Commands {
-    public static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess) {
+    public static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext commandRegistryAccess) {
         var mwonmodCommand = literal("mwonmod")
             .then(literal("discord")
                 .executes(context -> {
-                    assert MinecraftClient.getInstance().player != null;
-                    MinecraftClient.getInstance().player.sendMessage(
-                            Text.literal("Join the Developer Discord plz thx :3")
-                                    .styled(style -> style.withClickEvent(
+                    assert Minecraft.getInstance().player != null;
+                    Minecraft.getInstance().player.displayClientMessage(
+                            Component.literal("Join the Developer Discord plz thx :3")
+                                    .withStyle(style -> style.withClickEvent(
                                             new ClickEvent.OpenUrl(URI.create("https://discord.gg/ZsyGyMuvbz"))
                                     )),
                             false
@@ -50,12 +49,12 @@ public class Commands {
                             String value = StringArgumentType.getString(context, "value");
                             JsonObject lookupItemData = itemData.get(value.toLowerCase().replace(" ", "_")).getAsJsonObject();
 
-                            assert MinecraftClient.getInstance().player != null;
-                            MinecraftClient.getInstance().player.sendMessage(
-                                Text.literal(lookupItemData.get("name").getAsString())
-                                    .styled(style -> style.withHoverEvent(
+                            assert Minecraft.getInstance().player != null;
+                            Minecraft.getInstance().player.displayClientMessage(
+                                Component.literal(lookupItemData.get("name").getAsString())
+                                    .withStyle(style -> style.withHoverEvent(
                                         new HoverEvent.ShowText(
-                                            Text.of(lookupItemData.get("description").getAsString())
+                                            Component.nullToEmpty(lookupItemData.get("description").getAsString())
                                         )
                                     )),
                                 false
@@ -65,9 +64,9 @@ public class Commands {
                     ))
                 .then(literal("helditem")
                     .executes(context -> {
-                        MinecraftClient client = MinecraftClient.getInstance();
-                        client.player.sendMessage(
-                                Text.literal("item ID: " + ItemUtils.getItemID(context.getSource().getPlayer().getMainHandStack())),
+                        Minecraft client = Minecraft.getInstance();
+                        client.player.displayClientMessage(
+                                Component.literal("item ID: " + ItemUtils.getItemID(context.getSource().getPlayer().getMainHandItem())),
                                 false
                         );
                         return 1;
@@ -91,13 +90,13 @@ public class Commands {
                         .executes(context -> {
                             String action = StringArgumentType.getString(context, "action");
                             String regionName = StringArgumentType.getString(context, "name");
-                            MinecraftClient client = MinecraftClient.getInstance();
+                            Minecraft client = Minecraft.getInstance();
 
                             if (action.equalsIgnoreCase("start")) {
                                 assert client.player != null;
-                                BlockPos pos = client.player.getBlockPos().add(-plot_origin.x, 0, -plot_origin.y);
+                                BlockPos pos = client.player.blockPosition().offset(-plot_origin.x, 0, -plot_origin.y);
                                 if (GameState.beta_plot) {
-                                    pos = client.player.getBlockPos().add(-beta_plot_origin.x, 0, -beta_plot_origin.y);
+                                    pos = client.player.blockPosition().offset(-beta_plot_origin.x, 0, -beta_plot_origin.y);
                                 }
                                 Vec3i playerPos = new Vec3i(
                                     pos.getX(),
@@ -106,29 +105,29 @@ public class Commands {
                                 );
                                 Region newRegion = new Region(regionName, playerPos, playerPos);
                                 Mwonmod.setActiveRegion(newRegion);
-                                client.player.sendMessage(
-                                    Text.literal("Region creation started: " + regionName),
+                                client.player.displayClientMessage(
+                                    Component.literal("Region creation started: " + regionName),
                                     false
                                 );
                             } else if (action.equalsIgnoreCase("stop")) {
                                 if (Mwonmod.activeRegion != null) {
-                                    client.player.sendMessage(
-                                        Text.literal(Mwonmod.activeRegion.getDetails()),
+                                    client.player.displayClientMessage(
+                                        Component.literal(Mwonmod.activeRegion.getDetails()),
                                         false
                                     );
                                     Mwonmod.clearActiveRegion();
                                 } else {
-                                    client.player.sendMessage(
-                                        Text.literal("No active region to stop."),
+                                    client.player.displayClientMessage(
+                                        Component.literal("No active region to stop."),
                                         false
                                     );
                                 }
                             } else {
-                                client.player.sendMessage(
-                                    Text.literal("Unknown region action: " + action)
-                                        .styled(style -> style.withHoverEvent(
+                                client.player.displayClientMessage(
+                                    Component.literal("Unknown region action: " + action)
+                                        .withStyle(style -> style.withHoverEvent(
                                             new HoverEvent.ShowText(
-                                                Text.of("Valid actions are: start, stop")
+                                                Component.nullToEmpty("Valid actions are: start, stop")
                                             )
                                         )),
                                     false

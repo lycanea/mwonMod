@@ -1,10 +1,10 @@
 package dev.lycanea.mwonmod.music;
 
 import dev.lycanea.mwonmod.util.BossState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.sound.SoundInstance;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvent;
 
 public class CustomMusicManager {
     private static CustomSong currentSong = CustomSong.NONE;
@@ -22,7 +22,7 @@ public class CustomMusicManager {
         });
     }
 
-    public static void tick(MinecraftClient client) {
+    public static void tick(Minecraft client) {
 //        client.options.getSoundVolumeOption(SoundCategory.MUSIC).setValue(0.0);
 
         if (currentSong != playingSong) {
@@ -36,18 +36,18 @@ public class CustomMusicManager {
         }
     }
 
-    private static void playSong(MinecraftClient client, CustomSong song) {
+    private static void playSong(Minecraft client, CustomSong song) {
         Identifier soundId = song.getSoundId();
         if (soundId == null) return;
 
-        SoundEvent soundEvent = SoundEvent.of(soundId);
+        SoundEvent soundEvent = SoundEvent.createVariableRangeEvent(soundId);
         CustomMusicSoundInstance sound = new CustomMusicSoundInstance(soundEvent);
         currentSound = sound;
 
         client.getSoundManager().play(sound);
     }
 
-    public static void stopCurrentSong(MinecraftClient client) {
+    public static void stopCurrentSong(Minecraft client) {
         if (currentSound != null) {
             if (currentSound instanceof CustomMusicSoundInstance looping) {
                 looping.stop();

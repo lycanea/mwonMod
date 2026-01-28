@@ -2,33 +2,33 @@ package dev.lycanea.mwonmod.mixin;
 
 import dev.lycanea.mwonmod.Config;
 import dev.lycanea.mwonmod.Mwonmod;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(ClientPlayerEntity.class)
+@Mixin(LocalPlayer.class)
 public class ItemDropMixin {
-    @Inject(method = "dropSelectedItem", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "drop", at = @At("HEAD"), cancellable = true)
     public void dropSelectedItem(boolean entireStack, CallbackInfoReturnable<Boolean> cir) {
         if (Mwonmod.onMelonKing()) {
-            ClientPlayerEntity player = MinecraftClient.getInstance().player;
+            LocalPlayer player = Minecraft.getInstance().player;
 
             assert player != null;
-            ItemStack handItem = player.getMainHandStack();
-            handItem.getTooltip(Item.TooltipContext.DEFAULT, player, TooltipType.BASIC)
+            ItemStack handItem = player.getMainHandItem();
+            handItem.getTooltipLines(Item.TooltipContext.EMPTY, player, TooltipFlag.NORMAL)
                     .stream()
-                    .map(Text::getString)
+                    .map(Component::getString)
                     .forEach(str -> {
                         if (Config.HANDLER.instance().preventDroppingReflectives && "Reflection".equals(str)) {
-                            player.playSound(SoundEvents.ITEM_SHIELD_BLOCK.value());
+                            player.makeSound(SoundEvents.SHIELD_BLOCK.value());
                             cir.setReturnValue(false);
                             cir.cancel();
                         }

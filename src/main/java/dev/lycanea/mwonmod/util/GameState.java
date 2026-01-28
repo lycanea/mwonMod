@@ -1,8 +1,7 @@
 package dev.lycanea.mwonmod.util;
 
-import net.minecraft.util.math.Vec3d;
-
 import java.time.LocalDateTime;
+import net.minecraft.world.phys.Vec3;
 
 public class GameState {
     public static String currentPath;
@@ -16,6 +15,6 @@ public class GameState {
     public static Integer trophies;
     public static Integer personal_bank;
     public static Integer portable_bank;
-    public static Vec3d housing_pos;
+    public static Vec3 housing_pos;
     public static boolean beta_plot;
 }

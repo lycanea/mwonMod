@@ -21,20 +21,23 @@ import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.*;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.network.chat.ComponentUtils;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.CommonColors;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +61,7 @@ import static dev.lycanea.mwonmod.util.region.RegionLoader.plot_origin;
 public class Mwonmod implements ClientModInitializer {
     public static final String MOD_ID = "mwonmod";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static MinecraftClient MC = MinecraftClient.getInstance();
+    public static Minecraft MC = Minecraft.getInstance();
     public static Boolean inventory_rundown = false;
     private static final String ITEM_DATA_PATH = "assets/mwonmod/data/items.json";
     private static final String UPGRADES_PATH = "assets/mwonmod/data/melonmod_upgrades.json";
@@ -86,7 +89,6 @@ public class Mwonmod implements ClientModInitializer {
         BossState.init();
 
         RegionLoader.init();
-        RegionRenderer.init();
         RegionUpdater.init();
 
         // make flint check the players plot
@@ -96,20 +98,20 @@ public class Mwonmod implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             DiscordManager.tick();
-            if (client.player != null && client.player.getScoreboardTeam() != null && onMelonKing()) {
-                List<String> playerJoins = client.player.getScoreboardTeam().getPlayerList().stream()
+            if (client.player != null && client.player.getTeam() != null && onMelonKing()) {
+                List<String> playerJoins = client.player.getTeam().getPlayers().stream()
                         .filter(item -> !players.contains(item))
                         .toList();
                 List<String> playerLeaves = players.stream()
-                        .filter(item -> !client.player.getScoreboardTeam().getPlayerList().stream().toList().contains(item))
+                        .filter(item -> !client.player.getTeam().getPlayers().stream().toList().contains(item))
                         .toList();
                 if (!playerJoins.isEmpty()) {
-                    client.player.sendMessage(Text.of("Player Join: " + playerJoins.getFirst()).copy().formatted(Formatting.AQUA), false);
+                    client.player.displayClientMessage(net.minecraft.network.chat.Component.nullToEmpty("Player Join: " + playerJoins.getFirst()).copy().withStyle(ChatFormatting.AQUA), false);
                 }
                 if (!playerLeaves.isEmpty()) {
-                    client.player.sendMessage(Text.of("Player Leave: " + playerLeaves.getFirst()).copy().formatted(Formatting.RED), false);
+                    client.player.displayClientMessage(net.minecraft.network.chat.Component.nullToEmpty("Player Leave: " + playerLeaves.getFirst()).copy().withStyle(ChatFormatting.RED), false);
                 }
-                players = client.player.getScoreboardTeam().getPlayerList().stream().toList();
+                players = client.player.getTeam().getPlayers().stream().toList();
             }
             CustomMusicManager.tick(client);
         });
@@ -123,7 +125,7 @@ public class Mwonmod implements ClientModInitializer {
         ClientCommandRegistrationCallback.EVENT.register(Commands::registerCommands);
 
         // set up the overlay rendering thingy
-        HudElementRegistry.attachElementBefore(VanillaHudElements.CROSSHAIR, Identifier.of("mwonmod:overlay"), (context, tickCounter) -> renderHUDOverlay(context));
+        HudElementRegistry.attachElementBefore(VanillaHudElements.CROSSHAIR, Identifier.parse("mwonmod:overlay"), (context, tickCounter) -> renderHUDOverlay(context));
     }
 
     public static JsonObject loadJsonFile(String PATH) {
@@ -149,9 +151,9 @@ public class Mwonmod implements ClientModInitializer {
         return ret;
     }
 
-    private void renderHUDOverlay(DrawContext context) {
+    private void renderHUDOverlay(GuiGraphics context) {
         // we really should move this to a seperate class and... clean it up more
-        MinecraftClient client = MinecraftClient.getInstance();
+        Minecraft client = Minecraft.getInstance();
         if (Config.HANDLER.instance().debugMode) {
             List<String> debugLines = new ArrayList<>(List.of(
                     "DEBUG MODE",
@@ -171,17 +173,17 @@ public class Mwonmod implements ClientModInitializer {
             if (GameState.melonJoin != null) debugLines.add("MWON TIMER: " + Duration.between(GameState.melonJoin, LocalDateTime.now()).getSeconds());
             if (BossState.boss != null) debugLines.add("CURRENT BOSS: " + BossState.boss.bossID);
 
-            assert MinecraftClient.getInstance().player != null;
-            BlockPos pos = MinecraftClient.getInstance().player.getBlockPos().add(-plot_origin.x, 0, -plot_origin.y);
+            assert Minecraft.getInstance().player != null;
+            BlockPos pos = Minecraft.getInstance().player.blockPosition().offset(-plot_origin.x, 0, -plot_origin.y);
             if (GameState.beta_plot) {
-                pos = MinecraftClient.getInstance().player.getBlockPos().add(-beta_plot_origin.x, 0, -beta_plot_origin.y);
+                pos = Minecraft.getInstance().player.blockPosition().offset(-beta_plot_origin.x, 0, -beta_plot_origin.y);
             }
             debugLines.add("PLOTSPACE POS: " + pos);
 
-            int startY = context.getScaledWindowHeight() /2 - debugLines.toArray().length*5;
+            int startY = context.guiHeight() /2 - debugLines.toArray().length*5;
             drawDebugLines(context, client, debugLines, startY, 10, 0xFF82B7ED);
         }
-        if (!(client.player == null) && !(client.world == null) && onMelonKing()) {
+        if (!(client.player == null) && !(client.level == null) && onMelonKing()) {
             long auctionwaitMillis = TimeUtils.auctionTime();
             if (!auctionNotificationSent && auctionwaitMillis <= 30000) {
                 if (Config.HANDLER.instance().auctionDesktopNotification) {
@@ -199,28 +201,28 @@ public class Mwonmod implements ClientModInitializer {
             if (Config.HANDLER.instance().auctionTimer) {
                 long auctionminutes = auctionwaitMillis / 60000;
                 long auctionseconds = (auctionwaitMillis % 60000) / 1000;
-                context.drawTextWithShadow(client.textRenderer, String.format("Next Auction:  00:%02d:%02d", auctionminutes, auctionseconds), 3, 3, 0xFFFFFFFF);
+                context.drawString(client.font, String.format("Next Auction:  00:%02d:%02d", auctionminutes, auctionseconds), 3, 3, 0xFFFFFFFF);
                 flawlessTimerOffset += 9;
             }
             if (Config.HANDLER.instance().flawlessTimer) {
                 long flawlessWait = TimeUtils.flawlessTime();
                 if (flawlessWait < 4428) {
-                    context.drawTextWithShadow(client.textRenderer, String.format("Next Flawless: %02d:%02d:%02d", flawlessWait / 60 / 60, (flawlessWait + 1) / 60 % 60, (flawlessWait + 1)%60), 3, flawlessTimerOffset, 0xFFFFFFFF);
+                    context.drawString(client.font, String.format("Next Flawless: %02d:%02d:%02d", flawlessWait / 60 / 60, (flawlessWait + 1) / 60 % 60, (flawlessWait + 1)%60), 3, flawlessTimerOffset, 0xFFFFFFFF);
                 } else {
-                    context.drawTextWithShadow(client.textRenderer, "Next Flawless: Now", 3, flawlessTimerOffset, 0xFFFFFFFF);
+                    context.drawString(client.font, "Next Flawless: Now", 3, flawlessTimerOffset, 0xFFFFFFFF);
                 }
             }
         }
 
-        if (!(client.player == null) && !(client.world == null) && onMelonKing() && Mwonmod.inventory_rundown) {
-            int barY = client.getWindow().getScaledHeight() - 90;
+        if (!(client.player == null) && !(client.level == null) && onMelonKing() && Mwonmod.inventory_rundown) {
+            int barY = client.getWindow().getGuiScaledHeight() - 90;
             int barWidth = 100;
             int barHeight = 6;
             if(Config.HANDLER.instance().showPercentageInInventoryOverview) {
                 barHeight = 9;
                 barWidth = 120;
             }
-            int barX = client.getWindow().getScaledWidth() / 2 - (barWidth / 2);
+            int barX = client.getWindow().getGuiScaledWidth() / 2 - (barWidth / 2);
 
             Map<String, Integer> items = java.util.Map.of("gold", 0xFFFFE100, "shard", 0xFF00AAFF, "compressed_shard", 0xFF0066DB, "melon", 0xFF00FF43, "enchanted_melon", 0xFF00BF32, "super_enchanted_melon", 0xFF008A24);
             InventoryScanResult result = scanInventory(client.player, items.keySet().stream().toList());
@@ -247,12 +249,12 @@ public class Mwonmod implements ClientModInitializer {
                         "% empty" +
                         " " +
                         "(" + result.emptySlots() + " slots)";
-                context.drawText(
-                        MinecraftClient.getInstance().textRenderer,
+                context.drawString(
+                        Minecraft.getInstance().font,
                         inventoryOverviewText,
                         barX + 1,
                         barY + 1,
-                        Colors.BLACK,
+                        CommonColors.BLACK,
                         false
                 );
             }
@@ -260,17 +262,17 @@ public class Mwonmod implements ClientModInitializer {
 
         if (client.getWindow() == null) return;
         if (client.player == null) return;
-        if (client.world == null) return;
+        if (client.level == null) return;
 
         if (Config.HANDLER.instance().signUpgradeTooltip && onMelonKing()) {
 
-            Vec3d hit = client.player.raycast(4.5, 0, false).getPos();
+            Vec3 hit = client.player.pick(4.5, 0, false).getLocation();
             String vecKey = serializeVec(hit);
-            BlockEntity state = client.world.getBlockEntity(new BlockPos((int) hit.x, (int) hit.y, (int) hit.z).subtract(new Vec3i(GameState.beta_plot ? 0:1, 0, GameState.beta_plot ? 0:1))); // beta plot is +x and +z so blockpos offset isnt needed im p sure
+            BlockEntity state = client.level.getBlockEntity(new BlockPos((int) hit.x, (int) hit.y, (int) hit.z).subtract(new Vec3i(GameState.beta_plot ? 0:1, 0, GameState.beta_plot ? 0:1))); // beta plot is +x and +z so blockpos offset isnt needed im p sure
 
-            ArrayList<TooltipComponent> signTooltip = new ArrayList<>();
+            ArrayList<ClientTooltipComponent> signTooltip = new ArrayList<>();
             if (state instanceof SignBlockEntity signBlock) {
-                for (Text[] textList : new Text[][]{signBlock.getFrontText().getMessages(true), signBlock.getBackText().getMessages(true)}) {
+                for (net.minecraft.network.chat.Component[] textList : new net.minecraft.network.chat.Component[][]{signBlock.getFrontText().getMessages(true), signBlock.getBackText().getMessages(true)}) {
                     if (textList.length == 4 && !textList[0].getString().trim().isEmpty()) {
                         String top = textList[0].getString().trim();
                         String m = textList[1].getString().trim();
@@ -282,11 +284,11 @@ public class Mwonmod implements ClientModInitializer {
                         int color = 0xFFFFFFFF;
 
                         if (top.equals("[Right Click]")) color = 0xfcdb6d;
-                        if (top.equals("Bought!")) color = Colors.GREEN;
+                        if (top.equals("Bought!")) color = CommonColors.GREEN;
                         if (top.equals("Can't Buy") || Pattern.compile(".\\d/.\\d").matcher(top).find())
-                            color = Colors.LIGHT_RED;
+                            color = CommonColors.SOFT_RED;
                         if (top.equals("Locked") || top.equals("Locked!") || top.equals("Path Locked!") || top.equals("Disabled"))
-                            color = Colors.RED;
+                            color = CommonColors.RED;
 
 
                         String mkey = m;
@@ -298,36 +300,36 @@ public class Mwonmod implements ClientModInitializer {
                         //Mod.log("n:" + mkey + " d: " + upgradeDesc);
 
                         upgradeDesc = upgradeDesc.replace(" queen ", " monarch ").replace(" king ", " monarch ");
-                        List<OrderedText> otList = MC.textRenderer.wrapLines(StringVisitable.plain(upgradeDesc), client.getWindow().getScaledWidth() / 3);
+                        List<FormattedCharSequence> otList = MC.font.split(FormattedText.of(upgradeDesc), client.getWindow().getGuiScaledWidth() / 3);
 
-                        signTooltip = new ArrayList<>(List.of(TooltipComponent.of(Text.literal(m).withColor(color).asOrderedText())));
-                        for (OrderedText t : otList) {
-                            Text nt = convertOrderedTextToTextWithStyle(t);
-                            signTooltip.add(TooltipComponent.of(Text.literal(nt.getString()).withColor(Colors.LIGHT_GRAY).asOrderedText()));
+                        signTooltip = new ArrayList<>(List.of(ClientTooltipComponent.create(net.minecraft.network.chat.Component.literal(m).withColor(color).getVisualOrderText())));
+                        for (FormattedCharSequence t : otList) {
+                            net.minecraft.network.chat.Component nt = convertOrderedTextToTextWithStyle(t);
+                            signTooltip.add(ClientTooltipComponent.create(net.minecraft.network.chat.Component.literal(nt.getString()).withColor(CommonColors.LIGHT_GRAY).getVisualOrderText()));
                         }
                     }
                 }
             }
 
             if (!signTooltip.isEmpty()) {
-                context.drawTooltipImmediately(client.textRenderer, signTooltip, client.getWindow().getScaledWidth() / 2, client.getWindow().getScaledHeight() / 2, HoveredTooltipPositioner.INSTANCE, null);
+                context.renderTooltip(client.font, signTooltip, client.getWindow().getGuiScaledWidth() / 2, client.getWindow().getGuiScaledHeight() / 2, DefaultTooltipPositioner.INSTANCE, null);
             }
         }
     }
 
-    private static String serializeVec(Vec3d vec) {
+    private static String serializeVec(Vec3 vec) {
         return "<" + (int) vec.x + ", " + (int) vec.y + ", " + (int) vec.z + ">";
     }
 
-    public static Text convertOrderedTextToTextWithStyle(OrderedText orderedText) {
-        List<Text> components = new ArrayList<>();
+    public static net.minecraft.network.chat.Component convertOrderedTextToTextWithStyle(FormattedCharSequence orderedText) {
+        List<net.minecraft.network.chat.Component> components = new ArrayList<>();
         StringBuilder currentText = new StringBuilder();
         final Style[] currentStyle = {Style.EMPTY};
 
         orderedText.accept((index, style, codePoint) -> {
             if (!style.equals(currentStyle[0])) {
                 if (!currentText.isEmpty()) {
-                    components.add(Text.literal(currentText.toString()).setStyle(currentStyle[0]));
+                    components.add(net.minecraft.network.chat.Component.literal(currentText.toString()).setStyle(currentStyle[0]));
                     currentText.setLength(0);
                 }
                 currentStyle[0] = style;
@@ -337,13 +339,13 @@ public class Mwonmod implements ClientModInitializer {
         });
 
         if (!currentText.isEmpty()) {
-            components.add(Text.literal(currentText.toString()).setStyle(currentStyle[0]));
+            components.add(net.minecraft.network.chat.Component.literal(currentText.toString()).setStyle(currentStyle[0]));
         }
 
-        return Texts.join(components, Text.empty());
+        return ComponentUtils.formatList(components, net.minecraft.network.chat.Component.empty());
     }
 
-    public static InventoryScanResult scanInventory(PlayerEntity player, List<String> itemsToCount) {
+    public static InventoryScanResult scanInventory(Player player, List<String> itemsToCount) {
         Map<String, Integer> counts = new HashMap<>();
         Map<String, Integer> slotCounts = new HashMap<>();
         for (String item : itemsToCount) {
@@ -355,7 +357,7 @@ public class Mwonmod implements ClientModInitializer {
         int emptySlots = 0;
 
         // Scan main inventory
-        for (var stack : player.getInventory().getMainStacks()) {
+        for (var stack : player.getInventory().getNonEquipmentItems()) {
             if (stack.isEmpty()) {
                 emptySlots++;
             } else {
@@ -379,17 +381,17 @@ public class Mwonmod implements ClientModInitializer {
         return Flint.getUser().getPlot().getId() == 22467 || Flint.getUser().getPlot().getId() == 202028;
     }
 
-    public void drawDebugLines(DrawContext context, MinecraftClient client, List<String> lines, int startY, int lineSpacing, int color) {
+    public void drawDebugLines(GuiGraphics context, Minecraft client, List<String> lines, int startY, int lineSpacing, int color) {
         int maxWidth = 0;
         for (String line : lines) {
-            maxWidth = Math.max(maxWidth, client.textRenderer.getWidth(line));
+            maxWidth = Math.max(maxWidth, client.font.width(line));
         }
 
         context.fill(0, startY - 2, maxWidth + 4, startY + (lines.size() * lineSpacing), 0xFF000000);
 
         int y = startY;
         for (String line : lines) {
-            context.drawText(client.advanceValidatingTextRenderer, line, 0, y, color, false);
+            context.drawString(client.fontFilterFishy, line, 0, y, color, false);
             y += lineSpacing;
         }
     }
