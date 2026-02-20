@@ -29,16 +29,20 @@ public class SignRendering {
 
     @Inject(method = "extractRenderState*", at = @At("HEAD"), cancellable = true)
     private void onRender(SignBlockEntity signBlockEntity, SignRenderState signRenderState, float f, Vec3 vec3, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay, CallbackInfo ci) {
-
-        if (!Config.HANDLER.instance().bankSignImprovements) return;
         if (!Mwonmod.onMelonKing()) return;
-        int pos = signRenderState.blockPos.getX() - plot_origin.x;
-        if (GameState.beta_plot) {
-            pos = signRenderState.blockPos.getX() - beta_plot_origin.x;
-        }
-        if (pos < 0) {
-            if (Config.HANDLER.instance().codespaceHider) ci.cancel();
-            return;
+
+        if (Config.HANDLER.instance().codespaceHider) {
+            if (GameState.beta_plot) {
+                if (signBlockEntity.getBlockPos().getX() < beta_plot_origin.x) {
+                    ci.cancel();
+                    return;
+                }
+            } else {
+                if (signBlockEntity.getBlockPos().getX() < plot_origin.x) {
+                    ci.cancel();
+                    return;
+                }
+            }
         }
 
         signBlockEntity.updateText(signText -> {
@@ -51,7 +55,7 @@ public class SignRendering {
                         if (GameState.housing_pos != null && signRenderState.blockPos.closerToCenterThan(GameState.housing_pos, 5) && signText.getMessage(0, true).getString().startsWith("Gold")) {
                             GameState.personal_bank = Math.toIntExact(value);
                         }
-                        return signText.setMessage(3, Component.nullToEmpty(formatter.format(value)));
+                        if (Config.HANDLER.instance().bankSignImprovements) return signText.setMessage(3, Component.nullToEmpty(formatter.format(value)));
                     } catch (NumberFormatException e) {
                         return signText;
                     }
