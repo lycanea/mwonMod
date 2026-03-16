@@ -18,21 +18,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class ItemDropMixin {
     @Inject(method = "drop", at = @At("HEAD"), cancellable = true)
     public void dropSelectedItem(boolean entireStack, CallbackInfoReturnable<Boolean> cir) {
-        if (Mwonmod.onMelonKing()) {
-            LocalPlayer player = Minecraft.getInstance().player;
+        if (!Mwonmod.onMelonKing()) return;
+        LocalPlayer player = Minecraft.getInstance().player;
 
-            assert player != null;
-            ItemStack handItem = player.getMainHandItem();
-            handItem.getTooltipLines(Item.TooltipContext.EMPTY, player, TooltipFlag.NORMAL)
-                    .stream()
-                    .map(Component::getString)
-                    .forEach(str -> {
-                        if (Config.HANDLER.instance().preventDroppingReflectives && "Reflection".equals(str)) {
-                            player.makeSound(SoundEvents.SHIELD_BLOCK.value());
-                            cir.setReturnValue(false);
-                            cir.cancel();
-                        }
-                    });
-        }
+        if (player == null) return;
+
+        ItemStack handItem = player.getMainHandItem();
+        handItem.getTooltipLines(Item.TooltipContext.EMPTY, player, TooltipFlag.NORMAL)
+                .stream()
+                .map(Component::getString)
+                .forEach(str -> {
+                    if (Config.HANDLER.instance().preventDroppingReflectives && "Reflection".equals(str)) {
+                        player.makeSound(SoundEvents.SHIELD_BLOCK.value());
+                        cir.setReturnValue(false);
+                        cir.cancel();
+                    }
+                });
     }
 }

@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 @Mixin(Connection.class)
 public class OnPacketMixin {
     @Inject(method = "genericsFtw", at = @At("HEAD"), cancellable = true)
-    private static <T extends PacketListener> void onGameMessage(Packet<T> packet, PacketListener listener, CallbackInfo ci) {
+    private static <T extends PacketListener> void onGameMessage(Packet<@org.jetbrains.annotations.NotNull T> packet, PacketListener listener, CallbackInfo ci) {
         if (packet instanceof ClientboundSystemChatPacket(Component content, boolean overlay)) {
             handleChatPacket(content, overlay, ci);
         }
@@ -77,7 +77,7 @@ public class OnPacketMixin {
             GameState.melonJoin = LocalDateTime.now();
         }
 
-        if (!Mwonmod.onMelonKing()) return;
+        if (!Mwonmod.onMelonKing() || Minecraft.getInstance().player == null) return;
         if (message.equals("» All combatants perished, so the battle was lost.")) {
             BossState.updateBoss(null);
         }
@@ -89,22 +89,21 @@ public class OnPacketMixin {
         if (Config.HANDLER.instance().hideSellFailMessage && Objects.equals(message, "> You don't have any Super Enchanted Melons. Get them by cooking four Enchanted Melon Slices, which are gotten by cooking four Melon Slices.")) {
             ci.cancel();
         }
-        if (Config.HANDLER.instance().what && Objects.equals(message, "> What?") && Minecraft.getInstance().player != null) {
+        if (Config.HANDLER.instance().what && Objects.equals(message, "> What?")) {
             Mwonmod.notification("> What?", "> What?");
             Minecraft.getInstance().execute(() -> Minecraft.getInstance().player.connection.sendChat("> What?"));
         }
-        if (Config.HANDLER.instance().down && Objects.equals(message, "> Down.") && Minecraft.getInstance().player != null) {
+        if (Config.HANDLER.instance().down && Objects.equals(message, "> Down.")) {
             Mwonmod.notification("> Down.", "> Down.");
             Minecraft.getInstance().execute(() -> Minecraft.getInstance().player.connection.sendChat("> Down."));
         }
         Pattern auctionPattern = Pattern.compile("^>\\s*(?:First up,|And next,|Next,|And now,|And lastly,|Now,|Up next,)?\\s*(?:a|an|some)\\s+(.+?)!$");
-        Pattern newKingPattern = Pattern.compile("^>\\s*([\\w]+)\\s+is\\s+the\\s+new\\s+(?:king|queen|monarch)!$");
+        Pattern newKingPattern = Pattern.compile("^>\\s*(\\w+)\\s+is\\s+the\\s+new\\s+(?:king|queen|monarch)!$");
 
         Matcher auctionMatcher = auctionPattern.matcher(message);
         Matcher kingMatcher = newKingPattern.matcher(message);
 
         if (auctionMatcher.find()) {
-            assert Minecraft.getInstance().player != null;
             if (Config.HANDLER.instance().debugMode)
                 Minecraft.getInstance().player.displayClientMessage(net.minecraft.network.chat.Component.literal("Auction Item: " + auctionMatcher.group(1)), false);
             try {
@@ -122,7 +121,6 @@ public class OnPacketMixin {
                     Minecraft.getInstance().player.displayClientMessage(net.minecraft.network.chat.Component.literal("Error accessing item data: " + e.getMessage()), false);
             }
         } else if (kingMatcher.find()) {
-            assert Minecraft.getInstance().player != null;
             if (Config.HANDLER.instance().kingChangeNotification) {
                 GameState.bank_gold = 0;
                 GameState.coins = 0;

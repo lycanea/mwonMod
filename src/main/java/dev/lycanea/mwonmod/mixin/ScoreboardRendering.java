@@ -18,11 +18,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Gui.class)
 public class ScoreboardRendering {
+
     @Shadow
     @Final
     private Minecraft minecraft;
+
     @Unique
     java.text.NumberFormat formatter = java.text.NumberFormat.getNumberInstance();
+
     @Inject(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", at = @At("HEAD"))
     private void onRenderScoreboard(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (this.minecraft.level == null || !Mwonmod.onMelonKing()) return;
