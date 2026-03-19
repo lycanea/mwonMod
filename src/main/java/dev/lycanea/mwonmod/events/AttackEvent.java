@@ -27,6 +27,7 @@ public class AttackEvent {
         if (!Mwonmod.onMelonKing()) return InteractionResult.PASS;
         if (Config.HANDLER.instance().preventAttackingWithHoe
                 && Objects.equals(GameState.playerLocation, "main_farm")
+                && !playerEntity.getMainHandItem().isEmpty()
                 && hoes.contains(ItemUtils.getItemID(playerEntity.getMainHandItem()))) {
             return InteractionResult.FAIL;
         }

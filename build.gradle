@@ -60,7 +60,6 @@ dependencies {
     modImplementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
     implementation 'org.slf4j:slf4j-api:1.7.36'
 
-    modImplementation("maven.modrinth:flint:${project.flint_version}")
     modImplementation include("net.kyori:adventure-platform-fabric:${project.adventure_fabric_version}") {
         exclude group: "net.fabricmc.fabric-api"
     }

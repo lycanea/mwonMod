@@ -9,9 +9,6 @@ import dev.lycanea.mwonmod.events.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import dev.dfonline.flint.Flint;
-import dev.dfonline.flint.FlintAPI;
-import dev.dfonline.flint.hypercube.Mode;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -20,6 +17,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
@@ -67,9 +66,6 @@ public class Mwonmod implements ClientModInitializer {
 
         RegionLoader.init();
         RegionUpdater.init();
-
-        // make flint check the players plot
-        FlintAPI.confirmLocationWithLocate();
 
         KeyBindings.setup();
 
@@ -158,10 +154,23 @@ public class Mwonmod implements ClientModInitializer {
     public static boolean onMelonKing() {
         // rewrite to no longer require flint before next modrinth release, use server respawn loc data to determine node and player position to determine plot
         if (Config.HANDLER.instance().ignoreMelonKingCheck) return true;
-        if (Flint.getUser().getPlot() == null) {GameState.beta_plot=false;return false;}
-        if (Flint.getUser().getMode() != Mode.PLAY) return false;
-        GameState.beta_plot = Flint.getUser().getPlot().getId() == 202028;
-        return Flint.getUser().getPlot().getId() == 22467 || Flint.getUser().getPlot().getId() == 202028;
+        if (Minecraft.getInstance().getCurrentServer() == null || Minecraft.getInstance().level == null || Minecraft.getInstance().player == null) return false;
+        // check on df
+        if (!Minecraft.getInstance().getCurrentServer().ip.contains("mcdiamondfire.com") && !Minecraft.getInstance().getCurrentServer().ip.contains("diamondfire.games")) return false;
+        // check for node 2
+        if (Minecraft.getInstance().level.getRespawnData().globalPos().pos().getX() != -675) return false;
+        // check in plot bounds
+        BlockPos plotRelativePos = Minecraft.getInstance().player.blockPosition().subtract(new Vec3i(RegionLoader.plot_origin.x, 0, RegionLoader.plot_origin.y));
+        BlockPos betaRelativePos = Minecraft.getInstance().player.blockPosition().subtract(new Vec3i(RegionLoader.beta_plot_origin.x, 0, RegionLoader.beta_plot_origin.y));
+
+        GameState.beta_plot = betaRelativePos.getX() >= 0 && betaRelativePos.getX() <= 1001 && betaRelativePos.getZ() >= 0 && betaRelativePos.getZ() <= 1001;
+        return (plotRelativePos.getX() >= 0 && plotRelativePos.getX() <= 301 && plotRelativePos.getZ() >= 0 && plotRelativePos.getZ() <= 301) ||
+                (GameState.beta_plot);
+
+//        if (Flint.getUser().getPlot() == null) {GameState.beta_plot=false;return false;}
+//        if (Flint.getUser().getMode() != Mode.PLAY) return false;
+//        GameState.beta_plot = Flint.getUser().getPlot().getId() == 202028;
+//        return Flint.getUser().getPlot().getId() == 22467 || Flint.getUser().getPlot().getId() == 202028;
     }
 
     public static void notification(String title, String message) {
