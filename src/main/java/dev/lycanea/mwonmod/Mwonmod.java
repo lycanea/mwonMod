@@ -164,7 +164,7 @@ public class Mwonmod implements ClientModInitializer {
         BlockPos betaRelativePos = Minecraft.getInstance().player.blockPosition().subtract(new Vec3i(RegionLoader.beta_plot_origin.x, 0, RegionLoader.beta_plot_origin.y));
 
         GameState.beta_plot = betaRelativePos.getX() >= 0 && betaRelativePos.getX() <= 1001 && betaRelativePos.getZ() >= 0 && betaRelativePos.getZ() <= 1001;
-        return (plotRelativePos.getX() >= 0 && plotRelativePos.getX() <= 301 && plotRelativePos.getZ() >= 0 && plotRelativePos.getZ() <= 301) ||
+        return (plotRelativePos.getX() >= 0 && plotRelativePos.getX() <= 1001 && plotRelativePos.getZ() >= 0 && plotRelativePos.getZ() <= 1001) ||
                 (GameState.beta_plot);
 
 //        if (Flint.getUser().getPlot() == null) {GameState.beta_plot=false;return false;}
