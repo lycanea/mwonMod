@@ -15,7 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 
 public class RegionLoader {
-    public static final Vector2i plot_origin = new Vector2i(-975,-4270);
+    public static final Vector2i plot_origin = new Vector2i(104000,12000);
     public static final Vector2i beta_plot_origin = new Vector2i(104000,14000);
     public static List<Region> locationData;
 
