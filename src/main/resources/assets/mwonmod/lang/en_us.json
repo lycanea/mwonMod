@@ -1,7 +1,15 @@
 {
-  "lycanea.mwonmod.keybinds": "MwonMod",
+  "key.category.mwonmod.keybinds": "MwonMod",
   "key.mwonmod.bank": "Open @bank",
   "key.mwonmod.forge": "Open @forge",
+
+  "key.category.mwonmod.trinketkeybinds": " MwonMod: Trinket Database",
+  "key.mwonmod.trinket1": "Equip Trinket 1",
+  "key.mwonmod.trinket2": "Equip Trinket 2",
+  "key.mwonmod.trinket3": "Equip Trinket 3",
+  "key.mwonmod.trinket4": "Equip Trinket 4",
+  "key.mwonmod.trinket5": "Equip Trinket 5",
+  "key.mwonmod.trinket6": "Unequip Trinket",
 
   "yacl3.config.mwonmod:config.category.QOL": "Quality of Life",
   "yacl3.config.mwonmod:config.category.QOL.group.UI": "UI Improvements",

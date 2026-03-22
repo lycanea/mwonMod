@@ -90,7 +90,9 @@ public class Mwonmod implements ClientModInitializer {
                     if (!currentPlayers.contains(iterPlayer)) {
                         // leaving player
                         players.remove(iterPlayer);
-                        client.player.displayClientMessage(net.minecraft.network.chat.Component.nullToEmpty("Player Leave: " + iterPlayer).copy().withStyle(ChatFormatting.RED), false);
+                        if (!recentJoin) {
+                            client.player.displayClientMessage(net.minecraft.network.chat.Component.nullToEmpty("Player Leave: " + iterPlayer).copy().withStyle(ChatFormatting.RED), false);
+                        }
                     }
                 }
             } else {
