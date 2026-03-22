@@ -3,10 +3,12 @@ package dev.lycanea.mwonmod.mixin;
 import dev.lycanea.mwonmod.Config;
 import dev.lycanea.mwonmod.Mwonmod;
 import dev.lycanea.mwonmod.util.GameState;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.scores.*;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -50,6 +52,16 @@ public class ScoreboardRendering {
                 if (Config.HANDLER.instance().scoreboardImprovements) {
                     objective.getScoreboard().resetSinglePlayerScore(ScoreHolder.forNameOnly(display), objective);
                     objective.getScoreboard().getOrCreatePlayerScore(ScoreHolder.forNameOnly("§7Bank Gold: §6" + formatter.format(value)), objective, true).set(entry.value());
+                }
+            }
+            if (team.getPlayerPrefix().getString().startsWith("Thaumatite: ")) {
+                float value = Float.parseFloat(team.getPlayerPrefix().getString().substring(12));
+                if (Config.HANDLER.instance().scoreboardImprovements) {
+                    objective.getScoreboard().resetSinglePlayerScore(ScoreHolder.forNameOnly(display), objective);
+                    // has to be done differently to support more complex formatting (number needs custom color code)
+                    ScoreAccess bwa = objective.getScoreboard().getOrCreatePlayerScore(ScoreHolder.forNameOnly("THAUMATITE_MWONMOD_INTERNAL"), objective, true);
+                    bwa.set(entry.value());
+                    bwa.display(Component.literal("Thaumatite: ").withStyle(ChatFormatting.GRAY).append(Component.literal(formatter.format(value)).withColor(0x77AADD)));
                 }
             }
             if (team.getPlayerPrefix().getString().startsWith("Path: ")) {

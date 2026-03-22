@@ -33,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.*;
 import java.util.*;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class Mwonmod implements ClientModInitializer {
     public static JsonObject itemData;
     public static Map<String, String> upgradeData;
     public static Region activeRegion = null;
-    public static List<String> players = List.of();
+    public static HashSet<String> players = new HashSet<>();
 
     @Override
     public void onInitializeClient() {
@@ -72,19 +73,28 @@ public class Mwonmod implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             DiscordManager.tick();
             if (client.player != null && client.player.getTeam() != null && onMelonKing()) {
-                List<String> playerJoins = client.player.getTeam().getPlayers().stream()
-                        .filter(item -> !players.contains(item))
-                        .toList();
-                List<String> playerLeaves = players.stream()
-                        .filter(item -> !client.player.getTeam().getPlayers().stream().toList().contains(item))
-                        .toList();
-                if (!playerJoins.isEmpty()) {
-                    client.player.displayClientMessage(net.minecraft.network.chat.Component.nullToEmpty("Player Join: " + playerJoins.getFirst()).copy().withStyle(ChatFormatting.AQUA), false);
+                HashSet<String> currentPlayers = new HashSet<>(client.player.getTeam().getPlayers());
+                boolean recentJoin = Duration.between(GameState.melonJoin, LocalDateTime.now()).getSeconds() < 3;
+                for (String iterPlayer : currentPlayers) {
+                    if (iterPlayer.length() <= 16 && !players.contains(iterPlayer)) {
+                        // new player
+                        players.add(iterPlayer);
+                        if (!recentJoin) {
+                            client.player.displayClientMessage(net.minecraft.network.chat.Component.nullToEmpty("Player Join: " + iterPlayer).copy().withStyle(ChatFormatting.AQUA), false);
+                        }
+                    }
                 }
-                if (!playerLeaves.isEmpty()) {
-                    client.player.displayClientMessage(net.minecraft.network.chat.Component.nullToEmpty("Player Leave: " + playerLeaves.getFirst()).copy().withStyle(ChatFormatting.RED), false);
+
+                List<String> temp = players.stream().toList();
+                for (String iterPlayer : temp) {
+                    if (!currentPlayers.contains(iterPlayer)) {
+                        // leaving player
+                        players.remove(iterPlayer);
+                        client.player.displayClientMessage(net.minecraft.network.chat.Component.nullToEmpty("Player Leave: " + iterPlayer).copy().withStyle(ChatFormatting.RED), false);
+                    }
                 }
-                players = client.player.getTeam().getPlayers().stream().toList();
+            } else {
+                players.clear();
             }
             CustomMusicManager.tick(client);
         });
@@ -156,7 +166,7 @@ public class Mwonmod implements ClientModInitializer {
         if (Config.HANDLER.instance().ignoreMelonKingCheck) return true;
         if (Minecraft.getInstance().getCurrentServer() == null || Minecraft.getInstance().level == null || Minecraft.getInstance().player == null) return false;
         // check on df
-        if (!Minecraft.getInstance().getCurrentServer().ip.contains("mcdiamondfire.com") && !Minecraft.getInstance().getCurrentServer().ip.contains("diamondfire.games")) return false;
+        if (!Minecraft.getInstance().getCurrentServer().ip.endsWith("mcdiamondfire.com") && !Minecraft.getInstance().getCurrentServer().ip.endsWith("diamondfire.games") && !Minecraft.getInstance().getCurrentServer().ip.endsWith("mcdiamondfire.net")) return false;
         // check for node 2
         if (Minecraft.getInstance().level.getRespawnData().globalPos().pos().getX() != -675) return false;
         // check in plot bounds

@@ -10,7 +10,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
@@ -149,7 +148,7 @@ public class HUD {
 
             Vec3 hit = client.player.pick(4.5, 0, false).getLocation();
             String vecKey = serializeVec(hit);
-            BlockEntity state = client.level.getBlockEntity(new BlockPos((int) hit.x, (int) hit.y, (int) hit.z).subtract(new Vec3i(GameState.beta_plot ? 0:1, 0, GameState.beta_plot ? 0:1))); // beta plot is +x and +z so blockpos offset isnt needed im p sure
+            BlockEntity state = client.level.getBlockEntity(new BlockPos((int) hit.x, (int) hit.y, (int) hit.z)); // beta plot is +x and +z so blockpos offset isnt needed im p sure
 
             ArrayList<ClientTooltipComponent> signTooltip = new ArrayList<>();
             if (state instanceof SignBlockEntity signBlock) {
