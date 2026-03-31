@@ -2,6 +2,8 @@
   "key.category.mwonmod.keybinds": "MwonMod",
   "key.mwonmod.bank": "Open @bank",
   "key.mwonmod.forge": "Open @forge",
+  "key.mwonmod.pouch": "Open @pouch",
+  "key.mwonmod.vault": "Open @vault",
 
   "key.category.mwonmod.trinketkeybinds": " MwonMod: Trinket Database",
   "key.mwonmod.trinket1": "Equip Trinket 1",
@@ -26,6 +28,7 @@
   "yacl3.config.mwonmod:config.codespaceHider": "Melon King Codespace Hider",
   "yacl3.config.mwonmod:config.showPercentageInInventoryOverview": "Show Percentage in Inventory Overview",
   "yacl3.config.mwonmod:config.muteSellingSound": "Mute Selling Sound",
+  "yacl3.config.mwonmod:config.plotJoinLeaveMessages": "Player Join/Leave Messages",
 
   "yacl3.config.mwonmod:config.category.Auction": "Auction Improvements",
   "yacl3.config.mwonmod:config.category.Auction.group.Timers": "Timers",
