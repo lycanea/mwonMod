@@ -79,7 +79,7 @@ public class Mwonmod implements ClientModInitializer {
                     if (iterPlayer.length() <= 16 && !players.contains(iterPlayer)) {
                         // new player
                         players.add(iterPlayer);
-                        if (!recentJoin) {
+                        if (!recentJoin && Config.HANDLER.instance().plotJoinLeaveMessages) {
                             client.player.displayClientMessage(net.minecraft.network.chat.Component.nullToEmpty("Player Join: " + iterPlayer).copy().withStyle(ChatFormatting.AQUA), false);
                         }
                     }
@@ -90,7 +90,7 @@ public class Mwonmod implements ClientModInitializer {
                     if (!currentPlayers.contains(iterPlayer)) {
                         // leaving player
                         players.remove(iterPlayer);
-                        if (!recentJoin) {
+                        if (!recentJoin && Config.HANDLER.instance().plotJoinLeaveMessages) {
                             client.player.displayClientMessage(net.minecraft.network.chat.Component.nullToEmpty("Player Leave: " + iterPlayer).copy().withStyle(ChatFormatting.RED), false);
                         }
                     }

@@ -78,14 +78,19 @@ public class Config {
     @TickBox
     @AutoGen(category = "QOL", group = "Misc")
     @SerialEntry
-    public boolean muteSellingSound = true;
+    public boolean muteSellingSound = false;
+
+    @TickBox
+    @AutoGen(category = "QOL", group = "Misc")
+    @SerialEntry
+    public boolean plotJoinLeaveMessages = false;
 
     //Auction
 
     @TickBox
     @AutoGen(category = "Auction", group = "Timers")
     @SerialEntry
-    public boolean auctionTimer = true;
+    public boolean auctionTimer = false;
 
     @TickBox
     @AutoGen(category = "Auction", group = "Notifications")
@@ -102,7 +107,7 @@ public class Config {
     @TickBox
     @AutoGen(category = "Misc", group = "Timers")
     @SerialEntry
-    public boolean flawlessTimer = true;
+    public boolean flawlessTimer = false;
 
     @TickBox
     @AutoGen(category = "Misc", group = "Notifications")
