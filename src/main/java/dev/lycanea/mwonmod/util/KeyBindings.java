@@ -14,6 +14,8 @@ public class KeyBindings {
 
     private static KeyMapping bankKeyBinding;
     private static KeyMapping forgeKeyBinding;
+    private static KeyMapping vaultKeyBinding;
+    private static KeyMapping pouchKeyBinding;
 
     private static final KeyMapping[] trinketKeyBindings = new KeyMapping[6];
 
@@ -35,6 +37,18 @@ public class KeyBindings {
         ));
         forgeKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.mwonmod.forge", // The translation key of the keybinding's name
+                InputConstants.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
+                GLFW.GLFW_KEY_UNKNOWN, // The keycode of the key
+                MAIN_CATEGORY // The translation key of the keybinding's category.
+        ));
+        vaultKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+                "key.mwonmod.vault", // The translation key of the keybinding's name
+                InputConstants.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
+                GLFW.GLFW_KEY_UNKNOWN, // The keycode of the key
+                MAIN_CATEGORY // The translation key of the keybinding's category.
+        ));
+        pouchKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+                "key.mwonmod.pouch", // The translation key of the keybinding's name
                 InputConstants.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
                 GLFW.GLFW_KEY_UNKNOWN, // The keycode of the key
                 MAIN_CATEGORY // The translation key of the keybinding's category.
@@ -61,6 +75,12 @@ public class KeyBindings {
         while (forgeKeyBinding.consumeClick()) {
             client.execute(() -> client.player.connection.sendChat("@forge"));
         }
+        while (vaultKeyBinding.consumeClick()) {
+            client.execute(() -> client.player.connection.sendChat("@vault"));
+        }
+        while (pouchKeyBinding.consumeClick()) {
+            client.execute(() -> client.player.connection.sendChat("@pouch"));
+        } // im starting to want to softcode this
 
         for (int i = 0; i < trinketKeyBindings.length; i++) {
             var bind = trinketKeyBindings[i];
