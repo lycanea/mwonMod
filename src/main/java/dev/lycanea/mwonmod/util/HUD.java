@@ -49,7 +49,7 @@ public class HUD {
             if (GameState.karma != null) debugLines.add("Karma: " + GameState.karma);
             if (GameState.melonJoin != null) debugLines.add("Time Since Plot Join: " + Duration.between(GameState.melonJoin, LocalDateTime.now()).getSeconds());
             if (BossState.boss != null) debugLines.add("Current Boss: " + BossState.boss);
-            if (GameState.conquest_difficulty != null) debugLines.add("Conquest Difficulty: " + GameState.conquest_difficulty);
+//            if (GameState.conquest_difficulty != null) debugLines.add("Conquest Difficulty: " + GameState.conquest_difficulty);
 
             assert Minecraft.getInstance().player != null;
             BlockPos pos = Minecraft.getInstance().player.blockPosition().offset(-RegionLoader.plot_origin.x, 0, -RegionLoader.plot_origin.y);
