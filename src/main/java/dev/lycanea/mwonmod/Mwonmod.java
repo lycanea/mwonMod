@@ -73,6 +73,7 @@ public class Mwonmod implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             DiscordManager.tick();
             if (client.player != null && client.player.getTeam() != null && onMelonKing()) {
+                if (GameState.melonJoin == null) GameState.melonJoin = LocalDateTime.now();
                 HashSet<String> currentPlayers = new HashSet<>(client.player.getTeam().getPlayers());
                 boolean recentJoin = Duration.between(GameState.melonJoin, LocalDateTime.now()).getSeconds() < 3;
                 for (String iterPlayer : currentPlayers) {
@@ -168,7 +169,8 @@ public class Mwonmod implements ClientModInitializer {
         if (Config.HANDLER.instance().ignoreMelonKingCheck) return true;
         if (Minecraft.getInstance().getCurrentServer() == null || Minecraft.getInstance().level == null || Minecraft.getInstance().player == null) return false;
         // check on df
-        if (!Minecraft.getInstance().getCurrentServer().ip.endsWith("mcdiamondfire.com") && !Minecraft.getInstance().getCurrentServer().ip.endsWith("diamondfire.games") && !Minecraft.getInstance().getCurrentServer().ip.endsWith("mcdiamondfire.net")) return false;
+        String serverIp = Minecraft.getInstance().getCurrentServer().ip.toLowerCase();
+        if (!serverIp.endsWith("mcdiamondfire.com") && !serverIp.endsWith("diamondfire.games") && !serverIp.endsWith("mcdiamondfire.net")) return false;
         // check for node 2
         if (Minecraft.getInstance().level.getRespawnData().globalPos().pos().getX() != -675) return false;
         // check in plot bounds

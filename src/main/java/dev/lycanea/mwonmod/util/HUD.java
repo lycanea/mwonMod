@@ -35,36 +35,36 @@ public class HUD {
         if (Config.HANDLER.instance().debugMode) {
             List<String> debugLines = new ArrayList<>(List.of(
                     "DEBUG MODE",
-                    "ON MWON: " + Mwonmod.onMelonKing(),
-                    "ON BETA: " + GameState.beta_plot
+                    "On Melon King: " + Mwonmod.onMelonKing() + (GameState.beta_plot ? " (Beta)" : "")
             ));
-            if (GameState.housing_pos != null) debugLines.add("HOUSING LOCATION: " + GameState.housing_pos);
-            if (GameState.currentPath != null) debugLines.add("CURRENT PATH: " + GameState.currentPath);
-            if (GameState.currentMonarch != null) debugLines.add("CURRENT MONARCH: " + GameState.currentMonarch);
-            if (GameState.coins != null) debugLines.add("CURRENT COINS: " + GameState.coins);
-            if (GameState.bank_gold != null) debugLines.add("CURRENT BANK GOLD: " + GameState.bank_gold);
-            if (GameState.playerLocation != null) debugLines.add("CURRENT LOCATION: " + GameState.playerLocation);
-            if (GameState.personal_bank != null) debugLines.add("CURRENT PERSONAL BANK: " + GameState.personal_bank);
-            if (GameState.medals != null) debugLines.add("CURRENT MEDALS: " + GameState.medals);
-            if (GameState.trophies != null) debugLines.add("CURRENT TROPHIES: " + GameState.trophies);
-            if (GameState.karma != null) debugLines.add("CURRENT KARMA: " + GameState.karma);
-            if (GameState.melonJoin != null) debugLines.add("MWON TIMER: " + Duration.between(GameState.melonJoin, LocalDateTime.now()).getSeconds());
-            if (BossState.boss != null) debugLines.add("CURRENT BOSS: " + BossState.boss.bossID);
+            if (GameState.housing_pos != null) debugLines.add("Housing Loc: " + GameState.housing_pos);
+            if (GameState.currentPath != null) debugLines.add("Path: " + GameState.currentPath);
+            if (GameState.currentMonarch != null) debugLines.add("Monarch: " + GameState.currentMonarch);
+            if (GameState.coins != null) debugLines.add("Coins: " + GameState.coins);
+            if (GameState.bank_gold != null) debugLines.add("Bank Gold: " + GameState.bank_gold);
+            if (GameState.playerLocation != null) debugLines.add("Current Location: " + GameState.playerLocation);
+            if (GameState.personal_bank != null) debugLines.add("Personal Bank: " + GameState.personal_bank);
+            if (GameState.medals != null) debugLines.add("Medals: " + GameState.medals);
+            if (GameState.trophies != null) debugLines.add("Trophies: " + GameState.trophies);
+            if (GameState.karma != null) debugLines.add("Karma: " + GameState.karma);
+            if (GameState.melonJoin != null) debugLines.add("Time Since Plot Join: " + Duration.between(GameState.melonJoin, LocalDateTime.now()).getSeconds());
+            if (BossState.boss != null) debugLines.add("Current Boss: " + BossState.boss);
+            if (GameState.conquest_difficulty != null) debugLines.add("Conquest Difficulty: " + GameState.conquest_difficulty);
 
             assert Minecraft.getInstance().player != null;
             BlockPos pos = Minecraft.getInstance().player.blockPosition().offset(-RegionLoader.plot_origin.x, 0, -RegionLoader.plot_origin.y);
             if (GameState.beta_plot) {
                 pos = Minecraft.getInstance().player.blockPosition().offset(-RegionLoader.beta_plot_origin.x, 0, -RegionLoader.beta_plot_origin.y);
             }
-            debugLines.add("PLOTSPACE POS: " + pos);
+            debugLines.add("Plotspace Position: " + pos.toShortString());
 
             int startY = context.guiHeight() /2 - debugLines.toArray().length*5;
-            drawDebugLines(context, client, debugLines, startY, 10, 0xFF82B7ED);
+            drawDebugLines(context, client, debugLines, startY, 10, 0xFF62B75D);
         }
 
         if (!Mwonmod.onMelonKing()) return;
 
-        if (!(client.player == null) && !(client.level == null)) {
+        if (client.player != null && client.level != null) {
             long auctionwaitMillis = TimeUtils.auctionTime();
             if (!auctionNotificationSent && auctionwaitMillis <= 30000) {
                 if (Config.HANDLER.instance().auctionDesktopNotification) {
@@ -203,7 +203,7 @@ public class HUD {
             maxWidth = Math.max(maxWidth, client.font.width(line));
         }
 
-        context.fill(0, startY - 2, maxWidth + 4, startY + (lines.size() * lineSpacing), 0xFF000000);
+        context.fill(0, startY - 2, maxWidth + 4, startY + (lines.size() * lineSpacing), 0x90000000);
 
         int y = startY;
         for (String line : lines) {
