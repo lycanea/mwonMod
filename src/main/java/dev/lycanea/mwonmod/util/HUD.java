@@ -6,9 +6,12 @@ import dev.lycanea.mwonmod.util.region.RegionLoader;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.commands.arguments.MessageArgument.Message;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.FormattedText;
@@ -18,13 +21,19 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvents;
 
+import java.lang.reflect.Array;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 
 public class HUD {
     private static boolean auctionNotificationSent = false;
@@ -96,48 +105,59 @@ public class HUD {
         }
 
         if (!(client.player == null) && !(client.level == null) && Mwonmod.inventory_rundown) {
+            Identifier texture = Identifier.fromNamespaceAndPath(Mwonmod.MOD_ID, "textures/gui/sprites/hud/inventory_fill_bar_empty.png");
+            //Identifier EXPERIENCE_BAR_PROGRESS_SPRITE = Identifier.withDefaultNamespace("hud/experience_bar_progress");
+
             int barY = client.getWindow().getGuiScaledHeight() - 90;
-            int barWidth = 100;
-            int barHeight = 6;
-            if(Config.HANDLER.instance().showPercentageInInventoryOverview) {
-                barHeight = 9;
-                barWidth = 120;
-            }
+            int barWidth = 146;
+            int barHeight = 9;
             int barX = client.getWindow().getGuiScaledWidth() / 2 - (barWidth / 2);
 
-            Map<String, Integer> items = java.util.Map.of("gold", 0xFFFFE100, "shard", 0xFF00AAFF, "compressed_shard", 0xFF0066DB, "melon", 0xFF00FF43, "enchanted_melon", 0xFF00BF32, "super_enchanted_melon", 0xFF008A24);
-            InventoryScanResult result = Mwonmod.scanInventory(client.player, items.keySet().stream().toList());
+            List<String> items = List.of("gold", "shard", "compressed_shard", "melon", "enchanted_melon", "super_enchanted_melon");
+            InventoryScanResult result = Mwonmod.scanInventory(client.player, items);
 
             double emptyPercent = (double) result.emptySlots() / 36;
             double emptyWidth = (barWidth * emptyPercent);
 
-            context.fill(barX-1, barY-1, barX+1 + barWidth, barY+1 + barHeight, 0xFF000000); // Border
-            context.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF555555); // Misc
-            context.fill(barX, barY, (int) (barX + emptyWidth), barY + barHeight, 0xFF888888); // Empty
+            context.blit(RenderPipelines.GUI_TEXTURED, texture, barX, barY, 0, 0, barWidth, barHeight, barWidth, barHeight);
 
-            double offset = emptyWidth;
-            for (Map.Entry<String, Integer> entry : items.entrySet()) {
-                double percent = (double) result.itemSlots().get(entry.getKey()) / 36;
-                double width = (barWidth * percent);
-                context.fill((int) (barX + offset), barY, (int) (barX + offset + width), barY + barHeight, entry.getValue());
+            texture = Identifier.fromNamespaceAndPath(Mwonmod.MOD_ID, "textures/gui/sprites/hud/inventory_fill_bar_other.png");
+
+            context.blit(RenderPipelines.GUI_TEXTURED, texture, barX, barY, 0, 0, (int) (barWidth - emptyWidth), barHeight, barWidth, barHeight);
+            //context.fill(barX-1, barY-1, barX+1 + barWidth, barY+1 + barHeight, 0xFF000000); // Border
+            //context.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF555555); // Misc
+            //context.fill(barX, barY, (int) (barX + emptyWidth), barY + barHeight, 0xFF888888); // Empty
+
+                double offset = 0;
+                for (String entry : items) {
+                    double percent = (double) result.itemSlots().get(entry) / 36;
+                    double width = (barWidth * percent);
+                    String texture_path = "textures/gui/sprites/hud/inventory_fill_bar_" + entry + ".png";
+
+                texture = Identifier.fromNamespaceAndPath(Mwonmod.MOD_ID, texture_path);
+
+                context.blit(RenderPipelines.GUI_TEXTURED, texture, (int) Math.round(barX + offset), barY, (int) Math.round(offset), 0, (int) Math.round(width), barHeight, barWidth, barHeight);
+                //Minecraft.getInstance().player.show(entry.toString());
+                //context.fill((int) (barX + offset), barY, (int) Math.ceil(barX + offset + width), barY + barHeight, entry.getValue());
                 offset += width;
             }
 
             if(Config.HANDLER.instance().showPercentageInInventoryOverview) {
                 String inventoryOverviewText =
-                        " "
-                                + String.valueOf(Math.floor(emptyPercent * 100)).replace(".0", "") +
+                                String.valueOf(Math.floor(emptyPercent * 100)).replace(".0", "") +
                                 "% empty" +
                                 " " +
                                 "(" + result.emptySlots() + " slots)";
-                context.drawString(
-                        Minecraft.getInstance().font,
-                        inventoryOverviewText,
-                        barX + 1,
-                        barY + 1,
-                        CommonColors.BLACK,
-                        false
-                );
+                
+                Font font = Minecraft.getInstance().font;
+
+                int x = (client.getWindow().getGuiScaledWidth() - font.width(inventoryOverviewText)) / 2;
+                int y = barY - 3;
+                context.drawString(font, inventoryOverviewText, x + 1, y, CommonColors.BLACK, false);
+                context.drawString(font, inventoryOverviewText, x - 1, y, CommonColors.BLACK, false);
+                context.drawString(font, inventoryOverviewText, x, y - 1, CommonColors.BLACK, false);
+                context.drawString(font, inventoryOverviewText, x, y + 1, CommonColors.BLACK, false);
+                context.drawString(font, inventoryOverviewText, x, y, CommonColors.GREEN, false);
             }
         }
 
