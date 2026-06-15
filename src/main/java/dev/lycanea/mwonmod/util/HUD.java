@@ -79,26 +79,34 @@ public class HUD {
             if (auctionNotificationSent && auctionwaitMillis > 30000) {
                 auctionNotificationSent = false;
             }
-            int flawlessTimerOffset = 3;
+            int timerOffset = 3;
             if (Config.HANDLER.instance().auctionTimer) {
                 long auctionminutes = auctionwaitMillis / 60000;
                 long auctionseconds = (auctionwaitMillis % 60000) / 1000;
                 context.drawString(client.font, String.format("Next Auction:  00:%02d:%02d", auctionminutes, auctionseconds), 3, 3, 0xFFFFFFFF);
-                flawlessTimerOffset += 9;
+                timerOffset += 9;
             }
             if (Config.HANDLER.instance().flawlessTimer) {
                 long flawlessWait = TimeUtils.flawlessTime();
                 if (flawlessWait < 4428) {
-                    context.drawString(client.font, String.format("Next Flawless: %02d:%02d:%02d", flawlessWait / 60 / 60, (flawlessWait + 1) / 60 % 60, (flawlessWait + 1)%60), 3, flawlessTimerOffset, 0xFFFFFFFF);
+                    context.drawString(client.font, String.format("Next Flawless: %02d:%02d:%02d", flawlessWait / 60 / 60, (flawlessWait + 1) / 60 % 60, (flawlessWait + 1)%60), 3, timerOffset, 0xFFFFFFFF);
                 } else {
-                    context.drawString(client.font, "Next Flawless: Now", 3, flawlessTimerOffset, 0xFFFFFFFF);
+                    context.drawString(client.font, "Next Flawless: Now", 3, timerOffset, 0xFFFFFFFF);
+                }
+                timerOffset += 9;
+            }
+            if (Config.HANDLER.instance().eventTimer) {
+                long eventWait = TimeUtils.eventTime();
+                if (eventWait < 10800) {
+                    context.drawString(client.font, String.format("Next Event: %02d:%02d:%02d", eventWait / 60 / 60, (eventWait + 1) / 60 % 60, (eventWait + 1)%60), 3, timerOffset, 0xFFFFFFFF);
+                } else {
+                    context.drawString(client.font, "Next Event: Now", 3, timerOffset, 0xFFFFFFFF);
                 }
             }
         }
 
         if (!(client.player == null) && !(client.level == null) && Mwonmod.inventory_rundown) {
             Identifier texture = Identifier.fromNamespaceAndPath(Mwonmod.MOD_ID, "textures/gui/sprites/hud/inventory_fill_bar_empty.png");
-            //Identifier EXPERIENCE_BAR_PROGRESS_SPRITE = Identifier.withDefaultNamespace("hud/experience_bar_progress");
 
             int barY = client.getWindow().getGuiScaledHeight() - 90;
             int barWidth = 146;
@@ -116,9 +124,7 @@ public class HUD {
             texture = Identifier.fromNamespaceAndPath(Mwonmod.MOD_ID, "textures/gui/sprites/hud/inventory_fill_bar_other.png");
 
             context.blit(RenderPipelines.GUI_TEXTURED, texture, barX, barY, 0, 0, (int) (barWidth - emptyWidth), barHeight, barWidth, barHeight);
-            //context.fill(barX-1, barY-1, barX+1 + barWidth, barY+1 + barHeight, 0xFF000000); // Border
-            //context.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF555555); // Misc
-            //context.fill(barX, barY, (int) (barX + emptyWidth), barY + barHeight, 0xFF888888); // Empty
+           
 
                 double offset = 0;
                 for (String entry : items) {
@@ -129,8 +135,6 @@ public class HUD {
                 texture = Identifier.fromNamespaceAndPath(Mwonmod.MOD_ID, texture_path);
 
                 context.blit(RenderPipelines.GUI_TEXTURED, texture, (int) Math.round(barX + offset), barY, (int) Math.round(offset), 0, (int) Math.round(width), barHeight, barWidth, barHeight);
-                //Minecraft.getInstance().player.show(entry.toString());
-                //context.fill((int) (barX + offset), barY, (int) Math.ceil(barX + offset + width), barY + barHeight, entry.getValue());
                 offset += width;
             }
 

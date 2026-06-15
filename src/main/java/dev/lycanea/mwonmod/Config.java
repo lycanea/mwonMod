@@ -110,6 +110,11 @@ public class Config {
     public boolean flawlessTimer = false;
 
     @TickBox
+    @AutoGen(category = "Misc", group = "Timers")
+    @SerialEntry
+    public boolean eventTimer = false;
+
+    @TickBox
     @AutoGen(category = "Misc", group = "Notifications")
     @SerialEntry
     public boolean kingChangeNotification = false;

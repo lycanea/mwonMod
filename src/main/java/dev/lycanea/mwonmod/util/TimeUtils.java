@@ -42,4 +42,21 @@ public class TimeUtils {
         
         return nextFlawless;
     }
+    public static long eventTime() {
+        ZonedDateTime nowUtc = ZonedDateTime.now(ZoneOffset.UTC);
+
+        long currentMinutes = nowUtc.toEpochSecond();
+        long nextEvent = 154800 - ((currentMinutes) % 172800);
+        
+        if (nextEvent < 36000) {
+            nextEvent += 136800;
+        }
+        
+
+        // despawns at 1:14:38 spawn timer time
+        // despawns at nextFlawless = 4478
+        // if nextFlawless > 4478 then npc is spawned
+        
+        return nextEvent;
+    }
 }
