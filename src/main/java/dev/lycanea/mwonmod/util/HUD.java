@@ -11,7 +11,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.commands.arguments.MessageArgument.Message;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.FormattedText;
@@ -22,24 +21,17 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.resources.Identifier;
-import net.minecraft.sounds.SoundEvents;
 
-import java.lang.reflect.Array;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
-
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 
 public class HUD {
     private static boolean auctionNotificationSent = false;
 
     public static void renderHUDOverlay(GuiGraphics context) {
-        // we really should move this to a separate class and... clean it up more
         Minecraft client = Minecraft.getInstance();
         if (Config.HANDLER.instance().debugMode) {
             List<String> debugLines = new ArrayList<>(List.of(
