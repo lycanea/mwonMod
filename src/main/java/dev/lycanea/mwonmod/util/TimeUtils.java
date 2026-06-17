@@ -46,17 +46,20 @@ public class TimeUtils {
         ZonedDateTime nowUtc = ZonedDateTime.now(ZoneOffset.UTC);
 
         long currentMinutes = nowUtc.toEpochSecond();
-        long nextEvent = 154800 - ((currentMinutes) % 172800);
+        long eventTimer = (currentMinutes - 32400) % 172800;
+        long nextEvent = eventTimer;
         
-        if (nextEvent < 36000) {
-            nextEvent += 136800;
+        if(nextEvent < 147600) {
+            nextEvent = 147600;
+        }
+        else {
+            nextEvent = 172800;
         }
         
 
-        // despawns at 1:14:38 spawn timer time
-        // despawns at nextFlawless = 4478
-        // if nextFlawless > 4478 then npc is spawned
+        // event starts at 7200 and 144000 seconds compared to utc - 25200 seconds
+        // 
         
-        return nextEvent;
+        return nextEvent - eventTimer;
     }
 }

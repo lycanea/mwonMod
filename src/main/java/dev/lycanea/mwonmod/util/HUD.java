@@ -97,8 +97,8 @@ public class HUD {
             }
             if (Config.HANDLER.instance().eventTimer) {
                 long eventWait = TimeUtils.eventTime();
-                if (eventWait < 10800) {
-                    context.drawString(client.font, String.format("Next Event: %02d:%02d:%02d", eventWait / 60 / 60, (eventWait + 1) / 60 % 60, (eventWait + 1)%60), 3, timerOffset, 0xFFFFFFFF);
+                if (eventWait > 10800) {
+                    context.drawString(client.font, String.format("Next Event: %02d:%02d:%02d", (eventWait - 10800) / 60 / 60, (eventWait - 10799) / 60 % 60, (eventWait - 10799)%60), 3, timerOffset, 0xFFFFFFFF);
                 } else {
                     context.drawString(client.font, "Next Event: Now", 3, timerOffset, 0xFFFFFFFF);
                 }
