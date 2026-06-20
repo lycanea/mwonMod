@@ -42,4 +42,24 @@ public class TimeUtils {
         
         return nextFlawless;
     }
+    public static long eventTime() {
+        ZonedDateTime nowUtc = ZonedDateTime.now(ZoneOffset.UTC);
+
+        long currentMinutes = nowUtc.toEpochSecond();
+        long eventTimer = (currentMinutes - 32400) % 172800;
+        long nextEvent = eventTimer;
+        
+        if(nextEvent < 147600) {
+            nextEvent = 147600;
+        }
+        else {
+            nextEvent = 172800;
+        }
+        
+
+        // event starts at 7200 and 144000 seconds compared to utc - 25200 seconds
+        // 
+        
+        return nextEvent - eventTimer;
+    }
 }

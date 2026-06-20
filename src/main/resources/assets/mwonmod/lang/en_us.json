@@ -40,6 +40,7 @@
   "yacl3.config.mwonmod:config.category.Misc": "Miscellaneous",
   "yacl3.config.mwonmod:config.category.Misc.group.Timers": "Timers",
   "yacl3.config.mwonmod:config.flawlessTimer": "Enable Flawless NPC Spawn Timer",
+  "yacl3.config.mwonmod:config.eventTimer": "Enable Event Timer",
   "yacl3.config.mwonmod:config.category.Misc.group.Notifications": "Notifications",
   "yacl3.config.mwonmod:config.kingChangeNotification": "Desktop Notification on King Change",
   "yacl3.config.mwonmod:config.category.Misc.group.Discord": "Discord",
