@@ -45,12 +45,12 @@ public class TimeUtils {
     public static long eventTime() {
         ZonedDateTime nowUtc = ZonedDateTime.now(ZoneOffset.UTC);
 
-        long currentMinutes = nowUtc.toEpochSecond();
-        long eventTimer = (currentMinutes - 32400) % 172800;
+        long currentSeconds = nowUtc.toEpochSecond();
+        long eventTimer = (currentSeconds - 43200) % 172800;
         long nextEvent = eventTimer;
         
-        if(nextEvent < 147600) {
-            nextEvent = 147600;
+        if(nextEvent < 136800) {
+            nextEvent = 136800;
         }
         else {
             nextEvent = 172800;
@@ -58,7 +58,8 @@ public class TimeUtils {
         
 
         // event starts at 7200 and 144000 seconds compared to utc - 25200 seconds
-        // 
+        // event starts at 162000 and 126000 seconds compared to utc - 43200
+        // event ends at 172800 and 136800 seconds compared to ^^
         
         return nextEvent - eventTimer;
     }
