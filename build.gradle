@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.15-SNAPSHOT'
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
     id 'maven-publish'
 }
 
@@ -38,31 +38,28 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
-    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.2")
+//    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.2")
 
-    implementation include('com.github.jagrosh:DiscordIPC:a8d6631')
     implementation include('org.json:json:20230227')
-    implementation include('com.kohlschutter.junixsocket:junixsocket-common:2.6.2')
-    implementation include('com.kohlschutter.junixsocket:junixsocket-native-common:2.6.2')
-    modImplementation "com.google.code.gson:gson:2.10.1"
+//    implementation include('com.kohlschutter.junixsocket:junixsocket-common:2.6.2')
+//    implementation include('com.kohlschutter.junixsocket:junixsocket-native-common:2.6.2')
+    implementation "com.google.code.gson:gson:2.10.1"
 
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}")
-    modImplementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation("com.terraformersmc:modmenu:${project.modmenu_version}")
+    implementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
     implementation 'org.slf4j:slf4j-api:1.7.36'
 
-    modImplementation include("net.kyori:adventure-platform-fabric:${project.adventure_fabric_version}") {
-        exclude group: "net.fabricmc.fabric-api"
-    }
+//    implementation include("net.kyori:adventure-platform-fabric:${project.adventure_fabric_version}") {
+//        exclude group: "net.fabricmc.fabric-api"
+//    }
 }
 
 processResources {
@@ -78,7 +75,7 @@ processResources {
     }
 }
 
-def targetJavaVersion = 21
+def targetJavaVersion = 25
 tasks.withType(JavaCompile).configureEach {
     // ensure that the encoding is set to UTF-8, no matter what the system default is
     // this fixes some edge cases with special characters not displaying correctly

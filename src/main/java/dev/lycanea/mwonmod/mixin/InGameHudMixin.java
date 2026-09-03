@@ -2,6 +2,7 @@ package dev.lycanea.mwonmod.mixin;
 
 import dev.lycanea.mwonmod.Mwonmod;
 import dev.lycanea.mwonmod.util.GameState;
+import net.minecraft.client.gui.Hud;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -9,10 +10,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.network.chat.Component;
 
-@Mixin(Gui.class)
+@Mixin(Hud.class)
 public class InGameHudMixin {
     @Inject(method = "setOverlayMessage", at = @At("HEAD"))
     private void onSetOverlayMessage(Component message, boolean tinted, CallbackInfo ci) {

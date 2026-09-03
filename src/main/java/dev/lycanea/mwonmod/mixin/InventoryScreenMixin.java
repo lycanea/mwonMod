@@ -5,7 +5,7 @@ import dev.lycanea.mwonmod.Mwonmod;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -34,7 +34,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
     @Unique
     private void buttonPress(Button btn) {
         assert Minecraft.getInstance().player != null;
-        Minecraft.getInstance().player.displayClientMessage(Component.literal("Toggled Inventory Rundown"), false);
+        Minecraft.getInstance().player.sendSystemMessage(Component.literal("Toggled Inventory Rundown"));
         Mwonmod.inventory_rundown = !Mwonmod.inventory_rundown;
         btn.setMessage(Component.literal(Mwonmod.inventory_rundown ? "ON" : "OFF"));
     }
@@ -50,8 +50,8 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
         this.addRenderableWidget(inventoryRundownButton);
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
-    private void onRender(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("TAIL"))
+    private void onRender(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (inventoryRundownButton != null) {
             if (!Mwonmod.onMelonKing()) {
                 inventoryRundownButton.visible = false;

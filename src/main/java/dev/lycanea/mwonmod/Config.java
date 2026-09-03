@@ -7,9 +7,6 @@ import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 import dev.isxander.yacl3.platform.YACLPlatform;
 import net.minecraft.resources.Identifier;
 
-import java.lang.Boolean;
-
-
 public class Config {
     // Create and configure the handler: file path, format (JSON5), pretty print, etc.
     public static final ConfigClassHandler<Config> HANDLER =
@@ -119,27 +116,27 @@ public class Config {
     @SerialEntry
     public boolean kingChangeNotification = false;
 
-    @MasterTickBox(value = {"richPresenceLine1","richPresenceLine2","richPresencePathIcon"})
-    @AutoGen(category = "Misc", group = "Discord")
-    @SerialEntry
-    public boolean discordRichPresence = false;
-
-    @Dropdown(values = {"Empty","Medals","Trophies","Karma","Location","Personal Gold","Coins/City Gold","Path","Monarch"})
-    @AutoGen(category = "Misc", group = "Discord")
-    @SerialEntry
-    @CustomDescription(value = "Personal Gold requires entering housing once to update\nIf data is missing, mwonmod will just exclude that line from your status")
-    public String richPresenceLine1 = "Monarch";
-
-    @Dropdown(values = {"Empty","Medals","Trophies","Karma","Location","Personal Gold","Coins/City Gold","Path","Monarch"})
-    @AutoGen(category = "Misc", group = "Discord")
-    @SerialEntry
-    @CustomDescription(value = "Personal Gold requires entering housing once to update\nIf data is missing, mwonmod will just exclude that line from your status")
-    public String richPresenceLine2 = "Coins/City Gold";
-
-    @TickBox
-    @AutoGen(category = "Misc", group = "Discord")
-    @SerialEntry
-    public Boolean richPresencePathIcon = true;
+//    @MasterTickBox(value = {"richPresenceLine1","richPresenceLine2","richPresencePathIcon"})
+//    @AutoGen(category = "Misc", group = "Discord")
+//    @SerialEntry
+//    public boolean discordRichPresence = false;
+//
+//    @Dropdown(values = {"Empty","Medals","Trophies","Karma","Location","Personal Gold","Coins/City Gold","Path","Monarch"})
+//    @AutoGen(category = "Misc", group = "Discord")
+//    @SerialEntry
+//    @CustomDescription(value = "Personal Gold requires entering housing once to update\nIf data is missing, mwonmod will just exclude that line from your status")
+//    public String richPresenceLine1 = "Monarch";
+//
+//    @Dropdown(values = {"Empty","Medals","Trophies","Karma","Location","Personal Gold","Coins/City Gold","Path","Monarch"})
+//    @AutoGen(category = "Misc", group = "Discord")
+//    @SerialEntry
+//    @CustomDescription(value = "Personal Gold requires entering housing once to update\nIf data is missing, mwonmod will just exclude that line from your status")
+//    public String richPresenceLine2 = "Coins/City Gold";
+//
+//    @TickBox
+//    @AutoGen(category = "Misc", group = "Discord")
+//    @SerialEntry
+//    public Boolean richPresencePathIcon = true;
 
     @TickBox
     @AutoGen(category = "Misc", group = "Silly")

@@ -3,11 +3,9 @@ package dev.lycanea.mwonmod.util;
 import dev.lycanea.mwonmod.Config;
 import dev.lycanea.mwonmod.Mwonmod;
 import dev.lycanea.mwonmod.util.region.RegionLoader;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.title.Title;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -31,7 +29,7 @@ import java.util.regex.Pattern;
 public class HUD {
     private static boolean auctionNotificationSent = false;
 
-    public static void renderHUDOverlay(GuiGraphics context) {
+    public static void renderHUDOverlay(GuiGraphicsExtractor context) {
         Minecraft client = Minecraft.getInstance();
         if (Config.HANDLER.instance().debugMode) {
             List<String> debugLines = new ArrayList<>(List.of(
@@ -45,6 +43,7 @@ public class HUD {
             if (GameState.bank_gold != null) debugLines.add("Bank Gold: " + GameState.bank_gold);
             if (GameState.playerLocation != null) debugLines.add("Current Location: " + GameState.playerLocation);
             if (GameState.personal_bank != null) debugLines.add("Personal Bank: " + GameState.personal_bank);
+            if (GameState.portable_bank != null) debugLines.add("Portable Bank: " + GameState.portable_bank);
             if (GameState.medals != null) debugLines.add("Medals: " + GameState.medals);
             if (GameState.trophies != null) debugLines.add("Trophies: " + GameState.trophies);
             if (GameState.karma != null) debugLines.add("Karma: " + GameState.karma);
@@ -72,7 +71,10 @@ public class HUD {
                     Mwonmod.notification("Auction Alert", "There is an auction in 30 seconds.");
                 }
                 if (Config.HANDLER.instance().auctionTitleNotification) {
-                    client.player.showTitle(Title.title(Component.text("There is an auction in 30 seconds."), Component.text("")));
+//                    client.player.showTitle(Title.title(Component.text("There is an auction in 30 seconds."), Component.text("")));
+                    Minecraft.getInstance().gui.hud.resetTitleTimes();
+                    Minecraft.getInstance().gui.hud.setSubtitle(net.minecraft.network.chat.Component.empty());
+                    Minecraft.getInstance().gui.hud.setTitle(net.minecraft.network.chat.Component.literal("There is an auction in 30 seconds."));
                 }
                 auctionNotificationSent = true;
             }
@@ -83,24 +85,24 @@ public class HUD {
             if (Config.HANDLER.instance().auctionTimer) {
                 long auctionminutes = auctionwaitMillis / 60000;
                 long auctionseconds = (auctionwaitMillis % 60000) / 1000;
-                context.drawString(client.font, String.format("Next Auction:  00:%02d:%02d", auctionminutes, auctionseconds), 3, 3, 0xFFFFFFFF);
+                context.text(client.font, String.format("Next Auction:  00:%02d:%02d", auctionminutes, auctionseconds), 3, 3, 0xFFFFFFFF);
                 timerOffset += 9;
             }
             if (Config.HANDLER.instance().flawlessTimer) {
                 long flawlessWait = TimeUtils.flawlessTime();
                 if (flawlessWait < 4428) {
-                    context.drawString(client.font, String.format("Next Flawless: %02d:%02d:%02d", flawlessWait / 60 / 60, (flawlessWait + 1) / 60 % 60, (flawlessWait + 1)%60), 3, timerOffset, 0xFFFFFFFF);
+                    context.text(client.font, String.format("Next Flawless: %02d:%02d:%02d", flawlessWait / 60 / 60, (flawlessWait + 1) / 60 % 60, (flawlessWait + 1)%60), 3, timerOffset, 0xFFFFFFFF);
                 } else {
-                    context.drawString(client.font, "Next Flawless: Now", 3, timerOffset, 0xFFFFFFFF);
+                    context.text(client.font, "Next Flawless: Now", 3, timerOffset, 0xFFFFFFFF);
                 }
                 timerOffset += 9;
             }
             if (Config.HANDLER.instance().eventTimer) {
                 long eventWait = TimeUtils.eventTime();
                 if (eventWait > 10800) {
-                    context.drawString(client.font, String.format("Next Event: %02d:%02d:%02d", (eventWait - 10800) / 60 / 60, (eventWait - 10799) / 60 % 60, (eventWait - 10799)%60), 3, timerOffset, 0xFFFFFFFF);
+                    context.text(client.font, String.format("Next Event: %02d:%02d:%02d", (eventWait - 10800) / 60 / 60, (eventWait - 10799) / 60 % 60, (eventWait - 10799)%60), 3, timerOffset, 0xFFFFFFFF);
                 } else {
-                    context.drawString(client.font, "Next Event: Now", 3, timerOffset, 0xFFFFFFFF);
+                    context.text(client.font, "Next Event: Now", 3, timerOffset, 0xFFFFFFFF);
                 }
             }
         }
@@ -149,11 +151,11 @@ public class HUD {
 
                 int x = (client.getWindow().getGuiScaledWidth() - font.width(inventoryOverviewText)) / 2;
                 int y = barY - 3;
-                context.drawString(font, inventoryOverviewText, x + 1, y, CommonColors.BLACK, false);
-                context.drawString(font, inventoryOverviewText, x - 1, y, CommonColors.BLACK, false);
-                context.drawString(font, inventoryOverviewText, x, y - 1, CommonColors.BLACK, false);
-                context.drawString(font, inventoryOverviewText, x, y + 1, CommonColors.BLACK, false);
-                context.drawString(font, inventoryOverviewText, x, y, CommonColors.GREEN, false);
+                context.text(font, inventoryOverviewText, x + 1, y, CommonColors.BLACK, false);
+                context.text(font, inventoryOverviewText, x - 1, y, CommonColors.BLACK, false);
+                context.text(font, inventoryOverviewText, x, y - 1, CommonColors.BLACK, false);
+                context.text(font, inventoryOverviewText, x, y + 1, CommonColors.BLACK, false);
+                context.text(font, inventoryOverviewText, x, y, CommonColors.GREEN, false);
             }
         }
 
@@ -208,12 +210,12 @@ public class HUD {
             }
 
             if (!signTooltip.isEmpty()) {
-                context.renderTooltip(client.font, signTooltip, client.getWindow().getGuiScaledWidth() / 2, client.getWindow().getGuiScaledHeight() / 2, DefaultTooltipPositioner.INSTANCE, null);
+                context.tooltip(client.font, signTooltip, client.getWindow().getGuiScaledWidth() / 2, client.getWindow().getGuiScaledHeight() / 2, DefaultTooltipPositioner.INSTANCE, null);
             }
         }
     }
 
-    public static void drawDebugLines(GuiGraphics context, Minecraft client, List<String> lines, int startY, int lineSpacing, int color) {
+    public static void drawDebugLines(GuiGraphicsExtractor context, Minecraft client, List<String> lines, int startY, int lineSpacing, int color) {
         int maxWidth = 0;
         for (String line : lines) {
             maxWidth = Math.max(maxWidth, client.font.width(line));
@@ -223,7 +225,7 @@ public class HUD {
 
         int y = startY;
         for (String line : lines) {
-            context.drawString(client.fontFilterFishy, line, 0, y, color, false);
+            context.text(client.fontFilterFishy, line, 0, y, color, false);
             y += lineSpacing;
         }
     }

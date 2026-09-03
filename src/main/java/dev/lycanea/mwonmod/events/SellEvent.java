@@ -3,8 +3,8 @@ package dev.lycanea.mwonmod.events;
 import dev.lycanea.mwonmod.Mwonmod;
 import dev.lycanea.mwonmod.Config;
 
-import net.kyori.adventure.title.Title;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -14,8 +14,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class SellEvent {
@@ -33,7 +31,10 @@ public class SellEvent {
         if (Config.HANDLER.instance().preventFullInventorySelling && merchants.contains(String.valueOf(entity.getCustomName()))) {
             if (Mwonmod.scanInventory(playerEntity, List.of()).emptySlots() <= Config.HANDLER.instance().fullInvEmptySlots) {
                 Minecraft.getInstance().player.makeSound(SoundEvents.SHULKER_HURT_CLOSED);
-                Minecraft.getInstance().player.showTitle(Title.title(net.kyori.adventure.text.Component.text(""), net.kyori.adventure.text.Component.text("Inventory Full"), Title.Times.times(Duration.ZERO,Duration.of(500, ChronoUnit.MILLIS),Duration.ZERO)));
+//                Minecraft.getInstance().player.showTitle(Title.title(net.kyori.adventure.text.Component.text(""), net.kyori.adventure.text.Component.text("Inventory Full"), Title.Times.times(Duration.ZERO,Duration.of(500, ChronoUnit.MILLIS),Duration.ZERO)));
+                Minecraft.getInstance().gui.hud.setTimes(0, 10, 0); // 500 ms = 10 ticks
+                Minecraft.getInstance().gui.hud.setSubtitle(Component.literal("Inventory Full"));
+                Minecraft.getInstance().gui.hud.setTitle(Component.empty());
                 return InteractionResult.FAIL;
             }
         }

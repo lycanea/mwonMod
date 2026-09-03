@@ -2,13 +2,12 @@
   "required": true,
   "minVersion": "0.8",
   "package": "dev.lycanea.mwonmod.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_25",
   "client": [
     "InGameHudMixin",
     "ChestRendering",
     "InventoryScreenMixin",
     "ItemDropMixin",
-    "ItemRendererMixin",
     "OnPacketMixin",
     "ScoreboardRendering",
     "SignRendering"

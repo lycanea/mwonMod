@@ -1,5 +1,7 @@
 package dev.lycanea.mwonmod.mixin;
 
+// this whole class did NOTHING anyway,, i am NOT porting this to 26.2
+/*
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -30,3 +32,4 @@ public abstract class ItemRendererMixin {
 //        }
     }
 }
+*/

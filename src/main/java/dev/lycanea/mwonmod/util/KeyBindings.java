@@ -2,7 +2,7 @@ package dev.lycanea.mwonmod.util;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.lycanea.mwonmod.Mwonmod;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
@@ -21,33 +21,33 @@ public class KeyBindings {
 
     public static void setup() {
         // setup keybinds
-        KeyMapping.Category MAIN_CATEGORY = new KeyMapping.Category(
+        KeyMapping.Category MAIN_CATEGORY = KeyMapping.Category.register(
                 Identifier.fromNamespaceAndPath(Mwonmod.MOD_ID, "keybinds")
         );
 
-        KeyMapping.Category TRINKET_DATABASE_CATEGORY = new KeyMapping.Category(
+        KeyMapping.Category TRINKET_DATABASE_CATEGORY = KeyMapping.Category.register(
                 Identifier.fromNamespaceAndPath(Mwonmod.MOD_ID, "trinketkeybinds")
         );
 
-        bankKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        bankKeyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.mwonmod.bank", // The translation key of the keybinding's name
                 InputConstants.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
                 GLFW.GLFW_KEY_UNKNOWN, // The keycode of the key
                 MAIN_CATEGORY // The translation key of the keybinding's category.
         ));
-        forgeKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        forgeKeyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.mwonmod.forge", // The translation key of the keybinding's name
                 InputConstants.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
                 GLFW.GLFW_KEY_UNKNOWN, // The keycode of the key
                 MAIN_CATEGORY // The translation key of the keybinding's category.
         ));
-        vaultKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        vaultKeyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.mwonmod.vault", // The translation key of the keybinding's name
                 InputConstants.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
                 GLFW.GLFW_KEY_UNKNOWN, // The keycode of the key
                 MAIN_CATEGORY // The translation key of the keybinding's category.
         ));
-        pouchKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        pouchKeyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.mwonmod.pouch", // The translation key of the keybinding's name
                 InputConstants.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
                 GLFW.GLFW_KEY_UNKNOWN, // The keycode of the key
@@ -55,7 +55,7 @@ public class KeyBindings {
         ));
 
         for (int i = 1; i < 7; i++) {
-            var trinketKeybind = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+            var trinketKeybind = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                     "key.mwonmod.trinket" + i, // The translation key of the keybinding's name
                     InputConstants.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
                     GLFW.GLFW_KEY_UNKNOWN, // The keycode of the key

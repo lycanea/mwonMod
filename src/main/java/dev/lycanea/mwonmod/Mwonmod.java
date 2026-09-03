@@ -3,7 +3,6 @@ package dev.lycanea.mwonmod;
 import dev.lycanea.mwonmod.music.CustomMusicManager;
 import dev.lycanea.mwonmod.util.*;
 import dev.lycanea.mwonmod.util.region.*;
-import dev.lycanea.mwonmod.util.discord.DiscordManager;
 import dev.lycanea.mwonmod.events.*;
 
 import com.google.gson.JsonElement;
@@ -71,7 +70,6 @@ public class Mwonmod implements ClientModInitializer {
         KeyBindings.setup();
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            DiscordManager.tick();
             if (client.player != null && client.player.getTeam() != null && onMelonKing()) {
                 if (GameState.melonJoin == null) GameState.melonJoin = LocalDateTime.now();
                 HashSet<String> currentPlayers = new HashSet<>(client.player.getTeam().getPlayers());
@@ -81,7 +79,7 @@ public class Mwonmod implements ClientModInitializer {
                         // new player
                         players.add(iterPlayer);
                         if (!recentJoin && Config.HANDLER.instance().plotJoinLeaveMessages) {
-                            client.player.displayClientMessage(net.minecraft.network.chat.Component.nullToEmpty("Player Join: " + iterPlayer).copy().withStyle(ChatFormatting.AQUA), false);
+                            client.player.sendSystemMessage(net.minecraft.network.chat.Component.nullToEmpty("Player Join: " + iterPlayer).copy().withStyle(ChatFormatting.AQUA));
                         }
                     }
                 }
@@ -92,7 +90,7 @@ public class Mwonmod implements ClientModInitializer {
                         // leaving player
                         players.remove(iterPlayer);
                         if (!recentJoin && Config.HANDLER.instance().plotJoinLeaveMessages) {
-                            client.player.displayClientMessage(net.minecraft.network.chat.Component.nullToEmpty("Player Leave: " + iterPlayer).copy().withStyle(ChatFormatting.RED), false);
+                            client.player.sendSystemMessage(net.minecraft.network.chat.Component.nullToEmpty("Player Leave: " + iterPlayer).copy().withStyle(ChatFormatting.RED));
                         }
                     }
                 }
@@ -104,8 +102,6 @@ public class Mwonmod implements ClientModInitializer {
 
         UseEntityCallback.EVENT.register((SellEvent::entityInteract));
         AttackEntityCallback.EVENT.register((AttackEvent::entityAttack));
-
-        DiscordManager.initialise();
 
         // setup clientside commands
         ClientCommandRegistrationCallback.EVENT.register(Commands::registerCommands);

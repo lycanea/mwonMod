@@ -45,7 +45,7 @@ public class OnPacketMixin {
                 Matcher bankMatcher = bankPattern.matcher(screenTitle.getString());
 
                 if (bankMatcher.find()) {
-                    GameState.portable_bank = Integer.parseInt(bankMatcher.group(1));
+                    GameState.portable_bank = Integer.parseInt(bankMatcher.group(1)); // this isnt working for some reason - 26.2 issue but not in use anywhere
                 }
             }
         }
@@ -105,20 +105,20 @@ public class OnPacketMixin {
 
         if (auctionMatcher.find()) {
             if (Config.HANDLER.instance().debugMode)
-                Minecraft.getInstance().player.displayClientMessage(net.minecraft.network.chat.Component.literal("Auction Item: " + auctionMatcher.group(1)), false);
+                Minecraft.getInstance().player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Auction Item: " + auctionMatcher.group(1)));
             try {
                 var itemKey = auctionMatcher.group(1).toLowerCase().replaceAll(" ", "_");
                 var itemElement = Mwonmod.itemData.get(itemKey);
                 if (itemElement == null) {
                     if (Config.HANDLER.instance().debugMode)
-                        Minecraft.getInstance().player.displayClientMessage(net.minecraft.network.chat.Component.literal("Item data not found for: " + itemKey), false);
+                        Minecraft.getInstance().player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Item data not found for: " + itemKey));
                     return;
                 }
                 JsonObject itemData = itemElement.getAsJsonObject();
-                Minecraft.getInstance().player.displayClientMessage(net.minecraft.network.chat.Component.literal("Auction Item: " + itemData.get("name").getAsString()).withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(net.minecraft.network.chat.Component.nullToEmpty(itemData.get("description").getAsString())))), false);
+                Minecraft.getInstance().player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Auction Item: " + itemData.get("name").getAsString()).withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(net.minecraft.network.chat.Component.nullToEmpty(itemData.get("description").getAsString())))));
             } catch (Exception e) {
                 if (Config.HANDLER.instance().debugMode)
-                    Minecraft.getInstance().player.displayClientMessage(net.minecraft.network.chat.Component.literal("Error accessing item data: " + e.getMessage()), false);
+                    Minecraft.getInstance().player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Error accessing item data: " + e.getMessage()));
             }
         } else if (kingMatcher.find()) {
             if (Config.HANDLER.instance().kingChangeNotification) {

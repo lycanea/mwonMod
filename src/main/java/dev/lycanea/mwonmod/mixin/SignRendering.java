@@ -52,7 +52,7 @@ public class SignRendering {
                 if (numberPart.matches("\\d+")) {
                     try {
                         long value = Long.parseLong(numberPart);
-                        if (GameState.housing_pos != null && signRenderState.blockPos.closerToCenterThan(GameState.housing_pos, 5) && signText.getMessage(0, true).getString().startsWith("Gold")) {
+                        if (GameState.housing_pos != null && signBlockEntity.getBlockPos().closerToCenterThan(GameState.housing_pos, 5) && signText.getMessage(0, true).getString().startsWith("Gold")) {
                             GameState.personal_bank = Math.toIntExact(value);
                         }
                         if (Config.HANDLER.instance().bankSignImprovements) return signText.setMessage(3, Component.nullToEmpty(formatter.format(value)));
