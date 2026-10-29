@@ -3,6 +3,7 @@ package dev.lycanea.mwonmod.mixin;
 import dev.lycanea.mwonmod.Config;
 import dev.lycanea.mwonmod.Mwonmod;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -12,14 +13,13 @@ import net.minecraft.world.item.TooltipFlag;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(LocalPlayer.class)
+@Mixin(MultiPlayerGameMode.class)
 public class ItemDropMixin {
-    @Inject(method = "drop", at = @At("HEAD"), cancellable = true)
-    public void dropSelectedItem(boolean entireStack, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "dropItem", at = @At("HEAD"), cancellable = true)
+    public void dropSelectedItem(LocalPlayer player, boolean all, CallbackInfo ci) {
         if (!Mwonmod.onMelonKing()) return;
-        LocalPlayer player = Minecraft.getInstance().player;
 
         if (player == null) return;
 
@@ -30,8 +30,7 @@ public class ItemDropMixin {
                 .forEach(str -> {
                     if (Config.HANDLER.instance().preventDroppingReflectives && "Reflection".equals(str)) {
                         player.makeSound(SoundEvents.SHIELD_BLOCK.value());
-                        cir.setReturnValue(false);
-                        cir.cancel();
+                        ci.cancel();
                     }
                 });
     }

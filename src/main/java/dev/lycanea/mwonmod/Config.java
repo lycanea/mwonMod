@@ -75,11 +75,6 @@ public class Config {
     @TickBox
     @AutoGen(category = "QOL", group = "Misc")
     @SerialEntry
-    public boolean muteSellingSound = false;
-
-    @TickBox
-    @AutoGen(category = "QOL", group = "Misc")
-    @SerialEntry
     public boolean plotJoinLeaveMessages = false;
 
     //Auction

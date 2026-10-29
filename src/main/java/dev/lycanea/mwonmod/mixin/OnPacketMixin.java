@@ -33,11 +33,7 @@ public class OnPacketMixin {
         if (packet instanceof ClientboundSystemChatPacket(Component content, boolean overlay)) {
             handleChatPacket(content, overlay, ci);
         }
-        if (packet instanceof ClientboundSoundPacket PlaySoundS2CPacket && Mwonmod.onMelonKing()) {
-            if (Objects.equals(PlaySoundS2CPacket.getSound().getRegisteredName(), "minecraft:entity.sheep.shear") && Config.HANDLER.instance().muteSellingSound) {
-                ci.cancel();
-            }
-        }
+
         if (packet instanceof ClientboundOpenScreenPacket openScreenPacket) {
             if (Mwonmod.onMelonKing()) {
                 net.minecraft.network.chat.Component screenTitle = openScreenPacket.getTitle();

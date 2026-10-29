@@ -10,6 +10,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
@@ -17,6 +18,7 @@ import net.minecraft.util.CommonColors;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.entity.SignTextSlot;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.resources.Identifier;
 
@@ -170,7 +172,7 @@ public class HUD {
 
             ArrayList<ClientTooltipComponent> signTooltip = new ArrayList<>();
             if (state instanceof SignBlockEntity signBlock) {
-                for (net.minecraft.network.chat.Component[] textList : new net.minecraft.network.chat.Component[][]{signBlock.getFrontText().getMessages(true), signBlock.getBackText().getMessages(true)}) {
+                for (Component[] textList : new Component[][] {signBlock.getText(SignTextSlot.FRONT).getMessages(true).toArray(new Component[0]), signBlock.getText(SignTextSlot.BACK).getMessages(true).toArray(new Component[0])}) {
                     if (textList.length == 4 && !textList[0].getString().trim().isEmpty()) {
                         String top = textList[0].getString().trim();
                         String m = textList[1].getString().trim();
@@ -200,17 +202,17 @@ public class HUD {
                         upgradeDesc = upgradeDesc.replace(" queen ", " monarch ").replace(" king ", " monarch ");
                         List<FormattedCharSequence> otList = Minecraft.getInstance().font.split(FormattedText.of(upgradeDesc), client.getWindow().getGuiScaledWidth() / 3);
 
-                        signTooltip = new ArrayList<>(List.of(ClientTooltipComponent.create(net.minecraft.network.chat.Component.literal(m).withColor(color).getVisualOrderText())));
+                        signTooltip = new ArrayList<>(List.of(ClientTooltipComponent.create(Component.literal(m).withColor(color).getVisualOrderText())));
                         for (FormattedCharSequence t : otList) {
-                            net.minecraft.network.chat.Component nt = convertOrderedTextToTextWithStyle(t);
-                            signTooltip.add(ClientTooltipComponent.create(net.minecraft.network.chat.Component.literal(nt.getString()).withColor(CommonColors.LIGHT_GRAY).getVisualOrderText()));
+                            Component nt = convertOrderedTextToTextWithStyle(t);
+                            signTooltip.add(ClientTooltipComponent.create(Component.literal(nt.getString()).withColor(CommonColors.LIGHT_GRAY).getVisualOrderText()));
                         }
                     }
                 }
             }
 
             if (!signTooltip.isEmpty()) {
-                context.tooltip(client.font, signTooltip, client.getWindow().getGuiScaledWidth() / 2, client.getWindow().getGuiScaledHeight() / 2, DefaultTooltipPositioner.INSTANCE, null);
+                context.tooltip(client.font, signTooltip, client.getWindow().getGuiScaledWidth() / 2, client.getWindow().getGuiScaledHeight() / 2, DefaultTooltipPositioner.INSTANCE, null, false);
             }
         }
     }

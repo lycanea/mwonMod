@@ -5,6 +5,7 @@ import dev.lycanea.mwonmod.Mwonmod;
 import dev.lycanea.mwonmod.util.GameState;
 import net.minecraft.client.renderer.blockentity.state.SignRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.world.level.block.entity.SignTextSlot;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -27,41 +28,41 @@ public class SignRendering {
     @Unique
     NumberFormat formatter = NumberFormat.getIntegerInstance();
 
-    @Inject(method = "extractRenderState*", at = @At("HEAD"), cancellable = true)
-    private void onRender(SignBlockEntity signBlockEntity, SignRenderState signRenderState, float f, Vec3 vec3, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay, CallbackInfo ci) {
+    @Inject(method = "extractRenderState(Lnet/minecraft/world/level/block/entity/SignBlockEntity;Lnet/minecraft/client/renderer/blockentity/state/SignRenderState;FLnet/minecraft/world/phys/Vec3;Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V", at = @At("HEAD"), cancellable = true)
+    private void onRender(SignBlockEntity blockEntity, SignRenderState state, float partialTicks, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress, CallbackInfo ci) {
         if (!Mwonmod.onMelonKing()) return;
 
         if (Config.HANDLER.instance().codespaceHider) {
             if (GameState.beta_plot) {
-                if (signBlockEntity.getBlockPos().getX() < beta_plot_origin.x) {
+                if (blockEntity.getBlockPos().getX() < beta_plot_origin.x) {
                     ci.cancel();
                     return;
                 }
             } else {
-                if (signBlockEntity.getBlockPos().getX() < plot_origin.x) {
+                if (blockEntity.getBlockPos().getX() < plot_origin.x) {
                     ci.cancel();
                     return;
                 }
             }
         }
 
-        signBlockEntity.updateText(signText -> {
-            if (signText.getMessage(3, true).getString().startsWith("Banked: ")) {
+        blockEntity.updateText(signText -> {
+            if (signText.getMessages(true).get(3).getString().startsWith("Banked: ")) {
                 String prefix = "Banked: ";
-                String numberPart = signText.getMessage(3, true).getString().substring(prefix.length()).trim();
+                String numberPart = signText.getMessages(true).get(3).getString().substring(prefix.length()).trim();
                 if (numberPart.matches("\\d+")) {
                     try {
                         long value = Long.parseLong(numberPart);
-                        if (GameState.housing_pos != null && signBlockEntity.getBlockPos().closerToCenterThan(GameState.housing_pos, 5) && signText.getMessage(0, true).getString().startsWith("Gold")) {
+                        if (GameState.housing_pos != null && blockEntity.getBlockPos().closerToCenterThan(GameState.housing_pos, 5) && signText.getMessages(true).get(0).getString().startsWith("Gold")) {
                             GameState.personal_bank = Math.toIntExact(value);
                         }
-                        if (Config.HANDLER.instance().bankSignImprovements) return signText.setMessage(3, Component.nullToEmpty(formatter.format(value)));
+                        if (Config.HANDLER.instance().bankSignImprovements) return signText.asMutable().setLine(3, Component.nullToEmpty(formatter.format(value))).asImmutable();
                     } catch (NumberFormatException e) {
                         return signText;
                     }
                 }
             }
             return signText;
-        }, true);
+        }, SignTextSlot.FRONT);
     }
 }
